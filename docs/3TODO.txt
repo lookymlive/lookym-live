@@ -1,0 +1,46 @@
+# LOOKYM - TODO List
+
+> **This file contains granular tasks, bugs, and priorities. All contributors (human or AI) should check it frequently for up-to-date actionable items.**
+
+## High Priority
+- Fix bundling error with react-native-url-polyfill
+- Complete video upload functionality for business accounts
+- Implement video feed with proper playback controls
+- Create video detail screen with comments
+- Implement profile screen and editing
+- Add search functionality
+
+## Medium Priority
+- Implement video likes and comments
+- Create business profile view
+- Add verification badges for businesses
+- Implement saved videos feature
+- Add category filters for video discovery
+- Create trending section
+
+## Low Priority
+- Implement push notifications
+- Add analytics for businesses
+- Create personalized recommendations
+- Implement location-based discovery
+- Add in-app notification center
+
+## Bugs
+- Fix bundling error with react-native-url-polyfill
+- Ensure proper error handling in authentication
+- Fix video playback issues on web
+- Address chat message ordering
+
+## Documentation
+- Update README with setup instructions
+- Complete API documentation
+- Add component documentation
+- Create user guide
+- Document database schema
+
+## Testing
+- Write unit tests for authentication
+- Test video upload on different devices
+- Verify chat functionality
+- Test on both iOS and Android
+- Ensure web compatibility

@@ -1,0 +1,48 @@
+# LOOKYM - Project Description
+
+## Overview
+LOOKYM is an innovative Marketplace for commercial storefront videos, a multichannel platform designed to uniquely connect businesses and users. Businesses can showcase their products through their storefronts, while users have the opportunity to search, discover, and interact with their favorite storefronts. Additionally, they can upload their 3D figures and try on products. Direct communication with brands and the ability to make purchases directly from the platform.
+
+## Technology Stack
+- Frontend: React Native with Expo
+- Backend: Supabase for authentication, database, and real-time features
+- Media Storage: Cloudinary for video hosting and streaming
+- State Management: Zustand with persistence
+- Styling: React Native StyleSheet
+
+## Key Features
+1. Authentication with user/business roles
+2. Short-form video upload and viewing
+3. Direct messaging between users and businesses
+4. Video interactions (likes, comments, saves)
+5. User and business profiles
+6. Search and discovery
+
+## Project Structure
+- /app: Screens and navigation (Expo Router)
+- /components: Reusable UI components
+- /store: Zustand stores for state management
+- /utils: Utility functions and API clients
+- /types: TypeScript type definitions
+- /mocks: Mock data for development
+- /docs: Project documentation
+
+## Development Status
+The project is currently in active development. The authentication system is complete, and we are working on implementing the video and chat systems. The application uses Supabase for backend services and Cloudinary for video storage.
+
+## Next Steps
+1. Complete video upload and playback functionality
+2. Implement video feed and interactions
+3. Enhance chat system with real-time updates
+4. Create user and business profiles
+5. Add search and discovery features
+
+## Team
+The project is being developed by a team of React Native developers with expertise in mobile application development, backend integration, and UI/UX design.
+
+## Timeline
+- Phase 1 (Setup and Configuration): Completed
+- Phase 2 (Core Features): In Progress
+- Phase 3 (Advanced Features): Planned
+- Phase 4 (Testing and Optimization): Planned
+- Phase 5 (Deployment and Launch): Planned
