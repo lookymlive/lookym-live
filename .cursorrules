@@ -1,0 +1,42 @@
+# LOOKYM Project Intelligence
+
+## Supabase Schema (`sql/schema.sql`)
+
+* **Source of Truth:** Single `sql/schema.sql` file defines all tables, functions, views, triggers, and RLS policies.
+* **User Profiles:** `public.users` table stores profile info, linked to `auth.users` via a foreign key (id).
+* **Signup Trigger:** `handle_new_user()` function (triggered by `on_auth_user_created` on `auth.users`) automatically creates a profile in `public.users`. **Crucially requires client-side signup to pass `username` and `role` in `options.data`.** Must be defined with `SECURITY DEFINER` to have permissions to insert into `public.users`.
+* **Key Tables:**
+  * `users`: Profiles (user/business roles).
+  * `videos`: Video metadata (linked to users).
+  * `comments`: Video comments (linked to videos, users).
+  * `video_likes`: Tracks user likes on videos.
+  * `saved_videos`: Tracks user saved videos.
+  * `followers`: User follow relationships.
+  * `chats`: Chat conversations.
+  * `chat_participants`: Links users to chats.
+  * `messages`: Individual chat messages.
+  * `notifications`: User notifications.
+* **Denormalization:** `videos.likes` count is denormalized, managed by `increment_video_likes` / `decrement_video_likes` functions (intended for RPC calls or potential triggers).
+* **Timestamp Updates:** `update_updated_at()` trigger automatically updates `updated_at` columns on relevant tables.
+* **RLS:** Enabled on all tables. Policies generally allow public reads where appropriate, owner modifications, and participant access for chat-related tables. RLS for chat/notification *creation* might need refinement.
+* **Views:** `video_feed` provides a joined view of videos and user details for feed display.
+
+## Memory Bank
+
+* **Structure:** Follows the standard structure (`projectbrief.md`, `productContext.md`, etc.).
+* **Updates:** Keep documentation updated, especially `activeContext.md` and `progress.md`, after significant changes or task completion.
+
+## Environment Variables
+
+* Use `.env` file.
+* Prefix client-accessible variables with `EXPO_PUBLIC_`.
+* Key vars:
+  * `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+  * `EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME`, `EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET`
+  * (Potentially Google OAuth keys)
+
+## Video Handling
+
+* **Preview/Playback:** Use `expo-video` (`VideoView` component). Migrated from deprecated `expo-av` (`Video`) due to rendering issues in Expo Go.
+* **Selection:** Use `expo-image-picker` (`launchImageLibraryAsync` with `mediaTypes: ['videos']`).
+* **Upload:** Direct client-side upload to Cloudinary using `fetch` and an *unsigned* upload preset. Implemented in `utils/cloudinary.ts`.
