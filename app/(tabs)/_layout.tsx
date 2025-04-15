@@ -25,9 +25,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="create"
+        name="upload"
         options={{
-          title: 'Create',
+          title: 'Upload',
           tabBarIcon: ({ color, size }) => <PlusSquare size={size} color={color} />,
         }}
       />
