@@ -5,8 +5,14 @@ import VideoThumbnail from '@/components/VideoThumbnail';
 import Header from '@/components/Header';
 import Stories from '@/components/Stories';
 
+import { useEffect } from 'react';
+
 export default function HomeScreen() {
-  const { videos } = useVideoStore();
+  const { videos, fetchVideos } = useVideoStore();
+
+  useEffect(() => {
+    fetchVideos();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
