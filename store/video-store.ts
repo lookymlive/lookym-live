@@ -26,7 +26,7 @@ interface VideoState {
     videoUri: string,
     caption: string,
     hashtags: string[]
-  ) => Promise<void>;
+  ) => Promise<Video>;
   addVideo: (videoData: Partial<Video>) => void;
   fetchVideos: (page?: number, limit?: number) => Promise<void>;
   fetchVideosByUser: (userId: string) => Promise<void>;
@@ -36,7 +36,7 @@ interface VideoState {
 export const useVideoStore = create<VideoState>()(
   persist(
     (set, get) => ({
-      videos: initialVideos,
+      videos: [],
       likedVideos: {},
       savedVideos: {},
       isLoading: false,
@@ -359,6 +359,7 @@ export const useVideoStore = create<VideoState>()(
             videos: [newVideo, ...state.videos],
             isLoading: false,
           }));
+          return newVideo;
         } catch (error: any) {
           set({ error: error.message, isLoading: false });
           throw error;
@@ -549,7 +550,17 @@ export const useVideoStore = create<VideoState>()(
               likes: comment.likes,
             })),
             timestamp: new Date(data.created_at).getTime(),
+            mimeType: data.mime_type || inferMimeType(data.video_url),
           };
+
+// Helper to infer mime type from url
+function inferMimeType(url: string): string {
+  const ext = url.split('.').pop()?.toLowerCase();
+  if (ext === 'mov') return 'video/quicktime';
+  if (ext === 'webm') return 'video/webm';
+  if (ext === 'ogg') return 'video/ogg';
+  return 'video/mp4';
+}
 
           set({ isLoading: false });
           return formattedVideo;
