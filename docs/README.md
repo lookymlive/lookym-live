@@ -1,6 +1,16 @@
 # LOOKYM
 
-LOOKYM es una plataforma móvil que conecta usuarios y negocios a través de videos cortos. 
+LOOKYM es una plataforma móvil que conecta usuarios y negocios a través de videos cortos.
+
+---
+
+# [EN] Recent Updates
+- The bottom navigation tab previously labeled 'Create' is now 'Upload' for clarity.
+- The Home screen now fetches the latest videos automatically when opened.
+- The upload flow now returns the new video and provides a direct link to view it after successful upload.
+
+See documentation for more details.
+
 
 ## Documentación principal
 Toda la documentación se encuentra en la carpeta `/docs`. Consulta el archivo `overview.md` o este mismo README para empezar.
