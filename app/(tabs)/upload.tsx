@@ -45,7 +45,7 @@ export default function UploadScreen() {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+       mediaTypes: ImagePicker.MediaTypeOptions.Videos,
         allowsEditing: true,
         quality: 1,
         videoMaxDuration: 60, // Limit to 60 seconds
@@ -123,7 +123,7 @@ export default function UploadScreen() {
         );
 
       // Add the video to our store
-      await uploadVideo(videoUri, caption, hashtagArray);
+      const newVideo = await uploadVideo(videoUri, caption, hashtagArray);
 
       // Reset form
       setVideoUri(null);
@@ -133,9 +133,9 @@ export default function UploadScreen() {
 
       // Show success message
       Alert.alert(
-        "Upload Successful",
-        "Your video has been uploaded successfully!",
-        [{ text: "OK", onPress: () => router.push("/") }]
+        "Success",
+        "Your video was uploaded successfully!",
+        [{ text: "View Video", onPress: () => router.push({ pathname: "/video/[id]", params: { id: newVideo.id } }) }]
       );
     } catch (error) {
       console.error("Error uploading video:", error);
