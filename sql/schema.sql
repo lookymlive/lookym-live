@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS public.videos (
   hashtags TEXT[] DEFAULT '{}',
   likes INTEGER DEFAULT 0, -- Denormalized count, updated by triggers or functions
   views INTEGER DEFAULT 0,
+  mime_type TEXT, -- Tipo MIME del video
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
