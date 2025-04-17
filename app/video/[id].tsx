@@ -42,12 +42,26 @@ export default function VideoDetailScreen() {
   }
 
   if (error) {
+    const isSessionError =
+      error.toLowerCase().includes('session') ||
+      error.toLowerCase().includes('auth') ||
+      error.toLowerCase().includes('token');
     return (
       <View style={styles.centered}>
-        <Text style={{ color: 'red' }}>{error}</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>Go Back</Text>
-        </TouchableOpacity>
+        <Text style={{ color: 'red', marginBottom: 12 }}>
+          {isSessionError
+            ? 'Tu sesión ha expirado o es inválida. Por favor, vuelve a iniciar sesión para ver este video.'
+            : error}
+        </Text>
+        {isSessionError ? (
+          <TouchableOpacity onPress={() => router.push('/auth/login')} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Ir a Login</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   }
@@ -69,11 +83,22 @@ export default function VideoDetailScreen() {
         <Text style={styles.backButtonText}>← Back</Text>
       </TouchableOpacity>
       <ExpoVideo
-        source={{ uri: video.videoUrl }}
+        source={{ uri: video.videoUrl, type: "video/mp4" }}
         style={styles.video}
         useNativeControls
         resizeMode={ResizeMode.CONTAIN}
         shouldPlay
+        onError={(e) => {
+          // Type-safe: handle both event object and string error
+          const errorMsg =
+            typeof e === "object" && e !== null && "nativeEvent" in e && (e as any).nativeEvent?.error
+              ? (e as any).nativeEvent.error
+              : typeof e === "string"
+              ? e
+              : "Unknown video playback error";
+          console.error('Video playback error:', errorMsg);
+          setError(errorMsg);
+        }}
       />
       <Text style={styles.caption}>{video.caption}</Text>
       <Text style={styles.hashtags}>{video.hashtags?.join(" ")}</Text>

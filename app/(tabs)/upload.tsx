@@ -103,17 +103,8 @@ export default function UploadScreen() {
     setUploadProgress(0);
 
     try {
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          const newProgress = prev + 10;
-          if (newProgress >= 100) {
-            clearInterval(progressInterval);
-            return 100;
-          }
-          return newProgress;
-        });
-      }, 500);
+      // Reset progress
+      setUploadProgress(0);
 
       const hashtagArray = hashtags
         .split(" ")
@@ -131,11 +122,11 @@ export default function UploadScreen() {
       setHashtags("");
       setUploadProgress(100);
 
-      // Show success message
+      // Navega automáticamente al feed tras subir
       Alert.alert(
-        "Success",
-        "Your video was uploaded successfully!",
-        [{ text: "View Video", onPress: () => router.push({ pathname: "/video/[id]", params: { id: newVideo.id } }) }]
+        "¡Video subido!",
+        "Tu video fue subido exitosamente y ya aparece en el feed.",
+        [{ text: "Ver Feed", onPress: () => router.push("/") }]
       );
     } catch (error) {
       console.error("Error uploading video:", error);
