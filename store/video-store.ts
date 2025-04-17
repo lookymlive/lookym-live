@@ -1,4 +1,4 @@
-import { videos as initialVideos } from "@/mocks/videos";
+
 import { Video } from "@/types/video";
 import {
   uploadVideo as cloudinaryUpload,
@@ -233,12 +233,117 @@ export const useVideoStore = create<VideoState>()(
         }
       },
 
+      /**
+       * uploadVideo
+       *
+       * Sube un video real a Cloudinary y lo registra en Supabase.
+       * Actualiza el estado local y maneja el loading y errores.
+       */
+      uploadVideo: async (videoUri: string, caption: string, hashtags: string[]) => {
+        set({ isLoading: true, error: null });
+        try {
+          const currentUser = useAuthStore.getState().currentUser;
+          if (!currentUser) throw new Error("User not authenticated");
+
+          console.log("[uploadVideo] Iniciando subida a Cloudinary...", videoUri);
+          // Subir video a Cloudinary
+          const uploadResult = await cloudinaryUpload(videoUri);
+          if (!uploadResult || !uploadResult.secure_url) throw new Error("Error subiendo a Cloudinary");
+          console.log("[uploadVideo] Video subido a Cloudinary:", uploadResult.secure_url);
+
+          // Opcional: obtener thumbnail (si tienes lógica, si no, deja string vacío)
+          let thumbnailUrl = "";
+          if (typeof getVideoThumbnailUrl === 'function') {
+            try {
+              thumbnailUrl = getVideoThumbnailUrl(uploadResult.secure_url);
+            } catch (e) {
+              console.warn("No se pudo obtener thumbnail automáticamente:", e);
+            }
+          }
+
+          // Insertar en Supabase
+          const { data, error } = await supabase
+            .from("videos")
+            .insert([
+              {
+                user_id: currentUser.id,
+                video_url: uploadResult.secure_url,
+                thumbnail_url: thumbnailUrl,
+                caption,
+                hashtags,
+                likes: 0,
+              },
+            ])
+            .select(
+              `*, user:users(*), comments:comments(*, user:users(*))`
+            );
+          if (error) throw error;
+          if (!data || !data[0]) throw new Error("Supabase no devolvió datos del video subido");
+
+          // Formatear el video para el estado local
+          const video = data[0];
+          const newVideo: Video = {
+            id: video.id,
+            user: {
+              id: video.user.id,
+              username: video.user.username,
+              avatar: video.user.avatar_url,
+              verified: video.user.verified,
+              role: video.user.role,
+            },
+            videoUrl: video.video_url,
+            thumbnailUrl: video.thumbnail_url,
+            caption: video.caption,
+            hashtags: video.hashtags,
+            likes: video.likes,
+            comments: (video.comments || []).map((comment: any) => ({
+              id: comment.id,
+              user: {
+                id: comment.user.id,
+                username: comment.user.username,
+                avatar: comment.user.avatar_url,
+                verified: comment.user.verified,
+                role: comment.user.role,
+              },
+              text: comment.text,
+              timestamp: new Date(comment.created_at).getTime(),
+              likes: comment.likes,
+            })),
+            timestamp: new Date(video.created_at).getTime(),
+          };
+
+          set((state) => ({
+            videos: [newVideo, ...state.videos],
+            isLoading: false,
+          }));
+          console.log("[uploadVideo] Video subido y registrado correctamente en Supabase.");
+
+          // Refrescar la lista completa desde Supabase
+          if (typeof get().fetchVideos === 'function') {
+            await get().fetchVideos();
+          }
+
+          return newVideo;
+        } catch (error: any) {
+          set({ error: error.message, isLoading: false });
+          console.error("[uploadVideo] Error en el proceso:", error);
+          throw error;
+        }
+      },
+
+      /**
+       * addVideo
+       *
+       * Esta función solo agrega un video local/mock al estado para pruebas o demos.
+       * No sube archivos a Cloudinary ni guarda registros en Supabase.
+       * Para subir videos reales, usa uploadVideo.
+       */
       addVideo: (videoData: Partial<Video>) => {
         try {
           const currentUser = useAuthStore.getState().currentUser;
           if (!currentUser) throw new Error("User not authenticated");
 
-          // Create a new video object
+          // Crear un nuevo objeto Video mock/local
           const newVideo: Video = {
             id: `video-${Date.now()}`,
             user: {
@@ -259,110 +364,12 @@ export const useVideoStore = create<VideoState>()(
             timestamp: Date.now(),
           };
 
-          // Add to state
+          // Agregar al estado local (solo para pruebas/mocks)
           set((state) => ({
             videos: [newVideo, ...state.videos],
           }));
         } catch (error: any) {
-          console.error("Add video error:", error.message);
-          throw error;
-        }
-      },
-
-      uploadVideo: async (
-        videoUri: string,
-        caption: string,
-        hashtags: string[]
-      ) => {
-        try {
-          set({ isLoading: true, error: null });
-
-          const currentUser = useAuthStore.getState().currentUser;
-          if (!currentUser) throw new Error("User not authenticated");
-          if (currentUser.role !== "business")
-            throw new Error("Only business accounts can upload videos");
-
-          // Get file extension and MIME type
-          const fileExtension =
-            videoUri.split(".").pop()?.toLowerCase() || "mp4";
-          const mimeType = `video/${
-            fileExtension === "mov" ? "quicktime" : fileExtension
-          }`;
-
-          // Create form data for upload
-          const formData = new FormData();
-
-          if (Platform.OS !== "web") {
-            // For native platforms, create a file object
-            formData.append("file", {
-              uri: videoUri,
-              type: mimeType,
-              name: `video_${Date.now()}.${fileExtension}`,
-            } as any);
-          } else {
-            // For web platform
-            const response = await fetch(videoUri);
-            const blob = await response.blob();
-            formData.append(
-              "file",
-              blob,
-              `video_${Date.now()}.${fileExtension}`
-            );
-          }
-
-          // Upload to Cloudinary
-          const uploadResult = await cloudinaryUpload(videoUri, {
-            resource_type: "video",
-            folder: `lookym/${currentUser.id}`,
-            public_id: `video_${Date.now()}`,
-          });
-
-          // Save to Supabase
-          const { data, error } = await supabase
-            .from("videos")
-            .insert([
-              {
-                user_id: currentUser.id,
-                video_url: uploadResult.secure_url,
-                thumbnail_url: getVideoThumbnailUrl(uploadResult.public_id),
-                caption,
-                hashtags,
-                mime_type: mimeType,
-              },
-            ])
-            .select("*, user:users(*)");
-
-          if (error) throw error;
-
-          // Format the video for our app
-          const newVideo: Video = {
-            id: data[0].id,
-            user: {
-              id: data[0].user.id,
-              username: data[0].user.username,
-              avatar: data[0].user.avatar_url,
-              verified: data[0].user.verified,
-              role: data[0].user.role,
-            },
-            videoUrl: data[0].video_url,
-            thumbnailUrl: data[0].thumbnail_url,
-            caption: data[0].caption,
-            hashtags: data[0].hashtags,
-            likes: 0,
-            comments: [],
-            timestamp: new Date(data[0].created_at).getTime(),
-            mimeType: data[0].mime_type,
-          };
-
-          // Update local state
-          set((state) => ({
-            videos: [newVideo, ...state.videos],
-            isLoading: false,
-          }));
-          return newVideo;
-        } catch (error: any) {
-          set({ error: error.message, isLoading: false });
-          throw error;
+          console.error("addVideo error:", error.message);
         }
       },
 
@@ -370,26 +377,19 @@ export const useVideoStore = create<VideoState>()(
         try {
           set({ isLoading: true, error: null });
 
-          // In a real app with Supabase
+          // Fetch videos from Supabase
           const { data, error } = await supabase
             .from("videos")
-            .select(
-              `
-              *,
-              user:users(*),
-              comments:comments(
-                *,
-                user:users(*)
-              )
-            `
-            )
+            .select(`*, user:users(*), comments:comments(*, user:users(*))`)
             .order("created_at", { ascending: false })
             .range((page - 1) * limit, page * limit - 1);
 
           if (error) throw error;
 
+          console.log('[fetchVideos] Raw data from Supabase:', data);
+
           // Format the videos for our app
-          const formattedVideos: Video[] = data.map((video) => ({
+          const formattedVideos: Video[] = data.map((video: any) => ({
             id: video.id,
             user: {
               id: video.user.id,
@@ -403,7 +403,7 @@ export const useVideoStore = create<VideoState>()(
             caption: video.caption,
             hashtags: video.hashtags,
             likes: video.likes,
-            comments: video.comments.map((comment: any) => ({
+            comments: (video.comments || []).map((comment: any) => ({
               id: comment.id,
               user: {
                 id: comment.user.id,
@@ -419,6 +419,8 @@ export const useVideoStore = create<VideoState>()(
             timestamp: new Date(video.created_at).getTime(),
           }));
 
+          console.log('[fetchVideos] Formatted videos:', formattedVideos);
+
           // Update local state
           set((state) => ({
             videos:
@@ -433,7 +435,6 @@ export const useVideoStore = create<VideoState>()(
           throw error;
         }
       },
-
       fetchVideosByUser: async (userId: string) => {
         try {
           set({ isLoading: true, error: null });
@@ -578,6 +579,10 @@ function inferMimeType(url: string): string {
         likedVideos: state.likedVideos,
         savedVideos: state.savedVideos,
       }),
+      // Limpia videos del estado al rehidratar para evitar mostrar videos viejos
+      onRehydrateStorage: (state) => {
+        if (state) state.videos = [];
+      },
     }
   )
 );
