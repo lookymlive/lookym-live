@@ -105,6 +105,10 @@ export default function VideoPost({ video }: VideoPostProps) {
     }
   };
 
+  if (Platform.OS === "web") {
+    console.log("video.videoUrl:", video.videoUrl);
+    console.log("video object:", video);
+  }
   return (
     <View style={[styles.container, { backgroundColor: colors.card }]}>
       <View style={styles.header}>
@@ -150,7 +154,9 @@ export default function VideoPost({ video }: VideoPostProps) {
           <video
             style={styles.video as any}
             controls
+            autoPlay
             playsInline
+            muted
             poster={video.thumbnailUrl}
           >
             <source src={video.videoUrl} type={video.mimeType || "video/mp4"} />
