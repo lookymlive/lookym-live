@@ -4,7 +4,7 @@ import { formatTimeAgo } from '@/utils/time-format';
 import { Image } from 'expo-image';
 import { Bookmark, Heart, MessageCircle, MoreHorizontal, Play, Send } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 
 interface VideoThumbnailProps {
   video: Video;
@@ -12,7 +12,12 @@ interface VideoThumbnailProps {
 
 const { width } = Dimensions.get('window');
 
+import { Video as ExpoVideo, ResizeMode } from 'expo-av';
+
 export default function VideoThumbnail({ video }: VideoThumbnailProps) {
+  const [showPlayer, setShowPlayer] = useState(false);
+  // Modern web: video always visible, styled like Instagram/TikTok
+
   const { likedVideos, savedVideos, likeVideo, unlikeVideo, saveVideo, unsaveVideo } = useVideoStore();
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -58,16 +63,42 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.thumbnailContainer} onPress={() => setIsPlaying(!isPlaying)}>
-        <Image
-          source={{ uri: video.thumbnailUrl }}
-          style={styles.thumbnail}
-          contentFit="cover"
+      {Platform.OS === 'web' ? (
+        <video
+          src={video.videoUrl}
+          controls
+          autoPlay={false}
+          playsInline
+          muted={false}
+          poster={video.thumbnailUrl}
+          style={{
+            width: '100%',
+            display: 'block',
+            aspectRatio: '9/16',
+            objectFit: 'cover',
+            background: '#000',
+            borderRadius: 20,
+            marginBottom: 12,
+          }}
         />
-        <View style={styles.playButton}>
-          <Play size={40} color="#fff" />
-        </View>
-      </TouchableOpacity>
+      ) : (
+        showPlayer ? (
+          <ExpoVideo
+            source={{ uri: video.videoUrl }}
+            style={{ width: '100%', aspectRatio: 9/16, backgroundColor: '#000' }}
+            useNativeControls
+            resizeMode={ResizeMode.COVER}
+            shouldPlay
+          />
+        ) : (
+          <TouchableOpacity onPress={() => setShowPlayer(true)}>
+            <Image
+              source={{ uri: video.thumbnailUrl }}
+              style={{ width: '100%', aspectRatio: 9/16, backgroundColor: '#000' }}
+            />
+          </TouchableOpacity>
+        )
+      )}
 
       <View style={styles.actions}>
         <View style={styles.leftActions}>
