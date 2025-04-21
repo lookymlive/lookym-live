@@ -1,4 +1,3 @@
-
 import { Video } from "@/types/video";
 import {
   uploadVideo as cloudinaryUpload,
@@ -6,7 +5,7 @@ import {
 } from "@/utils/cloudinary";
 import { supabase } from "@/utils/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from "react-native";
+
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useAuthStore } from "./auth-store";
@@ -239,21 +238,32 @@ export const useVideoStore = create<VideoState>()(
        * Sube un video real a Cloudinary y lo registra en Supabase.
        * Actualiza el estado local y maneja el loading y errores.
        */
-      uploadVideo: async (videoUri: string, caption: string, hashtags: string[]) => {
+      uploadVideo: async (
+        videoUri: string,
+        caption: string,
+        hashtags: string[]
+      ) => {
         set({ isLoading: true, error: null });
         try {
           const currentUser = useAuthStore.getState().currentUser;
           if (!currentUser) throw new Error("User not authenticated");
 
-          console.log("[uploadVideo] Iniciando subida a Cloudinary...", videoUri);
+          console.log(
+            "[uploadVideo] Iniciando subida a Cloudinary...",
+            videoUri
+          );
           // Subir video a Cloudinary
           const uploadResult = await cloudinaryUpload(videoUri);
-          if (!uploadResult || !uploadResult.secure_url) throw new Error("Error subiendo a Cloudinary");
-          console.log("[uploadVideo] Video subido a Cloudinary:", uploadResult.secure_url);
+          if (!uploadResult || !uploadResult.secure_url)
+            throw new Error("Error subiendo a Cloudinary");
+          console.log(
+            "[uploadVideo] Video subido a Cloudinary:",
+            uploadResult.secure_url
+          );
 
           // Opcional: obtener thumbnail (si tienes lógica, si no, deja string vacío)
           let thumbnailUrl = "";
-          if (typeof getVideoThumbnailUrl === 'function') {
+          if (typeof getVideoThumbnailUrl === "function") {
             try {
               thumbnailUrl = getVideoThumbnailUrl(uploadResult.secure_url);
             } catch (e) {
@@ -274,11 +284,10 @@ export const useVideoStore = create<VideoState>()(
                 likes: 0,
               },
             ])
-            .select(
-              `*, user:users(*), comments:comments(*, user:users(*))`
-            );
+            .select(`*, user:users(*), comments:comments(*, user:users(*))`);
           if (error) throw error;
-          if (!data || !data[0]) throw new Error("Supabase no devolvió datos del video subido");
+          if (!data || !data[0])
+            throw new Error("Supabase no devolvió datos del video subido");
 
           // Formatear el video para el estado local
           const video = data[0];
@@ -316,10 +325,12 @@ export const useVideoStore = create<VideoState>()(
             videos: [newVideo, ...state.videos],
             isLoading: false,
           }));
-          console.log("[uploadVideo] Video subido y registrado correctamente en Supabase.");
+          console.log(
+            "[uploadVideo] Video subido y registrado correctamente en Supabase."
+          );
 
           // Refrescar la lista completa desde Supabase
-          if (typeof get().fetchVideos === 'function') {
+          if (typeof get().fetchVideos === "function") {
             await get().fetchVideos();
           }
 
@@ -386,7 +397,7 @@ export const useVideoStore = create<VideoState>()(
 
           if (error) throw error;
 
-          console.log('[fetchVideos] Raw data from Supabase:', data);
+          console.log("[fetchVideos] Raw data from Supabase:", data);
 
           // Format the videos for our app
           const formattedVideos: Video[] = data.map((video: any) => ({
@@ -419,7 +430,7 @@ export const useVideoStore = create<VideoState>()(
             timestamp: new Date(video.created_at).getTime(),
           }));
 
-          console.log('[fetchVideos] Formatted videos:', formattedVideos);
+          console.log("[fetchVideos] Formatted videos:", formattedVideos);
 
           // Update local state
           set((state) => ({
@@ -554,14 +565,14 @@ export const useVideoStore = create<VideoState>()(
             mimeType: data.mime_type || inferMimeType(data.video_url),
           };
 
-// Helper to infer mime type from url
-function inferMimeType(url: string): string {
-  const ext = url.split('.').pop()?.toLowerCase();
-  if (ext === 'mov') return 'video/quicktime';
-  if (ext === 'webm') return 'video/webm';
-  if (ext === 'ogg') return 'video/ogg';
-  return 'video/mp4';
-}
+          // Helper to infer mime type from url
+          function inferMimeType(url: string): string {
+            const ext = url.split(".").pop()?.toLowerCase();
+            if (ext === "mov") return "video/quicktime";
+            if (ext === "webm") return "video/webm";
+            if (ext === "ogg") return "video/ogg";
+            return "video/mp4";
+          }
 
           set({ isLoading: false });
           return formattedVideo;
