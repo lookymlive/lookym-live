@@ -7,4 +7,7 @@ export interface User {
   bio: string;
   role: 'user' | 'business';
   verified: boolean;
+  // Campos para negocios
+  category?: string;
+  location?: string;
 }
