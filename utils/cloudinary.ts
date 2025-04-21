@@ -15,6 +15,7 @@ export const uploadVideo = async (
     folder?: string;
     public_id?: string;
     tags?: string[];
+    onProgress?: (progress: number) => void;
   } = {}
 ) => {
   try {
@@ -61,22 +62,51 @@ export const uploadVideo = async (
       formData.append("tags", options.tags.join(","));
     }
 
-    // Upload to Cloudinary
-    const uploadResponse = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`,
-      {
-        method: "POST",
-        body: formData,
+    // Subida con progreso usando XMLHttpRequest si está disponible
+    if (typeof XMLHttpRequest !== 'undefined') {
+      const xhr = new XMLHttpRequest();
+      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`;
+      return await new Promise((resolve, reject) => {
+        xhr.open('POST', cloudinaryUrl);
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+            } catch (e) {
+              reject(new Error('Error parsing Cloudinary response'));
+            }
+          } else {
+            reject(new Error(`Cloudinary upload failed: ${xhr.statusText}`));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Cloudinary upload error'));
+        if (options.onProgress) {
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percent = Math.round((event.loaded / event.total) * 100);
+              options.onProgress(percent);
+            }
+          };
+        }
+        xhr.send(formData);
+      });
+    } else {
+      // Fallback para entornos donde no hay XMLHttpRequest (ej: Node)
+      const uploadResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text();
+        throw new Error(`Cloudinary upload failed: ${errorText}`);
       }
-    );
-
-    if (!uploadResponse.ok) {
-      const errorText = await uploadResponse.text();
-      throw new Error(`Cloudinary upload failed: ${errorText}`);
+      const uploadResult = await uploadResponse.json();
+      return uploadResult;
     }
-
-    const uploadResult = await uploadResponse.json();
-    return uploadResult;
   } catch (error) {
     console.error("Error uploading to Cloudinary:", error);
     throw error;
