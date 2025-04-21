@@ -241,7 +241,8 @@ export const useVideoStore = create<VideoState>()(
       uploadVideo: async (
         videoUri: string,
         caption: string,
-        hashtags: string[]
+        hashtags: string[],
+        options?: { onProgress?: (progress: number) => void }
       ) => {
         set({ isLoading: true, error: null });
         try {
@@ -253,7 +254,7 @@ export const useVideoStore = create<VideoState>()(
             videoUri
           );
           // Subir video a Cloudinary
-          const uploadResult = await cloudinaryUpload(videoUri);
+          const uploadResult = await cloudinaryUpload(videoUri, options);
           if (!uploadResult || !uploadResult.secure_url)
             throw new Error("Error subiendo a Cloudinary");
           console.log(
