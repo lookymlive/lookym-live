@@ -21,8 +21,7 @@ export default function ProfileScreen() {
   };
   
   const handleEditProfile = () => {
-    // In a real app, navigate to edit profile screen
-    Alert.alert('Edit Profile', 'This would navigate to the edit profile screen');
+    router.push('/edit-profile');
   };
   
   const handleChangePhoto = async () => {
@@ -116,10 +115,11 @@ export default function ProfileScreen() {
             </Text>
           </View>
           
-          <TouchableOpacity style={[styles.businessButton, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.businessButtonText, { color: colors.text }]}>
-              Business Dashboard
-            </Text>
+          <TouchableOpacity 
+            style={[styles.businessButton, { backgroundColor: colors.card, borderColor: colors.border }]}
+            onPress={() => router.push('/business-dashboard')}
+          >
+            <Text style={[styles.businessButtonText, { color: colors.text }]}>Business Dashboard</Text>
           </TouchableOpacity>
         </View>
       );
