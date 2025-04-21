@@ -1,25 +1,44 @@
-import { useVideoStore } from '@/store/video-store';
-import { Video } from '@/types/video';
-import { formatTimeAgo } from '@/utils/time-format';
-import { Image } from 'expo-image';
-import { Bookmark, Heart, MessageCircle, MoreHorizontal, Play, Send } from 'lucide-react-native';
-import React, { useState } from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
+import { useVideoStore } from "@/store/video-store";
+import { Video } from "@/types/video";
+import { formatTimeAgo } from "@/utils/time-format";
+import { Image } from "expo-image";
+import {
+  Bookmark,
+  Heart,
+  MessageCircle,
+  MoreHorizontal,
+  Send,
+} from "lucide-react-native";
+import React, { useState } from "react";
+import {
+  Dimensions,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface VideoThumbnailProps {
   video: Video;
 }
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
-import { Video as ExpoVideo, ResizeMode } from 'expo-av';
+import { Video as ExpoVideo, ResizeMode } from "expo-av";
 
 export default function VideoThumbnail({ video }: VideoThumbnailProps) {
   const [showPlayer, setShowPlayer] = useState(false);
   // Modern web: video always visible, styled like Instagram/TikTok
 
-  const { likedVideos, savedVideos, likeVideo, unlikeVideo, saveVideo, unsaveVideo } = useVideoStore();
-  const [isPlaying, setIsPlaying] = useState(false);
+  const {
+    likedVideos,
+    savedVideos,
+    likeVideo,
+    unlikeVideo,
+    saveVideo,
+    unsaveVideo,
+  } = useVideoStore();
 
   const isLiked = likedVideos[video.id] || false;
   const isSaved = savedVideos[video.id] || false;
@@ -32,7 +51,7 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
         await likeVideo(video.id);
       }
     } catch (error) {
-      console.error('Error toggling like:', error);
+      console.error("Error toggling like:", error);
     }
   };
 
@@ -55,7 +74,9 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
           />
           <View>
             <Text style={styles.username}>{video.user.username}</Text>
-            {video.user.verified && <Text style={styles.verified}>Verified</Text>}
+            {video.user.verified && (
+              <Text style={styles.verified}>Verified</Text>
+            )}
           </View>
         </View>
         <TouchableOpacity>
@@ -63,7 +84,7 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
         </TouchableOpacity>
       </View>
 
-      {Platform.OS === 'web' ? (
+      {Platform.OS === "web" ? (
         <video
           src={video.videoUrl}
           controls
@@ -72,38 +93,48 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
           muted={false}
           poster={video.thumbnailUrl}
           style={{
-            width: '100%',
-            display: 'block',
-            aspectRatio: '9/16',
-            objectFit: 'cover',
-            background: '#000',
+            width: "100%",
+            display: "block",
+            aspectRatio: "9/16",
+            objectFit: "cover",
+            background: "#000",
             borderRadius: 20,
             marginBottom: 12,
           }}
         />
+      ) : showPlayer ? (
+        <ExpoVideo
+          source={{ uri: video.videoUrl }}
+          style={{
+            width: "100%",
+            aspectRatio: 9 / 16,
+            backgroundColor: "#000",
+          }}
+          useNativeControls
+          resizeMode={ResizeMode.COVER}
+          shouldPlay
+        />
       ) : (
-        showPlayer ? (
-          <ExpoVideo
-            source={{ uri: video.videoUrl }}
-            style={{ width: '100%', aspectRatio: 9/16, backgroundColor: '#000' }}
-            useNativeControls
-            resizeMode={ResizeMode.COVER}
-            shouldPlay
+        <TouchableOpacity onPress={() => setShowPlayer(true)}>
+          <Image
+            source={{ uri: video.thumbnailUrl }}
+            style={{
+              width: "100%",
+              aspectRatio: 9 / 16,
+              backgroundColor: "#000",
+            }}
           />
-        ) : (
-          <TouchableOpacity onPress={() => setShowPlayer(true)}>
-            <Image
-              source={{ uri: video.thumbnailUrl }}
-              style={{ width: '100%', aspectRatio: 9/16, backgroundColor: '#000' }}
-            />
-          </TouchableOpacity>
-        )
+        </TouchableOpacity>
       )}
 
       <View style={styles.actions}>
         <View style={styles.leftActions}>
           <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-            <Heart size={24} color={isLiked ? "#FF3B30" : "#000"} fill={isLiked ? "#FF3B30" : "transparent"} />
+            <Heart
+              size={24}
+              color={isLiked ? "#FF3B30" : "#000"}
+              fill={isLiked ? "#FF3B30" : "transparent"}
+            />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
             <MessageCircle size={24} color="#000" />
@@ -113,7 +144,11 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
           </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={handleSave}>
-          <Bookmark size={24} color={isSaved ? "#007AFF" : "#000"} fill={isSaved ? "#007AFF" : "transparent"} />
+          <Bookmark
+            size={24}
+            color={isSaved ? "#007AFF" : "#000"}
+            fill={isSaved ? "#007AFF" : "transparent"}
+          />
         </TouchableOpacity>
       </View>
 
@@ -125,7 +160,9 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
         </View>
         <View style={styles.hashtagsContainer}>
           {video.hashtags.map((hashtag, index) => (
-            <Text key={index} style={styles.hashtag}>#{hashtag}</Text>
+            <Text key={index} style={styles.hashtag}>
+              #{hashtag}
+            </Text>
           ))}
         </View>
         <TouchableOpacity>
@@ -144,15 +181,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   avatar: {
     width: 32,
@@ -161,39 +198,39 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   username: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 14,
   },
   verified: {
     fontSize: 12,
-    color: '#007AFF',
+    color: "#007AFF",
   },
   thumbnailContainer: {
-    position: 'relative',
+    position: "relative",
     width: width,
     height: width,
   },
   thumbnail: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   playButton: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
     transform: [{ translateX: -20 }, { translateY: -20 }],
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 30,
     padding: 10,
   },
   actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   leftActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   actionButton: {
     marginRight: 16,
@@ -202,36 +239,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   likes: {
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   captionContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginBottom: 4,
   },
   captionUsername: {
-    fontWeight: '600',
+    fontWeight: "600",
     marginRight: 4,
   },
   caption: {
     flex: 1,
   },
   hashtagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginBottom: 4,
   },
   hashtag: {
-    color: '#007AFF',
+    color: "#007AFF",
     marginRight: 4,
   },
   viewComments: {
-    color: '#8E8E93',
+    color: "#8E8E93",
     marginBottom: 4,
   },
   timestamp: {
     fontSize: 12,
-    color: '#8E8E93',
+    color: "#8E8E93",
   },
 });
