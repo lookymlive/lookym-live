@@ -3,6 +3,7 @@ import { View, Text, FlatList, ActivityIndicator, Platform, StyleSheet } from 'r
 import { supabase } from '@/utils/supabase';
 import { Video as ExpoVideo, ResizeMode } from 'expo-av';
 import { Image } from 'expo-image';
+import { getVideoUrl, getVideoThumbnailUrl } from '@/utils/cloudinary';
 
 interface VideoRow {
   id: string;
@@ -35,35 +36,54 @@ export default function VideoTestScreen() {
   return (
     <View style={{ flex: 1, padding: 16, backgroundColor: '#111' }}>
       <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 22, marginBottom: 20 }}>
-        Prueba de videos (Supabase)
+        Lookym (Supabase)
       </Text>
       <FlatList
         data={videos}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            {Platform.OS === 'web' ? (
-              <video
-                src={item.video_url}
-                controls
-                style={{
-                  width: '100%',
-                  aspectRatio: '9/16',
-                  borderRadius: 16,
-                  background: '#000',
-                  objectFit: 'cover',
-                }}
-                poster={item.thumbnail_url}
-              />
-            ) : (
-              <ExpoVideo
-                source={{ uri: item.video_url }}
-                style={{ width: '100%', aspectRatio: 9/16, borderRadius: 16, backgroundColor: '#000' }}
-                useNativeControls
-                resizeMode={ResizeMode.COVER}
-                shouldPlay={false}
-              />
-            )}
+            {(() => {
+              // Detectar si es un video de Cloudinary
+              const isCloudinary = item.video_url.includes('cloudinary.com');
+              const videoUrl = isCloudinary
+                ? getVideoUrl(
+                    // extraer publicId del video_url
+                    item.video_url.split('/upload/')[1]?.replace(/\.(mp4|webm|mov|ogg|mkv|avi).*$/, '') || '',
+                    { quality: 'auto', format: 'mp4' }
+                  )
+                : item.video_url;
+              const thumbnailUrl = isCloudinary
+                ? getVideoThumbnailUrl(
+                    item.video_url.split('/upload/')[1]?.replace(/\.(mp4|webm|mov|ogg|mkv|avi).*$/, '') || '',
+                    { quality: 'auto', format: 'jpg', time: '1' }
+                  )
+                : item.thumbnail_url;
+              return Platform.OS === 'web' ? (
+                <video
+                  src={videoUrl}
+                  controls
+                  style={{
+                    width: '100%',
+                    aspectRatio: '9/16',
+                    borderRadius: 16,
+                    background: '#000',
+                    objectFit: 'cover',
+                  }}
+                  poster={thumbnailUrl}
+                />
+              ) : (
+                <ExpoVideo
+                  source={{ uri: videoUrl }}
+                  style={{ width: '100%', aspectRatio: 9/16, borderRadius: 16, backgroundColor: '#000' }}
+                  useNativeControls
+                  resizeMode={ResizeMode.COVER}
+                  shouldPlay={false}
+                  posterSource={thumbnailUrl ? { uri: thumbnailUrl } : undefined}
+                  posterStyle={{ resizeMode: 'cover', borderRadius: 16 }}
+                />
+              );
+            })()}
             <Text style={styles.caption}>{item.caption}</Text>
             <Text style={styles.date}>{item.created_at}</Text>
           </View>
