@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Video as ExpoVideo, ResizeMode } from 'expo-av';
 import { useAuthStore } from "@/store/auth-store";
 import { useVideoStore } from "@/store/video-store";
 import * as ImagePicker from "expo-image-picker";
@@ -113,8 +114,12 @@ export default function UploadScreen() {
           tag.startsWith("#") ? tag.substring(1).trim() : tag.trim()
         );
 
-      // Add the video to our store
-      const newVideo = await uploadVideo(videoUri, caption, hashtagArray);
+      // Add the video to our store, con progreso
+      const newVideo = await uploadVideo(videoUri, caption, hashtagArray, {
+        onProgress: (progress: number) => {
+          setUploadProgress(progress);
+        },
+      });
 
       // Reset form
       setVideoUri(null);
@@ -195,14 +200,15 @@ export default function UploadScreen() {
               ]}
             >
               {Platform.OS !== "web" ? (
-                <View style={styles.videoPlaceholder}>
-                  <Video width={40} height={40} color={colors.primary} />
-                  <Text style={[styles.videoSelected, { color: colors.text }]}>
-                    Video selected
-                  </Text>
-                </View>
+                <ExpoVideo
+                  source={{ uri: videoUri }}
+                  style={{ width: '100%', aspectRatio: 9/16, borderRadius: 16, backgroundColor: '#000' }}
+                  useNativeControls
+                  resizeMode={ResizeMode.COVER}
+                  shouldPlay={false}
+                />
               ) : (
-                <video src={videoUri} style={styles.videoPreview} controls />
+                <video src={videoUri} style={styles.videoPreview} controls poster={undefined} />
               )}
               <TouchableOpacity
                 style={[
