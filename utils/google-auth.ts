@@ -23,7 +23,7 @@ export const useGoogleAuth = () => {
     webClientId: WEB_CLIENT_ID,
     androidClientId: ANDROID_CLIENT_ID,
     iosClientId: IOS_CLIENT_ID,
-    expoClientId: WEB_CLIENT_ID,
+    clientId: WEB_CLIENT_ID,
   });
 
   useEffect(() => {
