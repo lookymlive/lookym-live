@@ -7,60 +7,34 @@ const CLOUDINARY_CLOUD_NAME =
 const CLOUDINARY_UPLOAD_PRESET =
   Constants.expoConfig?.extra?.cloudinaryUploadPreset || "lookym_videos";
 
-// Helper function to upload a video to Cloudinary
+import { buildCloudinaryFormData, CloudinaryOptions } from "./cloudinary-logic";
+
+// Helper function to upload a video a Cloudinary
 export const uploadVideo = async (
   videoUri: string,
-  options: {
-    resource_type?: string;
-    folder?: string;
-    public_id?: string;
-    tags?: string[];
-    onProgress?: (progress: number) => void;
-  } = {}
+  options: CloudinaryOptions & { onProgress?: (progress: number) => void } = {}
 ) => {
   try {
-    // Create form data for the upload
-    const formData = new FormData();
-
-    // Convert local URI to blob for web or use uri directly for native
+    let file: Blob | { uri: string; type: string; name: string };
     if (videoUri.startsWith("file://") || videoUri.startsWith("content://")) {
-      // For native platforms
+      // Para plataformas nativas
       const fileType = videoUri.split(".").pop() || "mp4";
-      const fileName =
-        videoUri.split("/").pop() || `video-${Date.now()}.${fileType}`;
-
-      // @ts-ignore - React Native's FormData implementation accepts objects with uri
-      formData.append("file", {
+      const fileName = videoUri.split("/").pop() || `video-${Date.now()}.${fileType}`;
+      file = {
         uri: videoUri,
         type: `video/${fileType}`,
         name: fileName,
-      });
+      };
     } else {
-      // For web
+      // Para web
       const response = await fetch(videoUri);
-      const blob = await response.blob();
-      formData.append("file", blob);
+      file = await response.blob();
     }
-
-    // Add upload preset (for unsigned uploads)
-    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-
-    // Add additional options
-    if (options.resource_type) {
-      formData.append("resource_type", options.resource_type);
-    }
-
-    if (options.folder) {
-      formData.append("folder", options.folder);
-    }
-
-    if (options.public_id) {
-      formData.append("public_id", options.public_id);
-    }
-
-    if (options.tags && options.tags.length > 0) {
-      formData.append("tags", options.tags.join(","));
-    }
+    const formData = buildCloudinaryFormData(
+      file,
+      CLOUDINARY_UPLOAD_PRESET,
+      options
+    );
 
     // Subida con progreso usando XMLHttpRequest si está disponible
     if (typeof XMLHttpRequest !== 'undefined') {
@@ -85,7 +59,7 @@ export const uploadVideo = async (
           xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {
               const percent = Math.round((event.loaded / event.total) * 100);
-              options.onProgress(percent);
+              options.onProgress?.(percent);
             }
           };
         }
