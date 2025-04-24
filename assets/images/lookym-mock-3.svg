@@ -1,0 +1,5 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" fill="#ececec"/>
+  <polygon points="32,8 56,56 8,56" fill="#ff4f8c"/>
+  <text x="32" y="48" font-size="20" font-family="Arial" fill="#fff" text-anchor="middle">Y</text>
+</svg>
