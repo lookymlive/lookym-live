@@ -39,4 +39,15 @@
 
 * **Preview/Playback:** Use `expo-video` (`VideoView` component). Migrated from deprecated `expo-av` (`Video`) due to rendering issues in Expo Go.
 * **Selection:** Use `expo-image-picker` (`launchImageLibraryAsync` with `mediaTypes: ['videos']`).
-* **Upload:** Direct client-side upload to Cloudinary using `fetch` and an *unsigned* upload preset. Implemented in `utils/cloudinary.ts`.
+* **Recording:** Use `expo-image-picker` (`launchCameraAsync` with `mediaTypes: ['videos']`).
+* **Upload:** Direct client-side upload to Cloudinary using `fetch` and an *unsigned* upload preset. Implemented in `utils/cloudinary.ts` with functions:
+  * `uploadVideoToCloudinary`: Primary function for direct uploads.
+  * `buildCloudinaryFormData`: Helper for creating appropriate FormData objects.
+  * Progress tracking implemented using XMLHttpRequest when available.
+* **Store Integration:** Video state managed through `useVideoStore` (Zustand), which handles:
+  * Cloudinary upload via `uploadVideo` function.
+  * Supabase metadata storage after successful upload.
+  * Video loading/fetching for feed and profile displays.
+  * Interactions (likes, comments, saves).
+* **User Restrictions:** Only users with "business" role can upload videos (checked in `upload.tsx`).
+* **Video Metadata:** After Cloudinary upload, video details (URL, caption, hashtags) are stored in Supabase `videos` table with relationship to user.
