@@ -20,25 +20,33 @@
   - Tables, functions, views, triggers, and RLS policies created.
   - Schema reviewed against project docs and confirmed to be aligned and comprehensive.
   - `handle_new_user` trigger successfully verified: correctly creates profiles in `public.users` upon signup when client passes required metadata (`username`, `role`).
-- **Video Upload (Partial):**
+- **Video Upload (Complete):**
   - Cloudinary setup complete.
   - Video selection from gallery implemented (`expo-image-picker`).
+  - Video recording implemented (`expo-image-picker` with camera).
   - Video preview implemented (`expo-video`).
   - UI for caption/hashtags added.
   - Successful upload to Cloudinary from client-side implemented.
-  - Layout issues resolved.
+  - Progress tracking for uploads implemented.
+  - Metadata saved to Supabase `videos` table after successful Cloudinary upload.
+  - Business role check implemented to restrict uploads.
+  - Error handling and validation in place.
 
 ## What's Left to Build (Core - Phase 2)
 
 - **Video System:**
-  - Video Upload:
-    - **Integrate Supabase save:** Store video metadata (URL, caption, etc.) in `public.videos` table after Cloudinary upload.
-    - Implement video recording (`expo-camera`).
-    - Add progress tracking for upload.
-  - Video Player component.
-  - Video Feed display.
-  - Video Interactions (Likes, Comments, Saves - backend functions exist, frontend needed).
-  - Video Detail Screen.
+  - Video Feed:
+    - Implement display of videos in a scrollable feed.
+    - Add playback controls.
+    - Implement autoplay/pause behavior.
+    - Add interaction UI (like, comment, save buttons).
+  - Video Detail Screen:
+    - Create dedicated screen for viewing a single video.
+    - Implement comments section.
+    - Add sharing functionality.
+  - Video Interactions:
+    - Complete frontend for likes, comments, and saves (backend functions exist).
+    - Implement notification system for interactions.
 - **Chat System:**
   - Ensure full real-time functionality.
   - Implement unread indicators.
@@ -48,18 +56,21 @@
   - Profile Editing functionality.
   - Display user/business specific content (videos, saves).
   - Verification badges.
+- **Search Functionality:**
+  - Implement search for videos, hashtags, and users.
+  - Add filtering options.
 
 ## Current Status
 
 - In Phase 2 of the development plan: Core Features Implementation.
 - Supabase database setup verified (schema applied, profile trigger working).
-- **Next:** Complete Video Upload feature by implementing Supabase integration.
+- Video Upload feature completed with Cloudinary and Supabase integration.
+- **Next:** Implement Video Feed display and playback functionality.
 
-## Known Issues/TODOs (High Priority from `docs/3TODO.txt`)
+## Known Issues/TODOs (High Priority)
 
 - Bundling error with `react-native-url-polyfill`.
-- **Complete video upload (Supabase integration remaining).**
-- Implement video feed & playback controls.
+- **Implement video feed & playback controls.**
 - Create video detail screen with comments.
 - Implement profile screen & editing.
 - Add search functionality.
