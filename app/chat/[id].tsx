@@ -1,38 +1,49 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Image } from 'expo-image';
-import { useLocalSearchParams, Stack, router } from 'expo-router';
-import { ArrowLeft, Send } from 'lucide-react-native';
-import { useChatStore } from '@/store/chat-store';
-import { useAuthStore } from '@/store/auth-store';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { formatTimeAgo } from '@/utils/time-format';
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { useAuthStore } from "@/store/auth-store";
+import { useChatStore } from "@/store/chat-store";
+import { formatTimeAgo } from "@/utils/time-format";
+import { Image } from "expo-image";
+import { Stack, router, useLocalSearchParams } from "expo-router";
+import { ArrowLeft, Send } from "lucide-react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ChatDetailScreen() {
   const { id } = useLocalSearchParams();
   const { getChat, sendMessage, markChatAsRead } = useChatStore();
   const { currentUser } = useAuthStore();
-  const { isDark, colors } = useColorScheme();
-  const [message, setMessage] = useState('');
+  const { colors } = useColorScheme();
+  const [message, setMessage] = useState("");
   const flatListRef = useRef<FlatList>(null);
-  
+
   const chatId = Array.isArray(id) ? id[0] : id;
   const chat = getChat(chatId);
-  
+
   useEffect(() => {
     if (chat) {
       markChatAsRead(chatId);
     }
   }, [chatId]);
-  
+
   if (!chat || !currentUser) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <Stack.Screen 
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <Stack.Screen
           options={{
             headerShown: true,
-            title: 'Chat',
+            title: "Chat",
             headerLeft: () => (
               <TouchableOpacity onPress={() => router.back()}>
                 <ArrowLeft size={24} color={colors.text} />
@@ -41,46 +52,54 @@ export default function ChatDetailScreen() {
           }}
         />
         <View style={styles.notFoundContainer}>
-          <Text style={[styles.notFoundText, { color: colors.text }]}>Chat not found</Text>
+          <Text style={[styles.notFoundText, { color: colors.text }]}>
+            Chat not found
+          </Text>
         </View>
       </SafeAreaView>
     );
   }
-  
-  const otherUser = chat.participants.find(p => p.id !== currentUser.id);
-  
+
+  const otherUser = chat.participants.find((p) => p.id !== currentUser.id);
+
   const handleSend = () => {
-    if (message.trim() === '') return;
-    
+    if (message.trim() === "") return;
+
     sendMessage(chatId, message);
-    setMessage('');
-    
+    setMessage("");
+
     // Scroll to bottom
     setTimeout(() => {
       flatListRef.current?.scrollToEnd({ animated: true });
     }, 100);
   };
-  
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['bottom']}>
-      <Stack.Screen 
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      edges={["bottom"]}
+    >
+      <Stack.Screen
         options={{
           headerShown: true,
-          title: otherUser?.username || 'Chat',
+          title: otherUser?.username || "Chat",
           headerTitleStyle: { color: colors.text },
           headerStyle: { backgroundColor: colors.card },
           headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backButton}
+            >
               <ArrowLeft size={24} color={colors.text} />
             </TouchableOpacity>
           ),
         }}
       />
-      
-      <KeyboardAvoidingView 
-        style={styles.keyboardAvoid} 
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoid}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
         <FlatList
           ref={flatListRef}
@@ -90,12 +109,16 @@ export default function ChatDetailScreen() {
           onLayout={() => flatListRef.current?.scrollToEnd({ animated: false })}
           renderItem={({ item }) => {
             const isCurrentUser = item.senderId === currentUser.id;
-            
+
             return (
-              <View style={[
-                styles.messageContainer,
-                isCurrentUser ? styles.currentUserMessage : styles.otherUserMessage
-              ]}>
+              <View
+                style={[
+                  styles.messageContainer,
+                  isCurrentUser
+                    ? styles.currentUserMessage
+                    : styles.otherUserMessage,
+                ]}
+              >
                 {!isCurrentUser && (
                   <Image
                     source={{ uri: otherUser?.avatar }}
@@ -103,22 +126,38 @@ export default function ChatDetailScreen() {
                     contentFit="cover"
                   />
                 )}
-                <View style={[
-                  styles.messageBubble,
-                  isCurrentUser 
-                    ? [styles.currentUserBubble, { backgroundColor: colors.primary }]
-                    : [styles.otherUserBubble, { backgroundColor: colors.card }]
-                ]}>
-                  <Text style={[
-                    styles.messageText,
-                    { color: isCurrentUser ? '#fff' : colors.text }
-                  ]}>
+                <View
+                  style={[
+                    styles.messageBubble,
+                    isCurrentUser
+                      ? [
+                          styles.currentUserBubble,
+                          { backgroundColor: colors.primary },
+                        ]
+                      : [
+                          styles.otherUserBubble,
+                          { backgroundColor: colors.card },
+                        ],
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.messageText,
+                      { color: isCurrentUser ? "#fff" : colors.text },
+                    ]}
+                  >
                     {item.text}
                   </Text>
-                  <Text style={[
-                    styles.messageTime,
-                    { color: isCurrentUser ? 'rgba(255,255,255,0.7)' : colors.textSecondary }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.messageTime,
+                      {
+                        color: isCurrentUser
+                          ? "rgba(255,255,255,0.7)"
+                          : colors.textSecondary,
+                      },
+                    ]}
+                  >
                     {formatTimeAgo(item.timestamp)}
                   </Text>
                 </View>
@@ -126,23 +165,35 @@ export default function ChatDetailScreen() {
             );
           }}
         />
-        
-        <View style={[styles.inputContainer, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
+
+        <View
+          style={[
+            styles.inputContainer,
+            { backgroundColor: colors.card, borderTopColor: colors.border },
+          ]}
+        >
           <TextInput
-            style={[styles.input, { backgroundColor: colors.background, color: colors.text }]}
+            style={[
+              styles.input,
+              { backgroundColor: colors.background, color: colors.text },
+            ]}
             placeholder="Type a message..."
             placeholderTextColor={colors.textSecondary}
             value={message}
             onChangeText={setMessage}
             multiline
           />
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[
-              styles.sendButton, 
-              { backgroundColor: message.trim() ? colors.primary : colors.disabled }
-            ]} 
+              styles.sendButton,
+              {
+                backgroundColor: message.trim()
+                  ? colors.primary
+                  : colors.disabled,
+              },
+            ]}
             onPress={handleSend}
-            disabled={message.trim() === ''}
+            disabled={message.trim() === ""}
           >
             <Send size={20} color="#fff" />
           </TouchableOpacity>
@@ -161,8 +212,8 @@ const styles = StyleSheet.create({
   },
   notFoundContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   notFoundText: {
     fontSize: 16,
@@ -174,22 +225,22 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   messageContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 16,
-    maxWidth: '80%',
+    maxWidth: "80%",
   },
   currentUserMessage: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
   },
   otherUserMessage: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   messageAvatar: {
     width: 28,
     height: 28,
     borderRadius: 14,
     marginRight: 8,
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
   },
   messageBubble: {
     padding: 12,
@@ -206,11 +257,11 @@ const styles = StyleSheet.create({
   },
   messageTime: {
     fontSize: 11,
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginTop: 4,
   },
   inputContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 8,
     borderTopWidth: 0.5,
   },
@@ -225,8 +276,8 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginLeft: 8,
   },
 });
