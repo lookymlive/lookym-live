@@ -21,13 +21,14 @@ import {
 
 interface VideoThumbnailProps {
   video: Video;
+  height?: number;
 }
 
 const { width } = Dimensions.get("window");
 
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 
-export default function VideoThumbnail({ video }: VideoThumbnailProps) {
+export default function VideoThumbnail({ video, height }: VideoThumbnailProps) {
   const [showPlayer, setShowPlayer] = useState(false);
   // Modern web: video always visible, styled like Instagram/TikTok
 
