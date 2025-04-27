@@ -51,3 +51,72 @@
   * Interactions (likes, comments, saves).
 * **User Restrictions:** Only users with "business" role can upload videos (checked in `upload.tsx`).
 * **Video Metadata:** After Cloudinary upload, video details (URL, caption, hashtags) are stored in Supabase `videos` table with relationship to user.
+
+## File Structure Patterns
+
+* **App Screens:** `/app` for all screens using Expo Router (file-based routing)
+* **Components:** `/components` for reusable UI components
+* **Utils:** `/utils` for service clients and helper functions
+* **Types:** `/types` for TypeScript definitions
+* **State Management:** `/store` for Zustand stores
+* **Database Schema:** `sql/schema.sql` contains all database definitions
+
+## Naming & Coding Conventions
+
+* **Components:**
+  * PascalCase for component files and names
+  * TypeScript for all components with proper typing
+  * Props interfaces defined with `[ComponentName]Props` naming
+  * Functional components with React.FC typing
+
+* **Hooks:**
+  * camelCase prefixed with `use`
+  * Always explicitly type return values
+
+* **State Stores:**
+  * Named with pattern `use[Domain]Store`
+  * Keep slices of state in separate stores (auth, video, chat)
+  * Use Zustand persist middleware for stores requiring persistence
+
+* **Styling:**
+  * React Native StyleSheet objects
+  * No inline styles except for very simple or dynamic styling
+  * Colors from theme object for consistency
+
+## Project-Specific Patterns
+
+* **Authentication:**
+  * Supabase Auth for user management
+  * User/Business role distinction
+  * Role check in routes requiring specific access
+  * Session persistence with AsyncStorage
+
+* **Video System:**
+  * `expo-video` for playback/preview (migrated from `expo-av`)
+  * `expo-image-picker` for selection/recording
+  * Direct upload to Cloudinary via fetch API
+  * Pass `caption` and `hashtags` when saving to Supabase
+
+* **Navigation:**
+  * File-based routing with Expo Router
+  * Protected routes via layout groups
+  * Tab navigation in `app/(tabs)` directory
+  * Modal screens in `app/modal.tsx`
+
+* **API Calls:**
+  * Supabase client initialized in `utils/supabase.ts`
+  * Cloudinary utilities in `utils/cloudinary.ts`
+  * Environment variables with `EXPO_PUBLIC_` prefix for client access
+
+## Known Challenges
+
+* `react-native-url-polyfill` bundling errors
+* Video performance optimization, especially on slower connections
+* Web video playback experience requires improvements
+* Chat message ordering and realtime issues
+
+## Documentation Practices
+
+* Update `memory-bank` files when implementing significant features
+* Keep `activeContext.md` and `progress.md` current
+* Use Spanish for user-facing documentation, English for technical docs
