@@ -1,10 +1,10 @@
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Video as ExpoVideo, ResizeMode } from 'expo-av';
 import { useAuthStore } from "@/store/auth-store";
 import { useVideoStore } from "@/store/video-store";
+import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { Camera, Info, Plus, Tag, Upload, Video, X } from "lucide-react-native";
+import { Camera, Info, Plus, Tag, Upload, X } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   Alert,
@@ -46,7 +46,7 @@ export default function UploadScreen() {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-       mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
         allowsEditing: true,
         quality: 1,
         videoMaxDuration: 60, // Limit to 60 seconds
@@ -115,11 +115,10 @@ export default function UploadScreen() {
         );
 
       // Add the video to our store, con progreso
-      const newVideo = await uploadVideo(videoUri, caption, hashtagArray, {
-        onProgress: (progress: number) => {
-          setUploadProgress(progress);
-        },
-      });
+      const newVideo = await uploadVideo(videoUri, caption, hashtagArray);
+
+      // Actualizar el progreso manualmente
+      setUploadProgress(100);
 
       // Reset form
       setVideoUri(null);
@@ -202,13 +201,23 @@ export default function UploadScreen() {
               {Platform.OS !== "web" ? (
                 <ExpoVideo
                   source={{ uri: videoUri }}
-                  style={{ width: '100%', aspectRatio: 9/16, borderRadius: 16, backgroundColor: '#000' }}
+                  style={{
+                    width: "100%",
+                    aspectRatio: 9 / 16,
+                    borderRadius: 16,
+                    backgroundColor: "#000",
+                  }}
                   useNativeControls
                   resizeMode={ResizeMode.COVER}
                   shouldPlay={false}
                 />
               ) : (
-                <video src={videoUri} style={styles.videoPreview} controls poster={undefined} />
+                <video
+                  src={videoUri}
+                  style={styles.videoPreview}
+                  controls
+                  poster={undefined}
+                />
               )}
               <TouchableOpacity
                 style={[
