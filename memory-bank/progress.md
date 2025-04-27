@@ -31,22 +31,35 @@
   - Metadata saved to Supabase `videos` table after successful Cloudinary upload.
   - Business role check implemented to restrict uploads.
   - Error handling and validation in place.
+- **Video Feed (Implemented):**
+  - Visualización de videos en un feed de desplazamiento vertical tipo TikTok.
+  - Reproducción automática cuando un video está visible en pantalla.
+  - Navegación fluida entre videos con animaciones suaves.
+  - Interacciones básicas (likes, comentarios, guardar).
+- **Video Detail Screen (Implemented):**
+  - Pantalla de detalle de video con información completa.
+  - Sistema de comentarios con capacidad para añadir nuevos comentarios.
+  - Botones para like y guardar con retroalimentación visual.
+  - Navegación directa al perfil del creador.
+  - Botón para iniciar chat con negocios.
+- **Search Functionality (Implemented):**
+  - Búsqueda por videos, hashtags y usuarios.
+  - Filtros por categoría para refinar resultados.
+  - UI para descubrir hashtags populares.
+  - Visualización de videos en formato grid.
+- **Bug Fixes (Completed):**
+  - Corregidos errores de tipado en múltiples componentes.
+  - Resueltos problemas de navegación con rutas dinámicas.
+  - Mejorada la compatibilidad de tipos en `VideoFeed` para `ViewToken`.
+  - Actualizados colores para utilizar las propiedades correctas del tema.
+  - Simplificada la función de carga de videos para evitar errores de tipos.
 
 ## What's Left to Build (Core - Phase 2)
 
-- **Video System:**
-  - Video Feed:
-    - Implement display of videos in a scrollable feed.
-    - Add playback controls.
-    - Implement autoplay/pause behavior.
-    - Add interaction UI (like, comment, save buttons).
-  - Video Detail Screen:
-    - Create dedicated screen for viewing a single video.
-    - Implement comments section.
-    - Add sharing functionality.
-  - Video Interactions:
-    - Complete frontend for likes, comments, and saves (backend functions exist).
-    - Implement notification system for interactions.
+- **Video System (Refinements):**
+  - Implementar compartir en redes sociales.
+  - Añadir efectos/filtros para video.
+  - Optimizar rendimiento y carga de videos.
 - **Chat System:**
   - Ensure full real-time functionality.
   - Implement unread indicators.
@@ -56,24 +69,26 @@
   - Profile Editing functionality.
   - Display user/business specific content (videos, saves).
   - Verification badges.
-- **Search Functionality:**
-  - Implement search for videos, hashtags, and users.
-  - Add filtering options.
+- **Notifications System:**
+  - Implement in-app notifications for interactions.
+  - Push notifications for important activity.
 
 ## Current Status
 
 - In Phase 2 of the development plan: Core Features Implementation.
 - Supabase database setup verified (schema applied, profile trigger working).
 - Video Upload feature completed with Cloudinary and Supabase integration.
-- **Next:** Implement Video Feed display and playback functionality.
+- Video Feed feature implemented with auto-playback and vertical scroll navigation.
+- Video Detail Screen implemented with comments functionality.
+- Search & Discovery features implemented with category filtering.
+- All critical type errors and navigation issues resueltos.
+- **Next:** Implement full Profile pages and Notifications system.
 
 ## Known Issues/TODOs (High Priority)
 
 - Bundling error with `react-native-url-polyfill`.
-- **Implement video feed & playback controls.**
-- Create video detail screen with comments.
-- Implement profile screen & editing.
-- Add search functionality.
-- Ensure proper error handling in authentication.
-- Fix video playback issues on web.
+- Optimizar rendimiento de reproducción de videos.
+- Mejorar la experiencia en web, especialmente para reproducción de video.
+- Implementar sistema de caché para videos frecuentemente vistos.
 - Address chat message ordering.
+- Implementar funcionalidad de seguimiento de usuarios.
