@@ -12,7 +12,7 @@ import {
   Play,
   Send,
 } from "lucide-react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Platform,
   StyleSheet,
@@ -23,9 +23,15 @@ import {
 
 interface VideoPostProps {
   video: Video;
+  isActive?: boolean;
+  isVisible?: boolean;
 }
 
-export default function VideoPost({ video }: VideoPostProps) {
+export default function VideoPost({
+  video,
+  isActive = false,
+  isVisible = false,
+}: VideoPostProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const videoRef = useRef<ExpoVideo>(null);
@@ -41,6 +47,26 @@ export default function VideoPost({ video }: VideoPostProps) {
 
   const isLiked = !!likedVideos[video.id];
   const isSaved = !!savedVideos[video.id];
+
+  // Efecto para manejar la reproducción automática basada en visibilidad
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const handleVisibilityChange = async () => {
+      if (isActive && isVisible) {
+        await videoRef.current?.playAsync();
+        setIsPlaying(true);
+        // Ocultar controles después de un tiempo
+        setTimeout(() => setShowControls(false), 2000);
+      } else {
+        await videoRef.current?.pauseAsync();
+        setIsPlaying(false);
+        setShowControls(true);
+      }
+    };
+
+    handleVisibilityChange();
+  }, [isActive, isVisible]);
 
   const handlePlayPause = async () => {
     if (!videoRef.current) return;
@@ -81,7 +107,7 @@ export default function VideoPost({ video }: VideoPostProps) {
 
   const handleComment = () => {
     // Navigate to comments screen
-    console.log("Open comments");
+    router.push(`/video/${video.id}`);
   };
 
   const handleShare = () => {
@@ -91,7 +117,10 @@ export default function VideoPost({ video }: VideoPostProps) {
 
   const handleUserProfile = () => {
     // Navigate to user profile
-    console.log("Navigate to user profile");
+    router.push({
+      pathname: "/(tabs)/profile",
+      params: { userId: video.user.id },
+    });
   };
 
   const handleVideoPress = () => {
