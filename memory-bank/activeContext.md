@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Implementando características del **Sistema de Video** con enfoque principal en la funcionalidad de reproducción, feed y interacción.
+Refinamiento del sistema de video y desarrollo de funcionalidades sociales clave, incluyendo la experiencia de perfil de usuario/negocio y notificaciones.
 
 ## Recent Changes
 
@@ -16,15 +16,34 @@ Implementando características del **Sistema de Video** con enfoque principal en
 - **AI Action:** Resueltos problemas con tipos en VideoFeed para el manejo correcto de índices y visibilidad.
 - **AI Action:** Actualizado el uso de colores en interfaz para usar las propiedades correctas del tema.
 - **AI Action:** Optimizada la función de carga de videos para mantener la compatibilidad de tipos.
+- **AI Action:** Revisada y sincronizada toda la documentación del proyecto para mantener coherencia.
 
-## Next Steps
+## Next Steps (Priorizado)
 
-1. **Mejorar la pantalla de perfil:** Completar las pantallas de perfil de usuario y negocio para mostrar videos subidos.
-2. **Implementar notificaciones:** Crear sistema de notificaciones para interacciones (likes, comentarios, seguidores).
-3. **Añadir analytics:** Proporcionar métricas básicas para usuarios de negocio sobre el rendimiento de sus videos.
-4. **Mejorar la interfaz de chat:** Refinar la UI/UX del sistema de chat con indicadores de mensajes no leídos.
-5. **Integrar compartir contenido:** Permitir compartir videos dentro y fuera de la aplicación.
-6. **Optimizar rendimiento:** Implementar carga progresiva y caché para mejorar el rendimiento de reproducción de video.
+1. **Completar la pantalla de perfil (Alta prioridad):**
+   - Implementar vista de perfil para usuarios y negocios
+   - Mostrar videos subidos en grid
+   - Añadir estadísticas para perfil de negocio
+   - Implementar funcionalidad de seguimiento de usuarios
+
+2. **Implementar sistema de notificaciones (Alta prioridad):**
+   - Crear notificaciones para interacciones (likes, comentarios, seguidores)
+   - Diseñar pantalla de notificaciones con indicadores visuales
+   - Integrar con la navegación principal
+
+3. **Refinar el sistema de chat (Media prioridad):**
+   - Mejorar la UI/UX del sistema de chat
+   - Añadir indicadores de mensajes no leídos
+   - Solucionar problema de ordenamiento de mensajes
+
+4. **Optimizar rendimiento de video (Media prioridad):**
+   - Implementar carga progresiva y caché para videos
+   - Resolver problemas de rendimiento en la reproducción
+   - Mejorar la experiencia en web
+
+5. **Añadir funcionalidad de compartir (Baja prioridad):**
+   - Permitir compartir videos dentro y fuera de la aplicación
+   - Generar enlaces compartibles para videos
 
 ## Active Considerations
 
@@ -36,3 +55,4 @@ Implementando características del **Sistema de Video** con enfoque principal en
 - Mejorar la experiencia de onboarding para nuevos usuarios.
 - Explorar la posibilidad de añadir historias efímeras.
 - Revisar y mejorar la seguridad general de la aplicación, especialmente en permisos y roles.
+- Corregir errores de bundling con react-native-url-polyfill.

@@ -3,20 +3,21 @@ import { Video } from "@/types/video";
 import { formatTimeAgo } from "@/utils/time-format";
 import { Image } from "expo-image";
 import {
-  Bookmark,
-  Heart,
-  MessageCircle,
-  MoreHorizontal,
-  Send,
+    AlertTriangle,
+    Bookmark,
+    Heart,
+    MessageCircle,
+    MoreHorizontal,
+    Send,
 } from "lucide-react-native";
 import React, { useState } from "react";
 import {
-  Dimensions,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    Platform,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 interface VideoThumbnailProps {
@@ -30,6 +31,8 @@ import { Video as ExpoVideo, ResizeMode } from "expo-av";
 
 export default function VideoThumbnail({ video, height }: VideoThumbnailProps) {
   const [showPlayer, setShowPlayer] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const [errorRetryCount, setErrorRetryCount] = useState(0);
   // Modern web: video always visible, styled like Instagram/TikTok
 
   const {
@@ -43,6 +46,46 @@ export default function VideoThumbnail({ video, height }: VideoThumbnailProps) {
 
   const isLiked = likedVideos[video.id] || false;
   const isSaved = savedVideos[video.id] || false;
+
+  // Manejar errores de video
+  const handleVideoError = (error: any) => {
+    console.error("Video thumbnail error:", error);
+
+    // Verificar si es un error específico de dispositivos Samsung con Exynos
+    if (
+      error &&
+      (error.message?.includes("Decoder init failed: OMX.Exynos") ||
+        error.message?.includes("OMX.Exynos"))
+    ) {
+      console.log(
+        "Detectado error de decodificador hardware Exynos en miniatura"
+      );
+      setVideoError(true);
+
+      // Mostrar alerta solo una vez
+      if (errorRetryCount === 0) {
+        setShowPlayer(false);
+      }
+
+      setErrorRetryCount((prev) => prev + 1);
+    } else {
+      // Otro tipo de error
+      setVideoError(true);
+      setShowPlayer(false);
+    }
+  };
+
+  // Reintentar reproducción
+  const retryPlayback = () => {
+    if (errorRetryCount < 2) {
+      setVideoError(false);
+      setShowPlayer(true);
+      setErrorRetryCount((prev) => prev + 1);
+    } else {
+      // Demasiados intentos, quedarse con la miniatura
+      setShowPlayer(false);
+    }
+  };
 
   const handleLike = async () => {
     try {
@@ -61,6 +104,87 @@ export default function VideoThumbnail({ video, height }: VideoThumbnailProps) {
       unsaveVideo(video.id);
     } else {
       saveVideo(video.id);
+    }
+  };
+
+  const renderVideoContent = () => {
+    if (Platform.OS === "web") {
+      return (
+        <video
+          src={video.videoUrl}
+          controls
+          autoPlay={false}
+          playsInline
+          muted={false}
+          poster={video.thumbnailUrl}
+          style={{
+            width: "100%",
+            display: "block",
+            aspectRatio: "9/16",
+            objectFit: "cover",
+            background: "#000",
+            borderRadius: 20,
+            marginBottom: 12,
+          }}
+          onError={(e) => handleVideoError(e)}
+        />
+      );
+    } else if (showPlayer) {
+      if (videoError) {
+        // Fallback cuando hay error de video
+        return (
+          <View style={styles.errorContainer}>
+            <Image
+              source={{ uri: video.thumbnailUrl || video.videoUrl }}
+              style={{
+                width: "100%",
+                aspectRatio: 9 / 16,
+                backgroundColor: "#000",
+              }}
+              contentFit="cover"
+            />
+            <View style={styles.errorOverlay}>
+              <AlertTriangle size={30} color="#fff" />
+              <Text style={styles.errorText}>Error de reproducción</Text>
+              <TouchableOpacity
+                style={styles.retryButton}
+                onPress={retryPlayback}
+              >
+                <Text style={styles.retryText}>Reintentar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      } else {
+        return (
+          <ExpoVideo
+            source={{ uri: video.videoUrl }}
+            style={{
+              width: "100%",
+              aspectRatio: 9 / 16,
+              backgroundColor: "#000",
+            }}
+            useNativeControls
+            resizeMode={ResizeMode.COVER}
+            shouldPlay
+            onError={handleVideoError}
+          />
+        );
+      }
+    } else {
+      // Miniatura estática predeterminada
+      return (
+        <TouchableOpacity onPress={() => setShowPlayer(true)}>
+          <Image
+            source={{ uri: video.thumbnailUrl }}
+            style={{
+              width: "100%",
+              aspectRatio: 9 / 16,
+              backgroundColor: "#000",
+            }}
+          />
+        </TouchableOpacity>
+      );
     }
   };
 
@@ -85,92 +209,41 @@ export default function VideoThumbnail({ video, height }: VideoThumbnailProps) {
         </TouchableOpacity>
       </View>
 
-      {Platform.OS === "web" ? (
-        <video
-          src={video.videoUrl}
-          controls
-          autoPlay={false}
-          playsInline
-          muted={false}
-          poster={video.thumbnailUrl}
-          style={{
-            width: "100%",
-            display: "block",
-            aspectRatio: "9/16",
-            objectFit: "cover",
-            background: "#000",
-            borderRadius: 20,
-            marginBottom: 12,
-          }}
-        />
-      ) : showPlayer ? (
-        <ExpoVideo
-          source={{ uri: video.videoUrl }}
-          style={{
-            width: "100%",
-            aspectRatio: 9 / 16,
-            backgroundColor: "#000",
-          }}
-          useNativeControls
-          resizeMode={ResizeMode.COVER}
-          shouldPlay
-        />
-      ) : (
-        <TouchableOpacity onPress={() => setShowPlayer(true)}>
-          <Image
-            source={{ uri: video.thumbnailUrl }}
-            style={{
-              width: "100%",
-              aspectRatio: 9 / 16,
-              backgroundColor: "#000",
-            }}
-          />
-        </TouchableOpacity>
-      )}
+      {renderVideoContent()}
 
       <View style={styles.actions}>
-        <View style={styles.leftActions}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-            <Heart
-              size={24}
-              color={isLiked ? "#FF3B30" : "#000"}
-              fill={isLiked ? "#FF3B30" : "transparent"}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <MessageCircle size={24} color="#000" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <Send size={24} color="#000" />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity onPress={handleSave}>
+        <TouchableOpacity style={styles.action} onPress={handleLike}>
+          <Heart
+            size={24}
+            color={isLiked ? "#F91880" : "#000"}
+            fill={isLiked ? "#F91880" : "none"}
+          />
+          <Text style={styles.actionText}>{video.likes}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.action}>
+          <MessageCircle size={24} color="#000" />
+          <Text style={styles.actionText}>{video.comments?.length || 0}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.action} onPress={handleSave}>
           <Bookmark
             size={24}
-            color={isSaved ? "#007AFF" : "#000"}
-            fill={isSaved ? "#007AFF" : "transparent"}
+            color={isSaved ? "#FFCC00" : "#000"}
+            fill={isSaved ? "#FFCC00" : "none"}
           />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.action}>
+          <Send size={24} color="#000" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.footer}>
-        <Text style={styles.likes}>{video.likes.toLocaleString()} likes</Text>
-        <View style={styles.captionContainer}>
-          <Text style={styles.captionUsername}>{video.user.username}</Text>
-          <Text style={styles.caption}>{video.caption}</Text>
-        </View>
-        <View style={styles.hashtagsContainer}>
-          {video.hashtags.map((hashtag, index) => (
-            <Text key={index} style={styles.hashtag}>
-              #{hashtag}
-            </Text>
-          ))}
-        </View>
-        <TouchableOpacity>
-          <Text style={styles.viewComments}>
-            View all {video.comments.length} comments
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.captionContainer}>
+        <Text style={styles.caption}>{video.caption}</Text>
+        <Text style={styles.hashtags}>
+          {video.hashtags?.map((tag) => `#${tag}`).join(" ")}
+        </Text>
         <Text style={styles.timestamp}>{formatTimeAgo(video.timestamp)}</Text>
       </View>
     </View>
@@ -179,97 +252,91 @@ export default function VideoThumbnail({ video, height }: VideoThumbnailProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginVertical: 16,
   },
   header: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    alignItems: "center",
+    marginBottom: 8,
   },
   userInfo: {
     flexDirection: "row",
     alignItems: "center",
   },
   avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
   },
   username: {
-    fontWeight: "600",
-    fontSize: 14,
+    fontWeight: "bold",
+    fontSize: 16,
   },
   verified: {
-    fontSize: 12,
-    color: "#007AFF",
-  },
-  thumbnailContainer: {
-    position: "relative",
-    width: width,
-    height: width,
-  },
-  thumbnail: {
-    width: "100%",
-    height: "100%",
-  },
-  playButton: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: [{ translateX: -20 }, { translateY: -20 }],
-    backgroundColor: "rgba(0,0,0,0.5)",
-    borderRadius: 30,
-    padding: 10,
+    color: "#1D9BF0",
+    fontSize: 14,
   },
   actions: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    marginVertical: 12,
+    paddingHorizontal: 8,
   },
-  leftActions: {
+  action: {
     flexDirection: "row",
+    alignItems: "center",
   },
-  actionButton: {
-    marginRight: 16,
-  },
-  footer: {
-    paddingHorizontal: 12,
-  },
-  likes: {
+  actionText: {
+    marginLeft: 4,
     fontWeight: "600",
-    marginBottom: 4,
   },
   captionContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 4,
-  },
-  captionUsername: {
-    fontWeight: "600",
-    marginRight: 4,
+    paddingHorizontal: 4,
   },
   caption: {
-    flex: 1,
-  },
-  hashtagsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    fontSize: 14,
     marginBottom: 4,
   },
-  hashtag: {
-    color: "#007AFF",
-    marginRight: 4,
-  },
-  viewComments: {
-    color: "#8E8E93",
+  hashtags: {
+    fontSize: 14,
+    color: "#1D9BF0",
     marginBottom: 4,
   },
   timestamp: {
     fontSize: 12,
-    color: "#8E8E93",
+    color: "#71767B",
+  },
+  errorContainer: {
+    position: "relative",
+    width: "100%",
+    aspectRatio: 9 / 16,
+  },
+  errorOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+  },
+  errorText: {
+    color: "#fff",
+    textAlign: "center",
+    marginTop: 10,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  retryButton: {
+    marginTop: 12,
+    backgroundColor: "rgba(255,255,255,0.3)",
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  retryText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 12,
   },
 });

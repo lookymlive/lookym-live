@@ -146,7 +146,7 @@ $$;
 -- Create functions for incrementing/decrementing likes count on videos table (Added based on documentation review)
 -- These can be called via RPC or potentially triggers on video_likes table.
 -- From sql/schema.sql (Lines 139-147)
-CREATE OR REPLACE FUNCTION public.increment_video_likes(video_id bigint)
+CREATE OR REPLACE FUNCTION public.increment_video_likes(video_id UUID)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY INVOKER

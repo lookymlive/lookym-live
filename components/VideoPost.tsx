@@ -6,6 +6,7 @@ import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import {
+  AlertTriangle,
   Bookmark,
   Heart,
   MessageCircle,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  Alert,
   Platform,
   StyleSheet,
   Text,
@@ -34,6 +36,8 @@ export default function VideoPost({
 }: VideoPostProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [videoError, setVideoError] = useState(false);
+  const [errorRetryCount, setErrorRetryCount] = useState(0);
   const videoRef = useRef<ExpoVideo>(null);
   const {
     likedVideos,
@@ -48,44 +52,92 @@ export default function VideoPost({
   const isLiked = !!likedVideos[video.id];
   const isSaved = !!savedVideos[video.id];
 
+  // Detectar y manejar errores de video
+  const handleVideoError = (error: any) => {
+    console.error("Video playback error:", error);
+
+    // Verificar si es un error específico de dispositivos Samsung con Exynos
+    if (
+      error &&
+      (error.message?.includes("Decoder init failed: OMX.Exynos") ||
+        error.message?.includes("OMX.Exynos"))
+    ) {
+      console.log("Detectado error de decodificador hardware Exynos");
+      setVideoError(true);
+
+      // Solo mostrar alerta en el primer error
+      if (errorRetryCount === 0) {
+        // Opcional: informar al usuario sobre el problema
+        Alert.alert(
+          "Problema de reproducción de video",
+          "Su dispositivo tiene dificultades para reproducir este video. Se mostrará una versión simplificada.",
+          [{ text: "OK" }]
+        );
+      }
+
+      setErrorRetryCount((prev) => prev + 1);
+    } else {
+      // Otro tipo de error
+      setVideoError(true);
+    }
+  };
+
+  // Reintentar reproducción
+  const retryPlayback = () => {
+    if (errorRetryCount < 2) {
+      setVideoError(false);
+      setErrorRetryCount((prev) => prev + 1);
+    }
+  };
+
   // Efecto para manejar la reproducción automática basada en visibilidad
   useEffect(() => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || videoError) return;
 
     const handleVisibilityChange = async () => {
-      if (isActive && isVisible) {
-        await videoRef.current?.playAsync();
-        setIsPlaying(true);
-        // Ocultar controles después de un tiempo
-        setTimeout(() => setShowControls(false), 2000);
-      } else {
-        await videoRef.current?.pauseAsync();
-        setIsPlaying(false);
-        setShowControls(true);
+      try {
+        if (isActive && isVisible) {
+          await videoRef.current?.playAsync();
+          setIsPlaying(true);
+          // Ocultar controles después de un tiempo
+          setTimeout(() => setShowControls(false), 2000);
+        } else {
+          await videoRef.current?.pauseAsync();
+          setIsPlaying(false);
+          setShowControls(true);
+        }
+      } catch (error) {
+        console.error("Error changing video playback state:", error);
+        handleVideoError(error);
       }
     };
 
     handleVisibilityChange();
-  }, [isActive, isVisible]);
+  }, [isActive, isVisible, videoError]);
 
   const handlePlayPause = async () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || videoError) return;
 
-    if (isPlaying) {
-      await videoRef.current.pauseAsync();
-    } else {
-      await videoRef.current.playAsync();
-    }
+    try {
+      if (isPlaying) {
+        await videoRef.current.pauseAsync();
+      } else {
+        await videoRef.current.playAsync();
+      }
 
-    setIsPlaying(!isPlaying);
+      setIsPlaying(!isPlaying);
 
-    // Hide controls after a delay
-    if (!isPlaying) {
-      setTimeout(() => {
-        setShowControls(false);
-      }, 2000);
-    } else {
-      setShowControls(true);
+      // Hide controls after a delay
+      if (!isPlaying) {
+        setTimeout(() => {
+          setShowControls(false);
+        }, 2000);
+      } else {
+        setShowControls(true);
+      }
+    } catch (error) {
+      console.error("Error on play/pause:", error);
+      handleVideoError(error);
     }
   };
 
@@ -124,6 +176,11 @@ export default function VideoPost({
   };
 
   const handleVideoPress = () => {
+    if (videoError) {
+      retryPlayback();
+      return;
+    }
+
     setShowControls(!showControls);
     handlePlayPause();
   };
@@ -131,6 +188,70 @@ export default function VideoPost({
   const handleChatWithBusiness = () => {
     if (video.user.role === "business") {
       router.push(`/chat/${video.user.id}`);
+    }
+  };
+
+  // Renderizar componente de video o fallback de imagen según el estado
+  const renderVideoContent = () => {
+    if (Platform.OS === "web") {
+      return (
+        <video
+          style={styles.video as any}
+          controls
+          autoPlay
+          playsInline
+          muted
+          poster={video.thumbnailUrl}
+          onError={(e) => handleVideoError(e)}
+        >
+          <source src={video.videoUrl} type={video.mimeType || "video/mp4"} />
+          Your browser does not support the video tag.
+        </video>
+      );
+    } else if (videoError) {
+      // Fallback a imagen estática cuando hay error de video
+      return (
+        <View style={styles.errorContainer}>
+          <Image
+            source={{ uri: video.thumbnailUrl || video.videoUrl }}
+            style={styles.thumbnailImage}
+            contentFit="cover"
+          />
+          <View style={styles.errorOverlay}>
+            <AlertTriangle size={40} color="#fff" />
+            <Text style={styles.errorText}>
+              No se puede reproducir el video
+            </Text>
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={retryPlayback}
+            >
+              <Text style={styles.retryText}>Reintentar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    } else {
+      // Reproducción normal de video
+      return (
+        <>
+          <ExpoVideo
+            ref={videoRef}
+            source={{ uri: video.videoUrl }}
+            style={styles.video}
+            resizeMode={ResizeMode.COVER}
+            useNativeControls={false}
+            isLooping
+            posterSource={{ uri: video.thumbnailUrl }}
+            onError={handleVideoError}
+          />
+          {!isPlaying && !videoError && (
+            <View style={styles.playButton}>
+              <Play size={40} color={colors.primary} />
+            </View>
+          )}
+        </>
+      );
     }
   };
 
@@ -179,38 +300,9 @@ export default function VideoPost({
         style={styles.videoContainer}
         onPress={handleVideoPress}
       >
-        {Platform.OS === "web" ? (
-          <video
-            style={styles.video as any}
-            controls
-            autoPlay
-            playsInline
-            muted
-            poster={video.thumbnailUrl}
-          >
-            <source src={video.videoUrl} type={video.mimeType || "video/mp4"} />
-            Your browser does not support the video tag.
-          </video>
-        ) : (
-          <>
-            <ExpoVideo
-              ref={videoRef}
-              source={{ uri: video.videoUrl }}
-              style={styles.video}
-              resizeMode={ResizeMode.COVER}
-              useNativeControls={false}
-              isLooping
-              posterSource={{ uri: video.thumbnailUrl }}
-            />
-            {!isPlaying && (
-              <View style={styles.playButton}>
-                <Play size={40} color={colors.primary} />
-              </View>
-            )}
-          </>
-        )}
+        {renderVideoContent()}
 
-        {showControls && (
+        {showControls && !videoError && (
           <View style={styles.videoControls}>
             <TouchableOpacity
               style={styles.playButton}
@@ -442,5 +534,35 @@ const styles = StyleSheet.create({
   timestamp: {
     fontSize: 12,
     marginTop: 4,
+  },
+  errorContainer: {
+    width: "100%",
+    height: "100%",
+    position: "relative",
+  },
+  errorOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  errorText: {
+    color: "#fff",
+    textAlign: "center",
+    marginTop: 12,
+    fontWeight: "500",
+    fontSize: 16,
+  },
+  retryButton: {
+    marginTop: 16,
+    backgroundColor: "rgba(255,255,255,0.3)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 18,
+  },
+  retryText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
