@@ -5,6 +5,7 @@ Este documento explica cómo configurar, habilitar/deshabilitar y utilizar los M
 ---
 
 ## ¿Qué es un MCP?
+
 Un MCP (Model Context Protocol) es un servidor que provee funcionalidades específicas (como acceso a archivos, búsqueda, integración con servicios externos, etc.) que puedes usar desde tu aplicación para potenciar tu flujo de desarrollo.
 
 ---
@@ -23,12 +24,13 @@ Un MCP (Model Context Protocol) es un servidor que provee funcionalidades espec�
     "github": { ... }
   }
 }
-```
+```psh
 Cada entrada representa un MCP habilitado. Puedes agregar, quitar o modificar MCPs según tus necesidades.
 
 ---
 
 ## 2. ¿Cómo habilitar o deshabilitar un MCP?
+
 - **Para habilitar:** Asegúrate de que el MCP esté presente en el objeto `mcpServers`.
 - **Para deshabilitar:** Elimina la entrada del MCP del archivo o renómbrala (por ejemplo, `"npx_DISABLED"`).
 - **Nota:** JSON no permite comentarios, así que no puedes comentar líneas, pero puedes mover entradas temporalmente a otro archivo para deshabilitarlas.
@@ -38,6 +40,7 @@ Cada entrada representa un MCP habilitado. Puedes agregar, quitar o modificar MC
 ## 3. Ejemplo de configuración de un MCP
 
 ### Selección y referencia de MCP
+
 - Puedes explorar y seleccionar MCP de distintos servidores usando [Context7 Expo](https://context7.com/expo/expo).
 - Para detalles y ejemplos de configuración avanzada del MCP Context7, consulta el [repositorio oficial de Upstash Context7](https://github.com/upstash/context7).
 
@@ -46,7 +49,7 @@ Cada entrada representa un MCP habilitado. Puedes agregar, quitar o modificar MC
   "command": "npx",
   "args": ["-y", "@upstash/context7-mcp@latest"]
 }
-```
+psh
 Si el MCP requiere variables de entorno, agrégalas así:
 ```json
 "context7": {
@@ -61,6 +64,7 @@ Si el MCP requiere variables de entorno, agrégalas así:
 ---
 
 ## 4. ¿Cómo te ayudan los MCP en tu app?
+
 - **Automatización:** Acceso a servicios externos (GitHub, Supabase, Brave Search, Context7, etc.) desde tu código, facilitando integraciones y automatizaciones.
 - **Productividad:** Puedes consultar, modificar o buscar información de manera centralizada sin salir de tu entorno de desarrollo.
 - **Escalabilidad:** Agrega o quita servicios según lo que tu app necesite en cada etapa del desarrollo.
@@ -69,6 +73,7 @@ Si el MCP requiere variables de entorno, agrégalas así:
 ---
 
 ## 5. Pasos para usar MCP en tu desarrollo
+
 1. **Edita `mcp_config.json`** y agrega/quita los MCPs que necesitas.
 2. **Configura las variables de entorno** en cada MCP si el servicio lo requiere (API keys, tokens, etc.).
 3. **Guarda el archivo** y reinicia tu entorno si es necesario para recargar la configuración.
@@ -77,6 +82,7 @@ Si el MCP requiere variables de entorno, agrégalas así:
 ---
 
 ## 6. Recomendaciones
+
 - Mantén tus tokens y claves seguras, no las compartas en repositorios públicos.
 - Documenta cada MCP que uses y para qué sirve en tu proyecto.
 - Si tienes dudas, revisa la documentación oficial de cada MCP o pide ayuda aquí.
