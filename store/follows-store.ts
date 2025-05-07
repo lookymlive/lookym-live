@@ -1,3 +1,4 @@
+import { createFollowNotification } from "@/utils/notifications";
 import { supabase } from "@/utils/supabase";
 import { create } from "zustand";
 import { useAuthStore } from "./auth-store";
@@ -69,6 +70,21 @@ export const useFollowsStore = create<FollowsState>((set, get) => ({
         .insert([{ follower_id: currentUser.id, following_id: userId }]);
 
       if (error) throw error;
+
+      // Crear notificación para el usuario seguido
+      try {
+        await createFollowNotification(
+          userId,
+          currentUser.id,
+          currentUser.username
+        );
+      } catch (notifError) {
+        console.error(
+          "Error al crear notificación de seguimiento:",
+          notifError
+        );
+        // No interrumpimos el flujo si falla la notificación
+      }
 
       // Actualizar estado local
       set((state) => ({

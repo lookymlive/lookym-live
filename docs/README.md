@@ -1,92 +1,38 @@
-# LOOKYM
+# Documentación del Proyecto LOOKYM
 
-LOOKYM es una plataforma móvil que conecta usuarios y negocios a través de videos cortos.
+Este directorio contiene la documentación oficial del proyecto LOOKYM. Utiliza esta guía para navegar por los diferentes documentos disponibles.
 
-## [EN] Recent Updates
+## Índice de Documentación
 
-- The bottom navigation tab previously labeled 'Create' is now 'Upload' for clarity.
-- The Home screen now fetches the latest videos automatically when opened.
-- The upload flow now returns the new video and provides a direct link to view it after successful upload.
+### Documentos Principales
 
-See documentation for more details.
+- [Guía de Documentación](./guia-documentacion.md) - Resumen completo del estado actual del proyecto
+- [Visión General](./overview.md) - Descripción general del proyecto y sus características
+- [Organización de la Documentación](./organizacion-documentacion.md) - Estructura y organización de la documentación
+- [Estado del Proyecto](./PROJECT_STATUS.md) - Estado actual de desarrollo
+- [Progreso y Roadmap](./progreso-y-roadmap.md) - Avances recientes y próximos pasos
+- [Descripción del Proyecto](./Project_Description.txt) - Descripción detallada y contexto general
+- [DOCUMENTACION.md (raíz)](../DOCUMENTACION.md) - Documento de trabajo que resume el estado actual del sistema
+- [Memoria Institucional y Contexto](../memory-bank/) - Contexto, patrones, tech y progreso histórico
 
-## Documentación principal
+### Referencias Cruzadas
+- Los documentos en `/memory-bank` contienen contexto institucional, patrones de sistema, progreso histórico y detalles técnicos clave. Consulta especialmente `activeContext.md`, `progress.md` y `techContext.md` para entender el estado y evolución del sistema.
+- El archivo `DOCUMENTACION.md` en la raíz es el resumen vivo del sistema y debe actualizarse con cada cambio relevante.
 
-Toda la documentación se encuentra en la carpeta `/docs`. Consulta el archivo `overview.md` o este mismo README para empezar.
+## Relación con Otras Carpetas de Documentación
 
----
+- `/memory-bank` - Contiene documentos de contexto y memoria institucional del proyecto
+- `DOCUMENTACION.md` (raíz) - Documento de trabajo que resume el estado actual del sistema
 
-## Testing en proyectos Expo/React Native
+## Cómo Mantener la Documentación
 
-La configuración de testing está optimizada para proyectos con Expo y React Native usando Jest, Babel y TypeScript:
-
-### Configuración base
-
-- Usa `babel-jest` como transformador principal para `.ts` y `.tsx`.
-- Archivo de configuración: `jest.config.cjs` (CommonJS, compatible con Babel y ESM en el código fuente).
-- Babel configurado en `babel.config.cjs`.
-
-### Mocks recomendados
-
-Mockea módulos nativos y externos en tu archivo `jest.setup.ts`:
-
-```ts
-jest.mock('expo-constants', () => ({
-  __esModule: true,
-  default: { expoConfig: { extra: { cloudinaryCloudName: 'test', cloudinaryUploadPreset: 'test' } } },
-}));
-jest.mock('react-native', () => ({}));
-jest.mock('@react-native-async-storage/async-storage', () => require('@react-native-async-storage/async-storage/jest/async-storage-mock'));
-```
-
-### Buenas prácticas
-
-- Mockea `fetch` y otros servicios de red en los tests que lo requieran.
-- Separa la lógica pura en módulos independientes para facilitar el testing.
-- Evita dependencias reales de red o de módulos nativos en los tests.
-
-### Ejemplo de test unitario robusto
-
-```ts
-import { uploadVideo } from '../utils/cloudinary';
-
-describe('uploadVideo', () => {
-  beforeAll(() => {
-    global.fetch = jest.fn(() => Promise.resolve({
-      ok: true,
-      status: 200,
-      json: async () => ({ secure_url: 'fake-url', public_id: 'fake_id' }),
-      text: async () => '',
-      blob: async () => new Blob(["test"], { type: "video/mp4", lastModified: Date.now() })
-    }));
-  });
-  it('should create FormData and call fetch for web URIs', async () => {
-    const videoUri = 'https://example.com/video.mp4';
-    await uploadVideo(videoUri, { resource_type: 'video' });
-    expect(global.fetch).toHaveBeenCalled();
-  });
-});
-```
-
-Para más detalles revisa los tests en `/utils/__tests__/` y `/store/__tests__/`.
-
-## Estructura del proyecto
-
-- Código fuente: `/app`, `/components`, `/utils`, etc.
-- Documentación: `/docs`
-- Recursos estáticos: `/assets`
-
-## Primeros pasos
-
-1. Instala dependencias: `npm install`
-2. Corre el proyecto: `npm start` (Expo)
-
-## Enlaces útiles
-
-- [Guía de desarrollo](./guides/development.md)
-- [Estado del proyecto](./PROJECT_STATUS.md)
-- [Contribuir](./CONTRIBUTING.md)
+1. Mantén los documentos actualizados cuando implementes nuevas características o cambios importantes.
+2. Sigue el formato y estilo establecido en los documentos existentes.
+3. Crea nuevos documentos en la categoría apropiada cuando sea necesario y enlázalos en este índice.
+4. Actualiza este índice y las referencias cruzadas cuando añadas o modifiques documentos clave.
+5. Sincroniza la información relevante entre `/docs`, `/memory-bank` y `DOCUMENTACION.md` para evitar inconsistencias.
+6. Si surge una nueva área de conocimiento o contexto, crea un archivo en `/memory-bank` y enlázalo aquí.
 
 ---
 
-Para más detalles, revisa los archivos dentro de `/docs`.
+### Last Updated: 2025-04-16

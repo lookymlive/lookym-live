@@ -3,6 +3,7 @@ import {
   uploadVideo as cloudinaryUpload,
   getVideoThumbnailUrl,
 } from "@/utils/cloudinary";
+import { createVideoLikeNotification } from "@/utils/notifications";
 import { supabase } from "@/utils/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -76,6 +77,22 @@ export const useVideoStore = create<VideoState>()(
               likedVideos: { ...state.likedVideos, [videoId]: true },
             };
           });
+          
+          // Crear notificación para el propietario del video
+          const videoToUpdate = get().videos.find((v) => v.id === videoId);
+          if (videoToUpdate && videoToUpdate.user.id !== currentUser.id) {
+            try {
+              await createVideoLikeNotification(
+                videoToUpdate.user.id,
+                currentUser.id,
+                currentUser.username,
+                videoId
+              );
+            } catch (notifError) {
+              console.error("Error al crear notificación de like:", notifError);
+              // No interrumpimos el flujo si falla la notificación
+            }
+          }
         } catch (error: any) {
           console.error("Like video error:", error.message);
           // Don't update state if the API call fails
