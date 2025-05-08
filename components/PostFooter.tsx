@@ -40,30 +40,56 @@ export default function PostFooter({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 12,
-    paddingBottom: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 0,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.05)",
+  },
+  statsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  commentBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#5E60CE",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginRight: 10,
+  },
+  commentCount: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 12,
+    marginLeft: 4,
   },
   likes: {
     fontWeight: "bold",
-    marginBottom: 6,
+    fontSize: 15,
   },
   captionContainer: {
-    flexDirection: "row",
-    marginBottom: 6,
+    marginBottom: 10,
+    paddingVertical: 6,
+  },
+  caption: {
+    fontSize: 15,
+    lineHeight: 20,
   },
   username: {
     fontWeight: "bold",
-    marginRight: 4,
   },
-  caption: {
-    lineHeight: 18,
+  viewCommentsButton: {
+    paddingVertical: 6,
+    marginBottom: 4,
   },
   viewComments: {
-    color: "#666",
-    marginBottom: 6,
+    fontSize: 14,
   },
   timestamp: {
     fontSize: 12,
-    color: "#666",
+    marginTop: 4,
   },
 });
