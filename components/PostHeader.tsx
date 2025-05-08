@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { MoreHorizontal, BadgeCheck } from 'lucide-react-native';
-import { PostUser } from '@/types/post';
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { PostUser } from "@/types/post";
+import { BadgeCheck, MoreHorizontal } from "lucide-react-native";
+import React from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface PostHeaderProps {
   user: PostUser;
@@ -9,22 +10,34 @@ interface PostHeaderProps {
 }
 
 export default function PostHeader({ user, location }: PostHeaderProps) {
+  const { colors, isDark } = useColorScheme();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.card }]}>
       <View style={styles.userContainer}>
         <Image source={{ uri: user.avatar }} style={styles.avatar} />
         <View style={styles.userInfo}>
           <View style={styles.usernameContainer}>
-            <Text style={styles.username}>{user.username}</Text>
+            <Text style={[styles.username, { color: colors.text }]}>
+              {user.username}
+            </Text>
             {user.verified && (
-              <BadgeCheck size={16} color="#3897F0" style={styles.verifiedBadge} />
+              <BadgeCheck
+                size={16}
+                color={colors.primary}
+                style={styles.verifiedBadge}
+              />
             )}
           </View>
-          {location && <Text style={styles.location}>{location}</Text>}
+          {location && (
+            <Text style={[styles.location, { color: colors.textSecondary }]}>
+              {location}
+            </Text>
+          )}
         </View>
       </View>
-      <TouchableOpacity>
-        <MoreHorizontal size={24} color="#000" />
+      <TouchableOpacity style={styles.moreButton}>
+        <MoreHorizontal size={24} color={colors.text} />
       </TouchableOpacity>
     </View>
   );
@@ -32,38 +45,50 @@ export default function PostHeader({ user, location }: PostHeaderProps) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.05)",
   },
   userContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+    borderWidth: 2,
+    borderColor: "#5E60CE",
   },
   userInfo: {
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   usernameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   username: {
-    fontWeight: 'bold',
-    fontSize: 14,
+    fontWeight: "bold",
+    fontSize: 15,
   },
   verifiedBadge: {
     marginLeft: 4,
   },
+  moreButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.03)",
+  },
   location: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: 13,
+    marginTop: 2,
   },
 });
