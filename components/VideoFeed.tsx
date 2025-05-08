@@ -1,11 +1,15 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { getColorWithOpacity, useColorScheme } from "@/hooks/useColorScheme";
 import { useVideoStore } from "@/store/video-store";
 import { Video as VideoType } from "@/types/video";
-import React, { useEffect, useRef, useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { RefreshCw, Video } from "lucide-react-native";
+import { MotiView } from "moti";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
+  Animated,
   Dimensions,
   FlatList,
+  Platform,
   ViewToken as RNViewToken,
   StyleSheet,
   Text,
@@ -26,12 +30,14 @@ interface VideoFeedProps {
   initialVideos?: VideoType[];
   userId?: string;
   isExplore?: boolean;
+  onRefresh?: () => void;
 }
 
 export default function VideoFeed({
   initialVideos,
   userId,
   isExplore = false,
+  onRefresh,
 }: VideoFeedProps) {
   const { videos, fetchVideos, fetchVideosByUser, isLoading, error } =
     useVideoStore();
@@ -39,8 +45,16 @@ export default function VideoFeed({
   const [visibleVideos, setVisibleVideos] = useState<Record<string, boolean>>(
     {}
   );
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [scrollDirection, setScrollDirection] = useState<"up" | "down" | null>(
+    null
+  );
+  const [lastScrollY, setLastScrollY] = useState(0);
   const flatListRef = useRef<FlatList>(null);
-  const { isDark, colors } = useColorScheme();
+  const { isDark, colors, gradients } = useColorScheme();
+
+  // Referencia para la animación de desplazamiento
+  const scrollIndicatorOpacity = useRef(new Animated.Value(0)).current;
 
   // Determinar qué videos mostrar
   const videosToShow = initialVideos || videos;
@@ -48,13 +62,76 @@ export default function VideoFeed({
   // Cargar videos al inicio
   useEffect(() => {
     if (!initialVideos) {
-      if (userId) {
-        fetchVideosByUser(userId);
-      } else {
-        fetchVideos();
-      }
+      loadVideos();
     }
-  }, [userId, fetchVideos, fetchVideosByUser, initialVideos]);
+  }, [userId, initialVideos]);
+
+  // Función para cargar videos
+  const loadVideos = useCallback(async () => {
+    try {
+      if (userId) {
+        await fetchVideosByUser(userId);
+      } else {
+        await fetchVideos();
+      }
+    } catch (error) {
+      console.error("Error cargando videos:", error);
+    }
+  }, [userId, fetchVideos, fetchVideosByUser]);
+
+  // Función para refrescar videos
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+
+    try {
+      if (onRefresh) {
+        await onRefresh();
+      } else {
+        await loadVideos();
+      }
+    } catch (error) {
+      console.error("Error refrescando videos:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [onRefresh, loadVideos]);
+
+  // Mostrar/ocultar indicador de desplazamiento
+  const fadeScrollIndicator = (show: boolean) => {
+    Animated.timing(scrollIndicatorOpacity, {
+      toValue: show ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Manejar eventos de desplazamiento
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: new Animated.Value(0) } } }],
+    {
+      useNativeDriver: false,
+      listener: (event: any) => {
+        const currentScrollY = event.nativeEvent.contentOffset.y;
+
+        // Determinar dirección de desplazamiento
+        if (currentScrollY > lastScrollY) {
+          setScrollDirection("down");
+        } else if (currentScrollY < lastScrollY) {
+          setScrollDirection("up");
+        }
+
+        setLastScrollY(currentScrollY);
+
+        // Mostrar indicador brevemente
+        fadeScrollIndicator(true);
+        if (scrollIndicatorTimeout) clearTimeout(scrollIndicatorTimeout);
+        const scrollIndicatorTimeout = setTimeout(
+          () => fadeScrollIndicator(false),
+          1500
+        );
+      },
+    }
+  );
 
   // Configurar el callback para seguimiento de videos visibles
   const onViewableItemsChanged = useRef(
@@ -82,7 +159,10 @@ export default function VideoFeed({
 
       // Actualizar el índice del video activo si se encontró uno
       if (maxVisibilityItem && maxVisibilityItem.index !== null) {
-        setActiveVideoIndex(maxVisibilityItem.index);
+        // Solo actualizar si cambió el índice para evitar re-renders innecesarios
+        if (maxVisibilityItem.index !== activeVideoIndex) {
+          setActiveVideoIndex(maxVisibilityItem.index);
+        }
       }
 
       setVisibleVideos(newVisibleVideos);
@@ -96,63 +176,177 @@ export default function VideoFeed({
 
   if (isLoading && videosToShow.length === 0) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View
+        style={[
+          styles.centered,
+          { backgroundColor: colors.backgroundSecondary },
+        ]}
+      >
+        <MotiView
+          from={{ opacity: 0.6, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "timing", duration: 500 }}
+          style={styles.loadingContainer}
+        >
+          <LinearGradient
+            colors={gradients.primary}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.loadingGradient}
+          >
+            <MotiView
+              from={{ rotate: "0deg" }}
+              animate={{ rotate: "360deg" }}
+              transition={{ type: "timing", duration: 2000, loop: true }}
+            >
+              <RefreshCw size={32} color="white" style={{ opacity: 0.9 }} />
+            </MotiView>
+            <Text style={styles.loadingText}>Cargando videos...</Text>
+          </LinearGradient>
+        </MotiView>
       </View>
     );
   }
 
   if (error && videosToShow.length === 0) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
-        <Text style={{ color: colors.error }}>
-          Error cargando videos: {error}
-        </Text>
+      <View
+        style={[
+          styles.centered,
+          { backgroundColor: colors.backgroundSecondary },
+        ]}
+      >
+        <MotiView
+          from={{ opacity: 0, translateY: 20 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "spring", damping: 15 }}
+          style={styles.errorContainer}
+        >
+          <LinearGradient
+            colors={[colors.error, colors.getColorWithOpacity("error", 0.7)]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.errorBanner}
+          >
+            <Text style={styles.errorTitle}>¡Ups! Algo salió mal</Text>
+            <Text style={styles.errorText}>{error}</Text>
+          </LinearGradient>
+        </MotiView>
       </View>
     );
   }
 
   if (videosToShow.length === 0) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
-        <Text style={{ color: colors.text }}>
-          {isExplore
-            ? "No hay videos disponibles para explorar ahora."
-            : userId
-            ? "Este usuario aún no ha publicado videos."
-            : "No hay videos disponibles. ¡Regresa pronto!"}
-        </Text>
+      <View
+        style={[
+          styles.centered,
+          { backgroundColor: colors.backgroundSecondary },
+        ]}
+      >
+        <MotiView
+          from={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", damping: 15 }}
+          style={styles.emptyContainer}
+        >
+          <LinearGradient
+            colors={gradients.primary}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0.8 }}
+            style={styles.emptyBanner}
+          >
+            <Video size={48} color="white" style={styles.emptyIcon} />
+            <Text style={styles.emptyTitle}>
+              {isExplore
+                ? "Exploración vacía"
+                : userId
+                ? "Sin videos"
+                : "Sin contenido"}
+            </Text>
+            <Text style={styles.emptyText}>
+              {isExplore
+                ? "No hay videos disponibles para explorar ahora."
+                : userId
+                ? "Este usuario aún no ha publicado videos."
+                : "No hay videos disponibles. ¡Regresa pronto!"}
+            </Text>
+          </LinearGradient>
+        </MotiView>
       </View>
     );
   }
 
+  // Renderizar el indicador de desplazamiento
+  const renderScrollIndicator = () => {
+    return (
+      <Animated.View
+        style={[
+          styles.scrollIndicator,
+          {
+            opacity: scrollIndicatorOpacity,
+            backgroundColor: getColorWithOpacity("primary", 0.7),
+          },
+        ]}
+      >
+        <Text style={styles.scrollIndicatorText}>
+          {scrollDirection === "down" ? "↓" : "↑"}
+        </Text>
+      </Animated.View>
+    );
+  };
+
   return (
-    <FlatList
-      ref={flatListRef}
-      data={videosToShow}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item, index }) => (
-        <View style={styles.videoContainer}>
-          <VideoPost
-            video={item}
-            isActive={index === activeVideoIndex}
-            isVisible={!!visibleVideos[item.id]}
-          />
-        </View>
-      )}
-      pagingEnabled
-      showsVerticalScrollIndicator={false}
-      snapToInterval={height}
-      snapToAlignment="start"
-      decelerationRate="fast"
-      onViewableItemsChanged={onViewableItemsChanged}
-      viewabilityConfig={viewabilityConfig}
-      initialNumToRender={2}
-      maxToRenderPerBatch={3}
-      windowSize={5}
-      removeClippedSubviews={true}
-      style={{ backgroundColor: colors.background }}
-    />
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <Animated.FlatList
+        ref={flatListRef}
+        data={videosToShow}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item, index }) => {
+          // Calcular la distancia desde el elemento activo para animaciones
+          const distance = Math.abs(index - activeVideoIndex);
+          const isActive = index === activeVideoIndex;
+
+          return (
+            <MotiView
+              from={{ opacity: 0.7 }}
+              animate={{
+                opacity: isActive ? 1 : 0.95,
+                scale: isActive ? 1 : 0.98,
+              }}
+              transition={{
+                type: "timing",
+                duration: 300,
+                delay: distance * 50, // Retrasar animaciones basadas en la distancia
+              }}
+              style={styles.videoContainer}
+            >
+              <VideoPost
+                video={item}
+                isActive={isActive}
+                isVisible={!!visibleVideos[item.id]}
+              />
+            </MotiView>
+          );
+        }}
+        pagingEnabled
+        showsVerticalScrollIndicator={false}
+        snapToInterval={height}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+        initialNumToRender={2}
+        maxToRenderPerBatch={3}
+        windowSize={5}
+        removeClippedSubviews={true}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        onRefresh={handleRefresh}
+        refreshing={isRefreshing}
+      />
+      {renderScrollIndicator()}
+    </View>
   );
 }
 
@@ -160,10 +354,121 @@ const styles = StyleSheet.create({
   videoContainer: {
     height,
     width: "100%",
+    marginBottom: 8,
   },
   centered: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  loadingContainer: {
+    width: "80%",
+    maxWidth: 300,
+  },
+  loadingGradient: {
+    padding: 28,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+  loadingText: {
+    color: "white",
+    marginTop: 20,
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  errorContainer: {
+    width: "85%",
+    maxWidth: 340,
+  },
+  errorBanner: {
+    padding: 28,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+  errorTitle: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  errorText: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 15,
+    opacity: 0.9,
+    lineHeight: 22,
+  },
+  emptyContainer: {
+    width: "85%",
+    maxWidth: 340,
+  },
+  emptyBanner: {
+    padding: 32,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+  emptyIcon: {
+    marginBottom: 16,
+    opacity: 0.9,
+  },
+  emptyTitle: {
+    color: "white",
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  emptyText: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 16,
+    opacity: 0.9,
+    lineHeight: 24,
+  },
+  scrollIndicator: {
+    position: "absolute",
+    right: 24,
+    bottom: Platform.OS === "ios" ? 60 : 40,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  scrollIndicatorText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
