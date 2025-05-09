@@ -1,4 +1,4 @@
-## Guía de estilos y gradientes
+# Guía de estilos y gradientes
 
 Para el uso correcto de gradientes y colores en componentes Expo LinearGradient, consulta la sección "Uso de gradientes y colores" en `/docs/styling-guide.md`. Allí encontrarás reglas, ejemplos y advertencias para desarrolladores y sistemas de IA.
 
@@ -8,7 +8,7 @@ Resumen de reglas clave:
 - Usa el helper `getColorWithOpacity` del hook `useColorScheme` para colores con opacidad.
 - Documenta cualquier cambio en gradientes en `/constants/colors.ts` y en la guía de estilos.
 
-# LOOKYM - Plataforma de Conexión por Video
+LOOKYM - Plataforma de Conexión por Video
 
 LOOKYM es una aplicación móvil que conecta usuarios con negocios a través de contenido de video de formato corto. La plataforma permite a los negocios mostrar sus productos y servicios, mientras que los usuarios pueden descubrir, interactuar y comunicarse directamente con estos negocios.
 
