@@ -1,4 +1,42 @@
-# LOOKYM - Styling Guide
+# Uso de gradientes y colores en componentes Expo LinearGradient
+
+## Reglas para IA y desarrolladores
+
+- Siempre que uses `LinearGradient` de Expo, el prop `colors` debe ser un array de al menos dos strings, tipado como `[string, string]`.
+  - Ejemplo: `colors={gradients.primary as [string, string]}`
+- Si usas helpers para opacidad, usa `getColorWithOpacity` del hook `useColorScheme`.
+  - Ejemplo: `getColorWithOpacity("primary", 0.5)`
+- No uses `colors.getColorWithOpacity`, solo el helper global.
+- Si agregas nuevos gradientes en `constants/colors.ts`, documenta el formato aquí y en los comentarios de los archivos fuente.
+- Si cambias la estructura de colores, actualiza este documento y los comentarios en los archivos fuente.
+
+## Ejemplo de uso correcto en un componente
+
+```tsx
+import { LinearGradient } from "expo-linear-gradient";
+import { useColorScheme } from "@/hooks/useColorScheme";
+
+const { gradients, getColorWithOpacity } = useColorScheme();
+
+<LinearGradient
+  colors={gradients.primary as [string, string]}
+  start={{ x: 0, y: 0 }}
+  end={{ x: 1, y: 1 }}
+>
+  {/* contenido */}
+</LinearGradient>
+
+// Para gradientes custom:
+<LinearGradient
+  colors={["#FF0000", getColorWithOpacity("primary", 0.5)] as [string, string]}
+  start={{ x: 0, y: 0 }}
+  end={{ x: 1, y: 1 }}
+>
+  {/* contenido */}
+</LinearGradient>
+```
+
+## LOOKYM - Styling Guide
 
 This document outlines the styling approach and guidelines for the LOOKYM application.
 

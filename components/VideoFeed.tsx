@@ -1,4 +1,26 @@
-import { getColorWithOpacity, useColorScheme } from "@/hooks/useColorScheme";
+/**
+ * VideoFeed.tsx - Componente principal del feed de videos de LOOKYM
+ *
+ * Notas de integración y buenas prácticas para IA y desarrolladores:
+ *
+ * - Gradientes: El prop `colors` de `LinearGradient` debe ser un array tipado como `[string, string]`.
+ *   Ejemplo: `colors={gradients.primary as [string, string]}`
+ *   Si necesitas un gradiente custom, asegúrate de que tenga al menos dos colores y tipa explícitamente.
+ *
+ * - Opacidad de color: Para obtener un color con opacidad, usa el helper `getColorWithOpacity` del hook `useColorScheme`.
+ *   Ejemplo: `getColorWithOpacity("error", 0.7)`
+ *
+ * - No uses `colors.getColorWithOpacity`, solo el helper global del hook.
+ *
+ * - Si agregas nuevos gradientes en `constants/colors.ts`, documenta el formato y asegúrate de que sean arrays de al menos dos strings.
+ *
+ * - Si cambias la lógica de temas o colores, actualiza también la documentación en `docs/styling-guide.md`.
+ *
+ * - Si la IA encuentra errores de tipo con gradientes, revisa el tipado y la cantidad de colores.
+ *
+ * Última actualización: 2025-05-08
+ */
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { useVideoStore } from "@/store/video-store";
 import { Video as VideoType } from "@/types/video";
 import { LinearGradient } from "expo-linear-gradient";
@@ -51,7 +73,9 @@ export default function VideoFeed({
   );
   const [lastScrollY, setLastScrollY] = useState(0);
   const flatListRef = useRef<FlatList>(null);
-  const { isDark, colors, gradients } = useColorScheme();
+  const { isDark, colors, gradients, getColorWithOpacity } = useColorScheme();
+  // Ref for scroll indicator timeout
+  const scrollIndicatorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Referencia para la animación de desplazamiento
   const scrollIndicatorOpacity = useRef(new Animated.Value(0)).current;
@@ -124,8 +148,10 @@ export default function VideoFeed({
 
         // Mostrar indicador brevemente
         fadeScrollIndicator(true);
-        if (scrollIndicatorTimeout) clearTimeout(scrollIndicatorTimeout);
-        const scrollIndicatorTimeout = setTimeout(
+        if (scrollIndicatorTimeoutRef.current) {
+          clearTimeout(scrollIndicatorTimeoutRef.current);
+        }
+        scrollIndicatorTimeoutRef.current = setTimeout(
           () => fadeScrollIndicator(false),
           1500
         );
@@ -189,7 +215,7 @@ export default function VideoFeed({
           style={styles.loadingContainer}
         >
           <LinearGradient
-            colors={gradients.primary}
+            colors={gradients.primary as [string, string]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.loadingGradient}
@@ -223,7 +249,12 @@ export default function VideoFeed({
           style={styles.errorContainer}
         >
           <LinearGradient
-            colors={[colors.error, colors.getColorWithOpacity("error", 0.7)]}
+            colors={
+              [colors.error, getColorWithOpacity("error", 0.7)] as [
+                string,
+                string,
+              ]
+            }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.errorBanner}
@@ -251,7 +282,7 @@ export default function VideoFeed({
           style={styles.emptyContainer}
         >
           <LinearGradient
-            colors={gradients.primary}
+            colors={gradients.primary as [string, string]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0.8 }}
             style={styles.emptyBanner}
@@ -261,15 +292,15 @@ export default function VideoFeed({
               {isExplore
                 ? "Exploración vacía"
                 : userId
-                ? "Sin videos"
-                : "Sin contenido"}
+                  ? "Sin videos"
+                  : "Sin contenido"}
             </Text>
             <Text style={styles.emptyText}>
               {isExplore
                 ? "No hay videos disponibles para explorar ahora."
                 : userId
-                ? "Este usuario aún no ha publicado videos."
-                : "No hay videos disponibles. ¡Regresa pronto!"}
+                  ? "Este usuario aún no ha publicado videos."
+                  : "No hay videos disponibles. ¡Regresa pronto!"}
             </Text>
           </LinearGradient>
         </MotiView>

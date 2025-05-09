@@ -1,3 +1,8 @@
+* **Estilo y Gradientes:**
+  * El prop `colors` de Expo LinearGradient debe ser siempre un array de al menos dos strings, tipado como `[string, string]`.
+  * Para colores con opacidad, usa el helper `getColorWithOpacity` del hook `useColorScheme`.
+  * Documenta cualquier cambio en gradientes en `/constants/colors.ts` y en `/docs/styling-guide.md`.
+
 # System Patterns
 
 * **Overall Architecture:** Mobile Client-Server architecture. React Native/Expo frontend communicates with Supabase (Backend-as-a-Service) and Cloudinary (Media PaaS).

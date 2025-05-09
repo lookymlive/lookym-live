@@ -1,3 +1,17 @@
+/**
+ * constants/colors.ts - Sistema de colores y gradientes para LOOKYM
+ *
+ * - Los gradientes exportados (por ejemplo, `gradients.primary`) deben ser arrays de al menos dos strings.
+ *   Ejemplo: `primary: ["#5E60CE", "#6930C3"]`
+ *
+ * - Si agregas un nuevo gradiente, documenta el formato aquí y en `docs/styling-guide.md`.
+ *
+ * - Los colores base (light/dark) deben ser strings hexadecimales o rgba válidos para React Native.
+ *
+ * - Si cambias la estructura, actualiza la guía de estilos y los comentarios en los componentes que usen gradientes.
+ *
+ * Última actualización: 2025-05-08
+ */
 // Paleta de colores moderna para LOOKYM
 const primaryColor = "#5E60CE"; // Púrpura vibrante
 const secondaryColor = "#64DFDF"; // Turquesa brillante

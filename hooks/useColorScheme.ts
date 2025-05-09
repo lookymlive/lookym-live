@@ -1,3 +1,17 @@
+/**
+ * hooks/useColorScheme.ts - Hook para gestión de temas y utilidades de color en LOOKYM
+ *
+ * - Provee acceso a los colores del tema actual (light/dark), gradientes y helpers como `getColorWithOpacity`.
+ *
+ * - Para obtener un color con opacidad, usa: `getColorWithOpacity("primary", 0.5)`
+ *
+ * - Para gradientes, usa siempre el tipado `[string, string]` al pasarlos a `LinearGradient`.
+ *   Ejemplo: `colors={gradients.primary as [string, string]}`
+ *
+ * - Si cambias la estructura de colores o gradientes, actualiza la documentación en este archivo y en `docs/styling-guide.md`.
+ *
+ * Última actualización: 2025-05-08
+ */
 import Colors, { gradients } from "@/constants/colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";

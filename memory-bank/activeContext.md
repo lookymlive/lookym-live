@@ -1,3 +1,9 @@
+## Reglas de estilo y gradientes (resumen IA)
+
+- Siempre tipa los gradientes como `[string, string]` al usarlos en Expo LinearGradient.
+- Usa `getColorWithOpacity` del hook para colores con opacidad.
+- Documenta cambios en `/constants/colors.ts` y `/docs/styling-guide.md`.
+
 # Active Context: LOOKYM
 
 ## Current Focus
