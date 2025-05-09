@@ -16,6 +16,7 @@ Este directorio contiene la documentación oficial del proyecto LOOKYM. Utiliza 
 - [Memoria Institucional y Contexto](../memory-bank/) - Contexto, patrones, tech y progreso histórico
 
 ### Referencias Cruzadas
+
 - Los documentos en `/memory-bank` contienen contexto institucional, patrones de sistema, progreso histórico y detalles técnicos clave. Consulta especialmente `activeContext.md`, `progress.md` y `techContext.md` para entender el estado y evolución del sistema.
 - El archivo `DOCUMENTACION.md` en la raíz es el resumen vivo del sistema y debe actualizarse con cada cambio relevante.
 
