@@ -110,3 +110,75 @@ export default function FeedScreen() {
     />
   );
 }
+```
+
+---
+
+## Business Components
+
+### ShowcaseView
+
+- **Propósito:**
+  - Vidriera virtual para perfiles de comercios. Simula la experiencia de "ver la vidriera desde la calle".
+  - Muestra avatar, nombre, video principal con etiquetas de productos, grid de productos y (futuro) carrusel de otras vidrieras.
+
+- **Props:**
+  - `store: StoreProfile` — Objeto con la información del comercio, videos y productos.
+
+- **Estructura esperada:**
+
+  ```typescript
+  interface StoreProfile {
+    id: string;
+    name: string;
+    avatar: string;
+    bio?: string;
+    location?: string;
+    category?: string;
+    videos: StoreVideo[];
+    products: StoreProduct[];
+  }
+  interface StoreVideo {
+    id: string;
+    videoUrl: string;
+    thumbnailUrl?: string;
+    tags: ProductTag[];
+  }
+  interface ProductTag {
+    id: string;
+    label: string;
+    x: number; // posición relativa (0-1)
+    y: number;
+    productId: string;
+  }
+  interface StoreProduct {
+    id: string;
+    name: string;
+    price: number;
+    imageUrl: string;
+    videoId?: string;
+    description?: string;
+    sizes?: string[];
+    colors?: string[];
+  }
+  ```
+
+- **Ejemplo de uso:**
+
+  ```tsx
+  import ShowcaseView from '@/components/ShowcaseView';
+  <ShowcaseView store={storeProfile} />
+  ```
+
+- **Integración:**
+  - Usado en la pantalla de perfil de negocios (`/app/(tabs)/profile.tsx`).
+  - Si agregas lógica de interacción (seguir, chat, etiquetas interactivas), documenta aquí y enlaza a la sección correspondiente.
+
+### Notas
+
+- El componente ahora muestra el avatar real del comercio usando la imagen de perfil (`store.avatar`). Si no hay avatar, muestra la inicial como fallback.
+- El video principal ahora se muestra usando un reproductor real (`expo-av`), con controles nativos y miniatura si está disponible.
+- Ahora el grid de productos muestra la imagen real (`product.imageUrl`) si está disponible, usando `expo-image`.
+- Si se integran más componentes reales (botones de interacción, etiquetas interactivas), actualiza esta sección y enlaza a la documentación relevante.
+- **Dependencias:** `expo-av` para video, `expo-image` para imágenes.
+- Última actualización: 2025-05-10
