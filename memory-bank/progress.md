@@ -42,7 +42,17 @@
     - Sistema de comentarios con capacidad para añadir nuevos comentarios.
     - Botones para like y guardar con retroalimentación visual.
     - Navegación directa al perfil del creador.
-    - Botón para iniciar chat con negocios.
+
+## Business Profile: ShowcaseView
+
+- `ShowcaseView` integrado y documentado como vidriera virtual para perfiles de negocios.
+- Avatar real del comercio usando `expo-image`.
+- Video principal mostrado con `expo-av` y controles nativos.
+- El grid de productos ahora muestra la imagen real (`product.imageUrl`) si está disponible, usando `expo-image`.
+- Documentación en `/docs/ui-components.md` actualizada tras cada mejora.
+- Mantener sincronía entre código y documentación.
+- Última actualización: 2025-05-10
+  - Botón para iniciar chat con negocios.
 - **Search Functionality:**
   - Búsqueda por videos, hashtags y usuarios.
   - Filtros por categoría para refinar resultados.
