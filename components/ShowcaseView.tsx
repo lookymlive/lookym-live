@@ -52,6 +52,8 @@
  * Última actualización: 2025-05-09
  */
 
+import { Video as ExpoVideo, ResizeMode } from "expo-av";
+import { Image } from "expo-image";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 
 export interface ShowcaseViewProps {
@@ -114,8 +116,16 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
           <View style={styles.headerCenter}>
             {/* Avatar y nombre */}
             <View style={styles.avatarCircle}>
-              {/* TODO: Usar componente Avatar si existe */}
-              <Text style={styles.avatarInitial}>{store.name[0]}</Text>
+              {/* Avatar real del comercio */}
+              {store.avatar ? (
+                <Image
+                  source={{ uri: store.avatar }}
+                  style={{ width: 40, height: 40, borderRadius: 20 }}
+                  contentFit="cover"
+                />
+              ) : (
+                <Text style={styles.avatarInitial}>{store.name[0]}</Text>
+              )}
             </View>
             <Text style={styles.storeName}>{store.name}</Text>
           </View>
@@ -126,17 +136,38 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
 
         {/* Hero video */}
         <View style={styles.heroVideo}>
-          {/* TODO: Usar VideoPlayer real */}
-          <View style={styles.heroVideoPlaceholder}>
-            <Text style={styles.heroVideoText}>Video principal aquí</Text>
-            {mainVideo && (
+          {mainVideo ? (
+            <>
+              <ExpoVideo
+                source={{ uri: mainVideo.videoUrl }}
+                style={{
+                  width: "100%",
+                  aspectRatio: 9 / 16,
+                  backgroundColor: "#000",
+                  borderRadius: 16,
+                }}
+                useNativeControls
+                resizeMode={ResizeMode.COVER}
+                posterSource={
+                  mainVideo.thumbnailUrl
+                    ? { uri: mainVideo.thumbnailUrl }
+                    : undefined
+                }
+                posterStyle={{ resizeMode: "cover", borderRadius: 16 }}
+                shouldPlay={false}
+                isLooping
+              />
               <Text style={styles.heroVideoTextSmall}>
                 {mainVideo.tags.length > 0
                   ? `Etiquetas: ${mainVideo.tags.map((t) => t.label).join(", ")}`
                   : "Sin etiquetas"}
               </Text>
-            )}
-          </View>
+            </>
+          ) : (
+            <View style={styles.heroVideoPlaceholder}>
+              <Text style={styles.heroVideoText}>Sin video principal</Text>
+            </View>
+          )}
         </View>
 
         {/* Grid de productos */}
@@ -148,8 +179,20 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
             ) : (
               store.products.slice(0, 6).map((product) => (
                 <View key={product.id} style={styles.productCard}>
-                  {/* TODO: Imagen real */}
-                  <View style={styles.productImagePlaceholder} />
+                  {product.imageUrl ? (
+                    <Image
+                      source={{ uri: product.imageUrl }}
+                      style={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: 8,
+                        marginBottom: 6,
+                      }}
+                      contentFit="cover"
+                    />
+                  ) : (
+                    <View style={styles.productImagePlaceholder} />
+                  )}
                   <Text style={styles.productName}>{product.name}</Text>
                   <Text style={styles.productPrice}>${product.price}</Text>
                 </View>
