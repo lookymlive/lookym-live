@@ -1,3 +1,70 @@
+// Integración de ShowcaseView para negocios
+import ShowcaseView, { ShowcaseViewProps } from "@/components/ShowcaseView";
+/**
+ * ProfileScreen - Pantalla de perfil de usuario/negocio para LOOKYM
+ *
+ * Documentación relevante:
+ * - /docs/ui-components.md (componentes reutilizables)
+ * - /docs/state-management.md (gestión de estado con Zustand)
+ * - /docs/styling-guide.md (estilos y gradientes)
+ * - /memory-bank/activeContext.md (prioridades actuales)
+ *
+ * Si agregas nuevas funcionalidades, actualiza la documentación y enlaza desde aquí.
+ *
+ * Última actualización: 2025-05-09
+ *
+ * -----------------------------
+ *
+ * Diseño de UI propuesto:
+ *
+ * - Header: botón volver (si no es propio), nombre usuario, settings (si es propio)
+ * - Sección perfil: avatar, nombre, verificación, rol, bio, info negocio
+ * - Estadísticas: posts, followers, following
+ * - Botones acción: seguir/dejar de seguir, editar perfil, mensaje
+ * - Tabs: posts (grid), saved, products (negocio)
+ * - Contenido tab: grid de videos, mensaje vacío, botón subir video
+ *
+ * Estructura de datos esperada:
+ *
+ * interface ProfileUser {
+ *   id: string;
+ *   username: string;
+ *   displayName: string;
+ *   avatar: string;
+ *   bio?: string;
+ *   role: "user" | "business";
+ *   verified?: boolean;
+ *   category?: string;
+ *   location?: string;
+ *   email: string;
+ * }
+ *
+ * interface FollowsStats {
+ *   followersCount: number;
+ *   followingCount: number;
+ * }
+ *
+ * interface Video {
+ *   id: string;
+ *   userId: string;
+ *   videoUrl: string;
+ *   thumbnailUrl?: string;
+ *   caption?: string;
+ *   hashtags?: string[];
+ *   createdAt: string;
+ * }
+ *
+ * Si agregas campos nuevos, actualiza este bloque y la documentación relevante.
+ *
+ * -----------------------------
+ *
+ * TODOs sugeridos para siguientes mejoras:
+ * - [ ] Extraer componentes UI reutilizables (Avatar, Stats, Tabs, Grid)
+ * - [ ] Documentar cada componente en /docs/ui-components.md
+ * - [ ] Añadir tests para lógica de perfil y helpers
+ * - [ ] Mejorar accesibilidad y responsividad
+ * - [ ] Sincronizar cambios con /memory-bank/activeContext.md y /docs/README.md
+ */
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuthStore } from "@/store/auth-store";
 import { useFollowsStore } from "@/store/follows-store";
@@ -12,10 +79,8 @@ import {
   Edit,
   Grid3X3,
   LogOut,
-  MapPin,
   Settings,
   ShoppingBag,
-  Store,
   User,
 } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
@@ -264,7 +329,7 @@ export default function ProfileScreen() {
     );
   }
 
-  // Business-specific data
+  // Business-specific data y estructura para ShowcaseView
   const businessInfo =
     profileUser.role === "business"
       ? {
@@ -273,56 +338,33 @@ export default function ProfileScreen() {
         }
       : null;
 
+  // Estructura de datos para ShowcaseView
+  const showcaseStoreProfile: ShowcaseViewProps["store"] | null =
+    profileUser.role === "business"
+      ? {
+          id: profileUser.id,
+          name: profileUser.displayName || profileUser.username,
+          avatar: profileUser.avatar,
+          bio: profileUser.bio,
+          location: profileUser.location,
+          category: profileUser.category,
+          videos: videos.map((v) => ({
+            id: v.id,
+            videoUrl: v.videoUrl,
+            thumbnailUrl: v.thumbnailUrl,
+            tags: [], // TODO: mapear etiquetas de productos si existen
+          })),
+          products: [], // TODO: mapear productos si existen
+        }
+      : null;
+
   // Render different content based on user role
   const renderRoleSpecificContent = () => {
-    if (profileUser.role === "business" && businessInfo) {
-      return (
-        <View style={styles.businessInfo}>
-          {businessInfo.category && (
-            <View style={styles.businessInfoItem}>
-              <Store size={16} color={colors.textSecondary} />
-              <Text
-                style={[
-                  styles.businessInfoText,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                {businessInfo.category}
-              </Text>
-            </View>
-          )}
-
-          {businessInfo.location && (
-            <View style={styles.businessInfoItem}>
-              <MapPin size={16} color={colors.textSecondary} />
-              <Text
-                style={[
-                  styles.businessInfoText,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                {businessInfo.location}
-              </Text>
-            </View>
-          )}
-
-          {isOwner && (
-            <TouchableOpacity
-              style={[
-                styles.businessButton,
-                { backgroundColor: colors.card, borderColor: colors.border },
-              ]}
-              onPress={() => router.push("/business-dashboard")}
-            >
-              <Text style={[styles.businessButtonText, { color: colors.text }]}>
-                Business Dashboard
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      );
+    if (profileUser.role === "business" && showcaseStoreProfile) {
+      // Renderizar ShowcaseView para negocios
+      return <ShowcaseView store={showcaseStoreProfile} />;
     }
-
+    // ... (mantener la lógica anterior para usuarios normales si se desea)
     return null;
   };
 
