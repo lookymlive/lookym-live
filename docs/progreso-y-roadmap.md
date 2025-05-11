@@ -3,6 +3,7 @@
 ## Últimos Avances
 
 ### 2025-04-16
+
 - **Depuración de reproducción de videos:**
   - Confirmado que los videos subidos a Cloudinary y registrados en Supabase se pueden reproducir correctamente en web.
   - Se agregó un `<video>` HTML directo para aislar problemas de renderizado.
