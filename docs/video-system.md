@@ -338,6 +338,43 @@ addComment: async (videoId: string, commentText: string) => {
 }
 ```
 
+## Video Download Prevention
+
+To ensure that videos cannot be downloaded by users, the following measures have been implemented:
+
+1. **Web Platform**:
+   - The `controlsList="nodownload"` attribute is added to the `<video>` element to disable the download option in the browser.
+   - A `onContextMenu` event listener is added to prevent right-click actions and display an alert notifying users that downloads are disabled.
+
+2. **Native Platforms**:
+   - The `ExpoVideo` component is used without native download controls.
+
+### Code Example
+
+```tsx
+<video
+  style={styles.video as any}
+  controlsList="nodownload"
+  autoPlay
+  playsInline
+  muted
+  poster={video.thumbnailUrl}
+  onError={(e) => handleVideoError(e)}
+  onContextMenu={(e) => {
+    e.preventDefault();
+    Alert.alert(
+      "Download Disabled",
+      "Downloading videos is not allowed in this app."
+    );
+  }}
+>
+  <source src={video.videoUrl} type={video.mimeType || "video/mp4"} />
+  Your browser does not support the video tag.
+</video>
+```
+
+This ensures a consistent user experience across platforms while protecting video content from unauthorized downloads.
+
 ## Performance Considerations
 
 - Videos are lazy-loaded
