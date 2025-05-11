@@ -11,7 +11,7 @@
   "dependencies": {
     "@expo/metro-config": "~0.19.0",
     "@expo/vector-icons": "^14.0.2",
-    "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-navigation/native": "^7.0.0",
     "@supabase/supabase-js": "^2.49.4",
     "expo": "~52.0.46",
@@ -57,6 +57,7 @@
     "@expo/ngrok": "^4.1.0",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.3.12",
+    "@types/react-native": "^0.72.8",
     "@types/react-test-renderer": "^19.1.0",
     "babel-jest": "^29.7.0",
     "expo-module-scripts": "^4.1.7",
