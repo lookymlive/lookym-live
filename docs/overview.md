@@ -1,5 +1,7 @@
 # Guía de uso y pruebas funcionales (actualizado al 2025-05-10)
 
+> ℹ️ **Para IA y desarrolladores:** Sigue siempre la [guía de buenas prácticas Markdown](./guia-documentacion.md) para evitar errores de formato y mantener la documentación consistente.
+
 Sigue estos pasos para probar y validar las funciones principales de LOOKYM antes de avanzar con nuevas features:
 
 ## 1. Inicio y Autenticación
