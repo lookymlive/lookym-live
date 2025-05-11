@@ -1,3 +1,43 @@
+
+# Guía de buenas prácticas para documentación Markdown en LOOKYM
+
+> **IMPORTANTE para IA:**
+>
+> Cuando generes comentarios, documentación o archivos `.md`, **sigue SIEMPRE** las buenas prácticas de este documento. Esto es obligatorio para evitar errores de formato, redundancias y problemas de integración en el flujo de trabajo del equipo.
+> **Patrón validado para IA, devs y onboarding:**
+
+- Solo un encabezado H1 (`#`) por archivo.
+- Rodea listas y encabezados con **una sola línea en blanco** antes y después.
+- No dejes líneas en blanco dobles entre secciones.
+- Si ves advertencias como `MD025`, `MD022`, `MD032`, revisa la estructura de encabezados y listas.
+- Usa subsecciones con `##` o `###` para organización.
+- Mantén la documentación y el código sincronizados.
+
+Ejemplo correcto:
+
+```markdown
+# Título principal
+
+## Sección
+
+- Elemento 1
+- Elemento 2
+
+### Sub-sección
+
+Texto aquí.
+```
+
+---
+
+**Errores comunes a evitar:**
+
+- Múltiples H1 (`#`) en un archivo.
+- Listas o encabezados sin líneas en blanco antes/después.
+- Duplicar secciones o encabezados.
+
+Sigue este patrón en todos los archivos de `/docs`, `README.md` y documentación generada por IA.
+
 # Guía de Documentación del Proyecto LOOKYM
 
 ## Estructura Actual del Sistema
