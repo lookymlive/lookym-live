@@ -1,7 +1,6 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useVideoStore } from "@/store/video-store";
-import { Video } from "@/types/video";
-import { formatLikes, formatTimeAgo } from "@/utils/time-format";
+import { useVideoStore } from "@/store/video-store.ts";
+import { Video } from "@/types/video.ts";
+import { formatLikes, formatTimeAgo } from "@/utils/time-format.ts";
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -22,6 +21,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useColorScheme } from "../hooks/useColorScheme.ts";
 
 interface VideoPostProps {
   video: Video;
@@ -48,6 +48,9 @@ export default function VideoPost({
     unsaveVideo,
   } = useVideoStore();
   const { isDark, colors } = useColorScheme();
+
+  // Extiende explícitamente el tipo de `colors` para incluir `primaryLight`
+  const extendedColors = colors as typeof colors & { primaryLight: string };
 
   const isLiked = !!likedVideos[video.id];
   const isSaved = !!savedVideos[video.id];
@@ -191,18 +194,29 @@ export default function VideoPost({
     }
   };
 
+  const handleDownloadPrevention = () => {
+    Alert.alert(
+      "Download Disabled",
+      "Downloading videos is not allowed in this app."
+    );
+  };
+
   // Renderizar componente de video o fallback de imagen según el estado
   const renderVideoContent = () => {
     if (Platform.OS === "web") {
       return (
         <video
           style={styles.video as any}
-          controls
+          controlsList="nodownload"
           autoPlay
           playsInline
           muted
           poster={video.thumbnailUrl}
           onError={(e) => handleVideoError(e)}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            handleDownloadPrevention();
+          }}
         >
           <source src={video.videoUrl} type={video.mimeType || "video/mp4"} />
           Your browser does not support the video tag.
@@ -219,9 +233,7 @@ export default function VideoPost({
           />
           <View style={styles.errorOverlay}>
             <AlertTriangle size={40} color="#fff" />
-            <Text style={styles.errorText}>
-              No se puede reproducir el video
-            </Text>
+            <Text style={styles.errorText}>Error de reproducción</Text>
             <TouchableOpacity
               style={styles.retryButton}
               onPress={retryPlayback}
@@ -232,25 +244,17 @@ export default function VideoPost({
         </View>
       );
     } else {
-      // Reproducción normal de video
       return (
-        <>
-          <ExpoVideo
-            ref={videoRef}
-            source={{ uri: video.videoUrl }}
-            style={styles.video}
-            resizeMode={ResizeMode.COVER}
-            useNativeControls={false}
-            isLooping
-            posterSource={{ uri: video.thumbnailUrl }}
-            onError={handleVideoError}
-          />
-          {!isPlaying && !videoError && (
-            <View style={styles.playButton}>
-              <Play size={40} color={colors.primary} />
-            </View>
-          )}
-        </>
+        <ExpoVideo
+          ref={videoRef}
+          source={{ uri: video.videoUrl }}
+          style={styles.video}
+          resizeMode={ResizeMode.COVER}
+          useNativeControls={false}
+          isLooping
+          posterSource={{ uri: video.thumbnailUrl }}
+          onError={handleVideoError}
+        />
       );
     }
   };
