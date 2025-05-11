@@ -1,12 +1,33 @@
-# Guía de estilos y gradientes
 
-Para el uso correcto de gradientes y colores en componentes Expo LinearGradient, consulta la sección "Uso de gradientes y colores" en `/docs/styling-guide.md`. Allí encontrarás reglas, ejemplos y advertencias para desarrolladores y sistemas de IA.
+# LOOKYM
 
-Resumen de reglas clave:
+Bienvenido a LOOKYM. Consulta [`/docs/overview.md`](./docs/overview.md) para una guía paso a paso y checklist funcional.
 
-- Siempre tipa el prop `colors` de LinearGradient como `[string, string]`.
-- Usa el helper `getColorWithOpacity` del hook `useColorScheme` para colores con opacidad.
-- Documenta cualquier cambio en gradientes en `/constants/colors.ts` y en la guía de estilos.
+> ℹ️ **Para IA y desarrolladores:** Sigue siempre la [guía de buenas prácticas Markdown](./docs/guia-documentacion.md) para evitar errores de formato y mantener la documentación consistente.
+
+## Guía rápida de pruebas y uso
+
+Incluye:
+
+- Cómo iniciar y autenticarse (usuarios y negocios)
+- Navegación y estructura de la app
+- Pruebas del perfil de negocio (ShowcaseView)
+- Subida y visualización de videos
+- Chat básico y búsqueda
+- Validación de documentación y sincronía
+- Casos límite y manejo de errores
+
+Esta guía es útil para tiendas, usuarios, desarrolladores y para la IA de soporte.
+
+---
+
+**Nota para IA y devs:**
+
+Evita agregar múltiples encabezados H1 (`#`) en el README principal. Usa solo un H1 al inicio y subsecciones con `##` o `###` para cumplir con linters y evitar advertencias como:
+
+- `MD025/single-title/single-h1: Multiple top-level headings in the same document`
+- `MD022/blanks-around-headings: Headings should be surrounded by blank lines`
+- `MD032/blanks-around-lists: Lists should be surrounded by blank lines`
 
 LOOKYM - Plataforma de Conexión por Video
 
