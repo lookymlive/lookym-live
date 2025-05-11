@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run App Tests",
+			"type": "shell",
+			"command": "npm test",
+			"problemMatcher": [
+				"$tsc"
+			]
+		}
+	]
+}
