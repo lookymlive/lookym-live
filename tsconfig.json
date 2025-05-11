@@ -19,7 +19,9 @@
       "@/*": [
         "./*"
       ]
-    }
+    },
+    "moduleSuffixes": [".ts", ".d.ts", ".tsx", ".js", ".jsx", ""],
+    "allowImportingTsExtensions": true
   },
   "include": [
     "**/*.ts",
