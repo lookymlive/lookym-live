@@ -12,10 +12,10 @@
  *
  * Última actualización: 2025-05-08
  */
-import Colors, { gradients } from "@/constants/colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { useColorScheme as useNativeColorScheme } from "react-native";
+import Colors, { gradients } from "../constants/colors.ts";
 
 // Importamos los colores definidos en constants/colors.ts
 const lightColors = Colors.light;
@@ -87,10 +87,11 @@ const darkStyles = {
 };
 
 // Definimos una interfaz para el tipo de retorno del hook
+// Updated the ColorSchemeType interface to use ExtendedColors for the colors property
 interface ColorSchemeType {
   isDark: boolean;
   colorScheme: "dark" | "light";
-  colors: typeof lightColors;
+  colors: ExtendedColors; // Updated to use ExtendedColors
   styles: typeof lightStyles | typeof darkStyles;
   toggleColorScheme: () => Promise<void>;
   gradients: typeof gradients;
@@ -98,6 +99,27 @@ interface ColorSchemeType {
     colorName: keyof typeof lightColors,
     opacity: number
   ) => string;
+}
+
+// Define una interfaz extendida para incluir primaryLight
+interface ExtendedColors {
+  text: string;
+  textSecondary: string;
+  background: string;
+  backgroundSecondary: string;
+  card: string;
+  border: string;
+  tint: string;
+  tabIconDefault: string;
+  tabIconSelected: string;
+  primary: string;
+  secondary: string;
+  accent: string;
+  success: string;
+  warning: string;
+  error: string;
+  shadow: string;
+  primaryLight: string;
 }
 
 export function useColorScheme(): ColorSchemeType {
@@ -137,7 +159,15 @@ export function useColorScheme(): ColorSchemeType {
   return {
     isDark,
     colorScheme: isDark ? "dark" : "light",
-    colors: isDark ? darkColors : lightColors,
+    colors: isDark
+      ? ({
+          ...darkColors,
+          primaryLight: `${darkColors.primary}33`,
+        } as ExtendedColors)
+      : ({
+          ...lightColors,
+          primaryLight: `${lightColors.primary}33`,
+        } as ExtendedColors),
     styles: isDark ? darkStyles : lightStyles,
     toggleColorScheme,
     gradients, // Exportamos los gradientes importados desde constants/colors
