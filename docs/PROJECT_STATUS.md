@@ -1,6 +1,7 @@
 # Project Status & Development Guide for LOOKYM
 
 ## Project Purpose
+
 LOOKYM is a mobile-first platform connecting users and businesses through short-form video content. Businesses showcase their storefronts and products, while users discover, interact, and communicate directly with them.
 
 ---
@@ -8,6 +9,7 @@ LOOKYM is a mobile-first platform connecting users and businesses through short-
 ## Current State (as of 2025-04-14)
 
 ### What Works
+
 - **Project Setup:** React Native/Expo, TypeScript, modular structure
 - **Navigation:** Expo Router
 - **State Management:** Zustand with persistence
