@@ -65,6 +65,8 @@
   - Memory bank estructurado y organizado.
   - README con información básica del proyecto.
   - Documentación de testing y configuración.
+  - Chat migrado a Supabase: ahora los mensajes y conversaciones son reales y en tiempo real, usando el store actualizado (`store/chat-store.ts`).
+  - Documentación y ejemplos de integración en `/docs/chat-implementation.md`.
 
 ## What's Left to Build (Core - Phase 2)
 
