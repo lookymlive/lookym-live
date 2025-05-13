@@ -1,3 +1,50 @@
+
+# Mock de Zustand y usuario global para tests (patrón recomendado)
+
+Para testear stores que dependen de autenticación o Zustand, sigue este patrón:
+
+1. **Tipa el usuario global:**
+
+   ```ts
+   import type { User } from "../../types/user.ts";
+   declare global {
+     // eslint-disable-next-line no-var
+     var __FAKE_USER__: User;
+   }
+   globalThis.__FAKE_USER__ = {
+     id: "user1",
+     email: "test@example.com",
+     username: "Test",
+     displayName: "Test User",
+     avatar: "",
+     bio: "",
+     role: "user",
+     verified: false,
+   };
+   ```
+
+2. **Mockea el store de Zustand con la API real:**
+
+   ```ts
+   jest.mock("../auth-store", () => ({
+     useAuthStore: {
+       getState: () => ({ currentUser: globalThis.__FAKE_USER__ }),
+       // Agrega otros métodos si tu store los usa
+     },
+   }));
+   ```
+
+3. **¿Cómo funciona?**
+   - Cualquier llamada a `useAuthStore.getState()` en el código de producción o tests devolverá el usuario simulado.
+   - Así puedes testear lógica de autenticación, permisos, etc. sin depender de la implementación real ni de Supabase.
+   - Si tu store crece, puedes agregar más métodos al mock.
+
+4. **¿Dónde usarlo?**
+   - En archivos de test que requieran un usuario autenticado o lógica de sesión.
+   - Útil para stores como `chat-store`, `notifications-store`, etc.
+
+---
+
 # LOOKYM - Development Workflow
 
 This document outlines the development workflow and best practices for contributing to the LOOKYM project.
