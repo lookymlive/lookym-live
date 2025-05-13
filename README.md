@@ -1,5 +1,52 @@
+# LOOKYM - Onboarding Rápido para IA Product Manager, UX/UI y Devs
 
-# LOOKYM
+Bienvenido/a al proyecto LOOKYM 🚀
+
+Este README te guía para que cualquier IA o humano pueda continuar el desarrollo, testing, diseño o gestión del producto de forma profesional y rápida.
+
+## 1. ¿Por dónde empezar?
+
+- Lee `/docs/overview.md` para entender la visión y arquitectura general.
+- Consulta `/docs/development-workflow.md` para el flujo de trabajo, testing y patrones de mock recomendados.
+- Revisa `/docs/ui-components.md` para conocer los componentes UI y su uso.
+- El estado y roadmap están en `/docs/progreso-y-roadmap.md` y `/docs/3TODO.txt`.
+- El contexto técnico y decisiones clave están en `/memory-bank/`.
+
+## 2. Testing y calidad
+
+- Ejecuta todos los tests con `npm test` o desde la tarea "Run App Tests" en VS Code.
+- Los tests de stores usan mocks realistas de usuario y servicios externos (ver `/store/__tests__`).
+- El patrón de mock de Zustand y usuario global está documentado en `/docs/development-workflow.md`.
+
+## 3. Documentación viva
+
+- Actualiza siempre `/docs/ui-components.md`, `/docs/chat-implementation.md` y `/docs/development-workflow.md` al agregar features.
+- Usa ejemplos de código y explica los patrones para facilitar el onboarding.
+
+## 4. Arquitectura y buenas prácticas
+
+- Mantén stores para estado, componentes para UI, utils para lógica auxiliar.
+- Usa tipado estricto en TypeScript.
+- Refactoriza y extrae componentes reutilizables cuando detectes duplicidad.
+
+## 5. Experiencia de usuario y performance
+
+- Prioriza mobile-first, animaciones fluidas y feedback visual.
+- Optimiza la carga de imágenes y videos, usa caché y paginación.
+- Asegura accesibilidad y responsividad en todos los componentes.
+
+## 6. ¿Cómo continuar?
+
+1. Lee los archivos clave mencionados arriba.
+2. Ejecuta los tests y revisa el estado del roadmap.
+3. Si agregas una feature, documenta y testea siguiendo los patrones del proyecto.
+4. Si eres IA, sigue las guías de buenas prácticas y mantén la documentación sincronizada.
+
+---
+
+**¡LOOKYM está listo para que cualquier IA o humano continúe el desarrollo de forma profesional y ordenada!**
+
+## LOOKYM
 
 Bienvenido a LOOKYM. Consulta [`/docs/overview.md`](./docs/overview.md) para una guía paso a paso y checklist funcional.
 
