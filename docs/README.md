@@ -1,4 +1,29 @@
-# Documentación del Proyecto LOOKYM
+# Onboarding para IA Product Manager, UX/UI y Devs
+
+Este proyecto está preparado para que cualquier IA o humano pueda continuar el desarrollo, testing, diseño o gestión del producto de forma profesional.
+
+## Pasos iniciales recomendados
+
+1. Lee `/docs/overview.md` para la visión general y arquitectura.
+2. Consulta `/docs/development-workflow.md` para el flujo de trabajo, testing y patrones de mock.
+3. Revisa `/docs/ui-components.md` para conocer los componentes UI y su uso.
+4. El estado y roadmap están en `/docs/progreso-y-roadmap.md` y `/docs/3TODO.txt`.
+5. El contexto técnico y decisiones clave están en `/memory-bank/`.
+
+## Testing y calidad
+
+- Ejecuta los tests con `npm test` o desde la tarea "Run App Tests" en VS Code.
+- Los tests de stores usan mocks realistas de usuario y servicios externos (ver `/store/__tests__`).
+- El patrón de mock de Zustand y usuario global está documentado en `/docs/development-workflow.md`.
+
+## Documentación y buenas prácticas
+
+- Actualiza siempre `/docs/ui-components.md`, `/docs/chat-implementation.md` y `/docs/development-workflow.md` al agregar features.
+- Usa ejemplos de código y explica los patrones para facilitar el onboarding.
+
+---
+
+## Documentación del Proyecto LOOKYM
 
 Este directorio contiene la documentación oficial del proyecto LOOKYM. Utiliza esta guía para navegar por los diferentes documentos disponibles.
 
