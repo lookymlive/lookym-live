@@ -1,4 +1,12 @@
+
+<!-- filepath: c:\Users\usuario\Desktop\lookym-live\docs\ui-components.md -->
 # LOOKYM - UI Components
+
+## Actualización 2025-05-12
+
+- El sistema de chat ahora utiliza Supabase para mensajes y conversaciones reales.
+- El store `useChatStore` fue migrado para usar Supabase en vez de mocks locales.
+- Consulta `/docs/chat-implementation.md` para detalles técnicos y ejemplos de uso.
 
 This document provides an overview of the UI components used in the LOOKYM application.
 
