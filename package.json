@@ -6,7 +6,8 @@
   "scripts": {
     "start": "expo start --tunnel",
     "start-web": "expo start --web --tunnel",
-    "start-web-dev": "DEBUG=expo* expo start --web --tunnel"
+    "start-web-dev": "DEBUG=expo* expo start --web --tunnel",
+    "test": "jest --passWithNoTests"
   },
   "dependencies": {
     "@expo/metro-config": "~0.19.0",
