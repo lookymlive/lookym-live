@@ -1,4 +1,28 @@
 
+# Onboarding rápido para IA Product Manager, UX/UI y Devs
+
+Este documento te guía para que cualquier IA o humano pueda continuar el desarrollo, testing, diseño o gestión del producto de forma profesional y rápida.
+
+## Pasos iniciales recomendados
+
+1. Lee `/docs/overview.md` para la visión general y arquitectura.
+2. Consulta `/docs/ui-components.md` para conocer los componentes UI y su uso.
+3. El estado y roadmap están en `/docs/progreso-y-roadmap.md` y `/docs/3TODO.txt`.
+4. El contexto técnico y decisiones clave están en `/memory-bank/`.
+
+## Testing y calidad
+
+- Ejecuta los tests con `npm test` o desde la tarea "Run App Tests" en VS Code.
+- Los tests de stores usan mocks realistas de usuario y servicios externos (ver `/store/__tests__`).
+- El patrón de mock de Zustand y usuario global está documentado más abajo en este archivo.
+
+## Documentación y buenas prácticas
+
+- Actualiza siempre `/docs/ui-components.md`, `/docs/chat-implementation.md` y este archivo al agregar features.
+- Usa ejemplos de código y explica los patrones para facilitar el onboarding.
+
+---
+
 # Mock de Zustand y usuario global para tests (patrón recomendado)
 
 Para testear stores que dependen de autenticación o Zustand, sigue este patrón:
