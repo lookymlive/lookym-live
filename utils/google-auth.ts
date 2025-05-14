@@ -1,7 +1,7 @@
-import * as Google from "expo-auth-session/providers/google";
+import * as Google from "expo-auth-session/providers/google.js";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useState } from "react";
-import { supabase } from "./supabase";
+import { supabase } from "./supabase.ts";
 
 // Ensure WebBrowser redirects are handled properly
 WebBrowser.maybeCompleteAuthSession();
