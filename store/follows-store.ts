@@ -1,7 +1,7 @@
-import { createFollowNotification } from "@/utils/notifications";
-import { supabase } from "@/utils/supabase";
+import { createFollowNotification } from "@/utils/notifications.ts";
+import { supabase } from "@/utils/supabase.ts";
 import { create } from "zustand";
-import { useAuthStore } from "./auth-store";
+import { useAuthStore } from "./auth-store.ts";
 
 interface User {
   id: string;

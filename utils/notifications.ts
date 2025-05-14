@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { supabase } from "./supabase.ts";
 
 // Tipos de notificaciones soportados
 export type NotificationType =
