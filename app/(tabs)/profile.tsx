@@ -1,5 +1,5 @@
 // Integración de ShowcaseView para negocios
-import ShowcaseView, { ShowcaseViewProps } from "@/components/ShowcaseView";
+import ShowcaseView, { ShowcaseViewProps } from "@/components/ShowcaseView.tsx";
 /**
  * ProfileScreen - Pantalla de perfil de usuario/negocio para LOOKYM
  *
@@ -65,11 +65,11 @@ import ShowcaseView, { ShowcaseViewProps } from "@/components/ShowcaseView";
  * - [ ] Mejorar accesibilidad y responsividad
  * - [ ] Sincronizar cambios con /memory-bank/activeContext.md y /docs/README.md
  */
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useAuthStore } from "@/store/auth-store";
-import { useFollowsStore } from "@/store/follows-store";
-import { useVideoStore } from "@/store/video-store";
-import { supabase } from "@/utils/supabase";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { useAuthStore } from "@/store/auth-store.ts";
+import { useFollowsStore } from "@/store/follows-store.ts";
+import { useVideoStore } from "@/store/video-store.ts";
+import { supabase } from "@/utils/supabase.ts";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import {

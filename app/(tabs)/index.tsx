@@ -1,5 +1,5 @@
-import VideoFeed from "@/components/VideoFeed";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import VideoFeed from "@/components/VideoFeed.tsx";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import React from "react";
 import {
   Platform,

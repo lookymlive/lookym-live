@@ -1,7 +1,7 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useAuthStore } from "@/store/auth-store";
-import { useNotificationsStore } from "@/store/notifications-store";
-import { formatTimeAgo } from "@/utils/time-format";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { useAuthStore } from "@/store/auth-store.ts";
+import { useNotificationsStore } from "@/store/notifications-store.ts";
+import { formatTimeAgo } from "@/utils/time-format.ts";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Bell, Check, Heart, MessageCircle, User } from "lucide-react-native";
