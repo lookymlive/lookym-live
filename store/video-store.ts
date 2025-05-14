@@ -1,15 +1,15 @@
-import { Video } from "@/types/video";
+import { Video } from "@/types/video.ts";
 import {
   uploadVideo as cloudinaryUpload,
   getVideoThumbnailUrl,
-} from "@/utils/cloudinary";
-import { createVideoLikeNotification } from "@/utils/notifications";
-import { supabase } from "@/utils/supabase";
+} from "@/utils/cloudinary.ts";
+import { createVideoLikeNotification } from "@/utils/notifications.ts";
+import { supabase } from "@/utils/supabase.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { useAuthStore } from "./auth-store";
+import { useAuthStore } from "./auth-store.ts";
 
 interface VideoState {
   videos: Video[];

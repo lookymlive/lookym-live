@@ -1,4 +1,4 @@
-import { Video } from '@/types/video';
+import { Video } from '@/types/video.ts';
 
 export const videos: Video[] = [
   {

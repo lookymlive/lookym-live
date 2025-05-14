@@ -1,6 +1,6 @@
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/utils/supabase.ts";
 import { create } from "zustand";
-import { useAuthStore } from "./auth-store";
+import { useAuthStore } from "./auth-store.ts";
 
 export interface Notification {
   id: string;

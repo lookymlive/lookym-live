@@ -1,4 +1,4 @@
-import { Chat } from "@/types/chat";
+import { Chat } from "@/types/chat.ts";
 
 export const chats: Chat[] = [
   {

@@ -3,11 +3,15 @@ import { Alert } from "react-native";
 
 // Cloudinary configuration
 const CLOUDINARY_CLOUD_NAME =
-  Constants.expoConfig?.extra?.cloudinaryCloudName || "your-cloud-name";
+  (Constants?.expoConfig?.extra?.cloudinaryCloudName as string) ||
+  process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME ||
+  "your-cloud-name";
 const CLOUDINARY_UPLOAD_PRESET =
-  Constants.expoConfig?.extra?.cloudinaryUploadPreset || "lookym_videos";
+  (Constants?.expoConfig?.extra?.cloudinaryUploadPreset as string) ||
+  process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET ||
+  "lookym_videos";
 
-import { buildCloudinaryFormData, CloudinaryOptions } from "./cloudinary-logic";
+import { buildCloudinaryFormData, CloudinaryOptions } from "./cloudinary-logic.ts";
 
 // Helper function to upload a video a Cloudinary
 export const uploadVideo = async (
@@ -19,7 +23,8 @@ export const uploadVideo = async (
     if (videoUri.startsWith("file://") || videoUri.startsWith("content://")) {
       // Para plataformas nativas
       const fileType = videoUri.split(".").pop() || "mp4";
-      const fileName = videoUri.split("/").pop() || `video-${Date.now()}.${fileType}`;
+      const fileName =
+        videoUri.split("/").pop() || `video-${Date.now()}.${fileType}`;
       file = {
         uri: videoUri,
         type: `video/${fileType}`,
@@ -37,24 +42,24 @@ export const uploadVideo = async (
     );
 
     // Subida con progreso usando XMLHttpRequest si está disponible
-    if (typeof XMLHttpRequest !== 'undefined') {
+    if (typeof XMLHttpRequest !== "undefined") {
       const xhr = new XMLHttpRequest();
       const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`;
       return await new Promise((resolve, reject) => {
-        xhr.open('POST', cloudinaryUrl);
+        xhr.open("POST", cloudinaryUrl);
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
               const response = JSON.parse(xhr.responseText);
               resolve(response);
             } catch (e) {
-              reject(new Error('Error parsing Cloudinary response'));
+              reject(new Error("Error parsing Cloudinary response"));
             }
           } else {
             reject(new Error(`Cloudinary upload failed: ${xhr.statusText}`));
           }
         };
-        xhr.onerror = () => reject(new Error('Cloudinary upload error'));
+        xhr.onerror = () => reject(new Error("Cloudinary upload error"));
         if (options.onProgress) {
           xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {

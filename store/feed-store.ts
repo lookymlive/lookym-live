@@ -1,5 +1,5 @@
-import { posts as initialPosts } from "@/mocks/posts";
-import { Post, Comment as PostComment } from "@/types/post";
+import { posts as initialPosts } from "@/mocks/posts.ts";
+import { Post, Comment as PostComment } from "@/types/post.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";

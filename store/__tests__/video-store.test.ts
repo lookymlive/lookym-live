@@ -13,7 +13,7 @@ jest.mock('react-native', () => ({}));
 jest.mock('@react-native-async-storage/async-storage', () => require('@react-native-async-storage/async-storage/jest/async-storage-mock'));
 
 import { act } from 'react-test-renderer';
-import { useVideoStore } from '../video-store';
+import { useVideoStore } from '../video-store.ts';
 
 jest.mock('@/utils/supabase', () => ({
   supabase: {

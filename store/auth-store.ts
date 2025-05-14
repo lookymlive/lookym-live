@@ -1,9 +1,9 @@
-import { User } from "@/types/user";
+import { User } from "@/types/user.ts";
 import {
   signInWithGoogle as googleSignIn,
   signOut as googleSignOut,
-} from "@/utils/google-auth";
-import { supabase, uploadFile } from "@/utils/supabase";
+} from "@/utils/google-auth.ts";
+import { supabase, uploadFile } from "@/utils/supabase.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import { create } from "zustand";

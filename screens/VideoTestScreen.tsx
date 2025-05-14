@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, Platform, StyleSheet } from 'react-native';
-import { supabase } from '@/utils/supabase';
+import { supabase } from '@/utils/supabase.ts';
 import { Video as ExpoVideo, ResizeMode } from 'expo-av';
 import { Image } from 'expo-image';
-import { getVideoUrl, getVideoThumbnailUrl } from '@/utils/cloudinary';
+import { getVideoUrl, getVideoThumbnailUrl } from '@/utils/cloudinary.ts';
 
 interface VideoRow {
   id: string;
