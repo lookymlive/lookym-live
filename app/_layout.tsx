@@ -1,5 +1,5 @@
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { initializeAuth, useAuthStore } from '@/store/auth-store';
+import { useColorScheme } from '@/hooks/useColorScheme.ts';
+import { initializeAuth, useAuthStore } from '@/store/auth-store.ts';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
