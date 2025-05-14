@@ -1,6 +1,6 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useAuthStore } from "@/store/auth-store";
-import { useVideoStore } from "@/store/video-store";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { useAuthStore } from "@/store/auth-store.ts";
+import { useVideoStore } from "@/store/video-store.ts";
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";

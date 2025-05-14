@@ -3,10 +3,10 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingVi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
-import { useAuthStore } from '@/store/auth-store';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useAuthStore } from '@/store/auth-store.ts';
+import { useColorScheme } from '@/hooks/useColorScheme.ts';
 import { router } from 'expo-router';
-import GoogleSignInButton from '@/components/GoogleSignInButton';
+import GoogleSignInButton from '@/components/GoogleSignInButton.tsx';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -72,8 +72,8 @@ export default function LoginScreen() {
         </View>
         
         {error ? (
-          <View style={[styles.errorContainer, { backgroundColor: colors.errorLight }]}>
-            <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
+          <View style={[styles.errorContainer, { backgroundColor: colors.error }]}>
+            <Text style={[styles.errorText, { color: '#fff' }]}>{error}</Text>
           </View>
         ) : null}
         

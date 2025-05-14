@@ -3,8 +3,8 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingVi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react-native';
-import { useAuthStore } from '@/store/auth-store';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useAuthStore } from '@/store/auth-store.ts';
+import { useColorScheme } from '@/hooks/useColorScheme.ts';
 import { router } from 'expo-router';
 
 export default function RegisterScreen() {
@@ -70,8 +70,8 @@ export default function RegisterScreen() {
           </View>
           
           {error ? (
-            <View style={[styles.errorContainer, { backgroundColor: colors.errorLight }]}>
-              <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
+            <View style={[styles.errorContainer, { backgroundColor: colors.error }]}>
+              <Text style={[styles.errorText, { color: '#fff' }]}>{error}</Text>
             </View>
           ) : null}
           

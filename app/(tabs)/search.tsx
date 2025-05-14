@@ -1,7 +1,7 @@
-import VideoThumbnail from "@/components/VideoThumbnail";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useVideoStore } from "@/store/video-store";
-import type { Video } from "@/types/video";
+import VideoThumbnail from "@/components/VideoThumbnail.tsx";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { useVideoStore } from "@/store/video-store.ts";
+import type { Video } from "@/types/video.ts";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Hash, Search, User, Video as VideoIcon, X } from "lucide-react-native";
@@ -95,7 +95,7 @@ export default function SearchScreen() {
     videos.forEach((video) => {
       if (!video.hashtags) return;
 
-      video.hashtags.forEach((tag) => {
+      video.hashtags.forEach((tag: string) => {
         if (tagCounts[tag]) {
           tagCounts[tag]++;
         } else {
@@ -142,7 +142,7 @@ export default function SearchScreen() {
     const allTags = new Set<string>();
     videos.forEach((video) => {
       if (!video.hashtags) return;
-      video.hashtags.forEach((tag) => {
+      video.hashtags.forEach((tag: string) => {
         if (tag.toLowerCase().includes(lower)) {
           allTags.add(tag);
         }
