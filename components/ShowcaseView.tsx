@@ -54,7 +54,13 @@
 
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import { Image } from "expo-image";
+import { useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { useAuthStore } from "../store/auth-store.ts";
+import { useChatStore } from "../store/chat-store.ts";
+import { useFollowsStore } from "../store/follows-store.ts";
+import ChatButton from "./ChatButton.ts";
+import FollowButton from "./FollowButton.tsx";
 
 export interface ShowcaseViewProps {
   store: {
@@ -98,14 +104,40 @@ export interface ShowcaseViewProps {
  *
  * Si agregas lógica de interacción, documenta aquí y en /docs/ui-components.md
  */
+
 export default function ShowcaseView({ store }: ShowcaseViewProps) {
   // Header: avatar, nombre, chat, seguir, volver
   // Hero: video destacado (primero de la lista)
   // Grid: productos/videos
   // Carrusel: otras vidrieras (futuro)
 
-  // TODO: Integrar componentes reales (Avatar, VideoPlayer, etc.)
   const mainVideo = store.videos[0];
+  const { currentUser } = useAuthStore();
+  const { isFollowing, followUser, unfollowUser } = useFollowsStore();
+  const { createChat } = useChatStore();
+  const [chatLoading, setChatLoading] = useState(false);
+
+  // Acciones de follow/unfollow
+  const handleFollow = async () => {
+    if (!currentUser) return;
+    await followUser(store.id);
+  };
+  const handleUnfollow = async () => {
+    if (!currentUser) return;
+    await unfollowUser(store.id);
+  };
+
+  // Acción de iniciar chat
+  const handleStartChat = async () => {
+    if (!currentUser) return;
+    setChatLoading(true);
+    try {
+      await createChat(store.id, "Hola! Me interesa tu negocio.");
+      // Aquí podrías navegar al chat si lo deseas
+    } finally {
+      setChatLoading(false);
+    }
+  };
 
   return (
     <View style={styles.outerContainer}>
@@ -116,7 +148,6 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
           <View style={styles.headerCenter}>
             {/* Avatar y nombre */}
             <View style={styles.avatarCircle}>
-              {/* Avatar real del comercio */}
               {store.avatar ? (
                 <Image
                   source={{ uri: store.avatar }}
@@ -130,7 +161,20 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
             <Text style={styles.storeName}>{store.name}</Text>
           </View>
           <View style={styles.headerRight}>
-            {/* TODO: Botón chat, seguir */}
+            {/* Botón seguir y chat solo si no es el propio perfil */}
+            {currentUser && currentUser.id !== store.id && (
+              <>
+                <FollowButton
+                  isFollowing={isFollowing(store.id)}
+                  onFollow={handleFollow}
+                  onUnfollow={handleUnfollow}
+                />
+                <ChatButton
+                  onStartChat={handleStartChat}
+                  label={chatLoading ? "Cargando..." : "Chat"}
+                />
+              </>
+            )}
           </View>
         </View>
 

@@ -129,6 +129,7 @@ export default function FeedScreen() {
 - **Propósito:**
   - Vidriera virtual para perfiles de comercios. Simula la experiencia de "ver la vidriera desde la calle".
   - Muestra avatar, nombre, video principal con etiquetas de productos, grid de productos y (futuro) carrusel de otras vidrieras.
+  - **Incluye botones de Seguir/Dejar de seguir y Chat con feedback visual y accesibilidad.**
 
 - **Props:**
   - `store: StoreProfile` — Objeto con la información del comercio, videos y productos.
@@ -177,6 +178,18 @@ export default function FeedScreen() {
   import ShowcaseView from '@/components/ShowcaseView';
   <ShowcaseView store={storeProfile} />
   ```
+
+- **Integración de botones de acción:**
+  - El header muestra los botones `FollowButton` y `ChatButton` si el usuario no es el dueño del perfil.
+  - Ambos botones muestran feedback visual (loading, error) y cumplen con accesibilidad (labels, roles).
+  - El botón de chat inicia una conversación real usando el store de chat.
+  - El botón de seguir usa el store de follows y actualiza el estado global.
+
+- **Documentación de componentes:**
+  - `FollowButton`: Botón reutilizable para seguir/dejar de seguir usuarios/negocios.
+  - `ChatButton`: Botón reutilizable para iniciar chat con feedback visual.
+
+- **Actualiza esta sección si agregas más acciones o mejoras la UI.**
 
 - **Integración:**
   - Usado en la pantalla de perfil de negocios (`/app/(tabs)/profile.tsx`).
