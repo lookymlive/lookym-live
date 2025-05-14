@@ -1,5 +1,5 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useNotificationsStore } from "@/store/notifications-store";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { useNotificationsStore } from "@/store/notifications-store.ts";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 

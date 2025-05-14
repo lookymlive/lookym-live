@@ -1,8 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View, Platform } from 'react-native';
-import { useAuthStore } from '@/store/auth-store';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useGoogleAuth } from '@/utils/google-auth';
+import { useAuthStore } from '@/store/auth-store.ts';
+import { useColorScheme } from '@/hooks/useColorScheme.ts';
+import { useGoogleAuth } from '@/utils/google-auth.ts';
 import { router } from 'expo-router';
 
 export default function GoogleSignInButton() {

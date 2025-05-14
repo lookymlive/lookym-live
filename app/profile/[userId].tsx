@@ -1,8 +1,8 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import ProfileScreen from "../(tabs)/profile";
+import ProfileScreen from "../(tabs)/profile.tsx";
 
 export default function ProfileRedirect() {
   const { userId } = useLocalSearchParams();

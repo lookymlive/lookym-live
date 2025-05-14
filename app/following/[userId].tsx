@@ -1,6 +1,6 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useAuthStore } from "@/store/auth-store";
-import { useFollowsStore } from "@/store/follows-store";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { useAuthStore } from "@/store/auth-store.ts";
+import { useFollowsStore } from "@/store/follows-store.ts";
 import { router, useLocalSearchParams } from "expo-router";
 import { Check, ChevronLeft } from "lucide-react-native";
 import React, { useEffect, useState } from "react";

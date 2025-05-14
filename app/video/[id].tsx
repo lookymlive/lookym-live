@@ -1,8 +1,8 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useAuthStore } from "@/store/auth-store";
-import { useVideoStore } from "@/store/video-store";
-import type { Comment as CommentType, Video as VideoType } from "@/types/video";
-import { formatLikes, formatTimeAgo } from "@/utils/time-format";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { useAuthStore } from "@/store/auth-store.ts";
+import { useVideoStore } from "@/store/video-store.ts";
+import type { Comment as CommentType, Video as VideoType } from "@/types/video.ts";
+import { formatLikes, formatTimeAgo } from "@/utils/time-format.ts";
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
