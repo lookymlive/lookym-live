@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import StoryCircle from './StoryCircle';
+import StoryCircle from './StoryCircle.tsx';
 
 // Mock data for stories
 const stories = [

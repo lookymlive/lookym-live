@@ -1,5 +1,5 @@
-import { Comment } from "@/types/post";
-import { formatTimeAgo } from "@/utils/time-format";
+import { Comment } from "@/types/post.ts";
+import { formatTimeAgo } from "@/utils/time-format.ts";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 

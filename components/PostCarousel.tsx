@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Image, Dimensions, FlatList } from 'react-native';
-import { PostMedia } from '@/types/post';
-import VideoThumbnail from './VideoThumbnail';
+import { PostMedia } from '@/types/post.ts';
+import VideoThumbnail from './VideoThumbnail.tsx';
 
 interface PostCarouselProps {
   media: PostMedia[];

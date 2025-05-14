@@ -1,4 +1,4 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Bell, MessageCircle } from "lucide-react-native";
@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import NotificationIndicator from "./NotificationIndicator";
+import NotificationIndicator from "./NotificationIndicator.tsx";
 
 interface HeaderProps {
   title?: string;

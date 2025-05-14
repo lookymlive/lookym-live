@@ -1,5 +1,5 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { PostUser } from "@/types/post";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { PostUser } from "@/types/post.ts";
 import { BadgeCheck, MoreHorizontal } from "lucide-react-native";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";

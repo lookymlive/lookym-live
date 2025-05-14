@@ -1,6 +1,6 @@
-import { useVideoStore } from "@/store/video-store";
-import { Video } from "@/types/video";
-import { formatTimeAgo } from "@/utils/time-format";
+import { useVideoStore } from "@/store/video-store.ts";
+import { Video } from "@/types/video.ts";
+import { formatTimeAgo } from "@/utils/time-format.ts";
 import { Image } from "expo-image";
 import {
     AlertTriangle,

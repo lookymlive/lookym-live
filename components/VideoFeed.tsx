@@ -20,9 +20,9 @@
  *
  * Última actualización: 2025-05-08
  */
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useVideoStore } from "@/store/video-store";
-import { Video as VideoType } from "@/types/video";
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { useVideoStore } from "@/store/video-store.ts";
+import { Video as VideoType } from "@/types/video.ts";
 import { LinearGradient } from "expo-linear-gradient";
 import { RefreshCw, Video } from "lucide-react-native";
 import { MotiView } from "moti";
@@ -37,7 +37,7 @@ import {
   Text,
   View,
 } from "react-native";
-import VideoPost from "./VideoPost";
+import VideoPost from "./VideoPost.tsx";
 
 const { height } = Dimensions.get("window");
 

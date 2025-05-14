@@ -1,10 +1,10 @@
 
 import { View, StyleSheet } from 'react-native';
-import { Post as PostType } from '@/types/post';
-import PostHeader from './PostHeader';
-import PostCarousel from './PostCarousel';
-import PostActions from './PostActions';
-import PostFooter from './PostFooter';
+import { Post as PostType } from '@/types/post.ts';
+import PostHeader from './PostHeader.tsx';
+import PostCarousel from './PostCarousel.tsx';
+import PostActions from './PostActions.tsx';
+import PostFooter from './PostFooter.tsx';
 
 interface PostProps {
   post: PostType;
