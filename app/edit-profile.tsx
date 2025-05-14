@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useAuthStore } from '@/store/auth-store';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useAuthStore } from '@/store/auth-store.ts';
+import { useColorScheme } from '@/hooks/useColorScheme.ts';
 import { router } from 'expo-router';
 
 export default function EditProfileScreen() {
