@@ -11,7 +11,10 @@ const CLOUDINARY_UPLOAD_PRESET =
   process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET ||
   "lookym_videos";
 
-import { buildCloudinaryFormData, CloudinaryOptions } from "./cloudinary-logic.ts";
+import {
+  buildCloudinaryFormData,
+  CloudinaryOptions,
+} from "./cloudinary-logic.ts";
 
 // Helper function to upload a video a Cloudinary
 export const uploadVideo = async (
@@ -19,6 +22,9 @@ export const uploadVideo = async (
   options: CloudinaryOptions & { onProgress?: (progress: number) => void } = {}
 ) => {
   try {
+    if (typeof videoUri !== "string") {
+      throw new Error("videoUri must be a string");
+    }
     let file: Blob | { uri: string; type: string; name: string };
     if (videoUri.startsWith("file://") || videoUri.startsWith("content://")) {
       // Para plataformas nativas
