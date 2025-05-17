@@ -104,3 +104,53 @@ Actualmente implementado con datos simulados (mock data) y almacenamiento local.
    - Añadir pruebas unitarias para componentes clave
    - Implementar pruebas de integración
    - Depurar problemas conocidos.
+
+## Resultados de los tests y estado del sistema (14/05/2025)
+
+### Ejecución de tests
+
+Se ejecutaron los tests automáticos del proyecto con el comando `npm test`.
+
+**Resumen de resultados:**
+
+- Total de suites de test: 5
+- Suites exitosas: 4
+- Suites fallidas: 1
+- Total de tests: 15
+- Tests exitosos: 13
+- Tests fallidos: 2
+
+**Principales errores detectados:**
+
+- Fallos en el componente `FollowButton` (posible error de exportación o importación incorrecta, revisar si el componente está correctamente exportado/importado y si se usan correctamente los imports default/named).
+- Errores en la lógica de Cloudinary (uso de `startsWith` sobre un valor `undefined` o no string, revisar validación de tipos en la función que sube videos a Cloudinary).
+
+**Recomendaciones inmediatas:**
+
+- Revisar y corregir la exportación/importación del componente `FollowButton`.
+- Validar los tipos de datos antes de usar métodos como `startsWith` en la lógica de Cloudinary.
+- Repetir los tests tras corregir los errores para asegurar que todo el sistema funcione correctamente.
+
+### Cómo correr los tests
+
+1. Asegúrate de tener las dependencias instaladas:
+
+   ```sh
+   npm install
+   ```
+
+2. Ejecuta los tests:
+
+   ```sh
+   npm test
+   ```
+
+   O usa la tarea de VS Code "Run App Tests".
+
+### Notas adicionales
+
+- Los tests cubren stores, componentes y utilidades clave.
+- Se recomienda mantener y ampliar la cobertura de tests a medida que se agregan nuevas funcionalidades.
+- Documenta cualquier cambio relevante en `/docs/development-workflow.md` y en este archivo.
+
+---
