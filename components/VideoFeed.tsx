@@ -9,6 +9,7 @@
  *
  * - Opacidad de color: Para obtener un color con opacidad, usa el helper `getColorWithOpacity` del hook `useColorScheme`.
  *   Ejemplo: `getColorWithOpacity("error", 0.7)`
+ *   IMPORTANTE: Asegúrate de desestructurar correctamente la función del hook: `const { getColorWithOpacity } = useColorScheme();`
  *
  * - No uses `colors.getColorWithOpacity`, solo el helper global del hook.
  *
@@ -18,7 +19,7 @@
  *
  * - Si la IA encuentra errores de tipo con gradientes, revisa el tipado y la cantidad de colores.
  *
- * Última actualización: 2025-05-08
+ * Última actualización: 2025-05-10
  */
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useVideoStore } from "@/store/video-store.ts";
@@ -26,7 +27,13 @@ import { Video as VideoType } from "@/types/video.ts";
 import { LinearGradient } from "expo-linear-gradient";
 import { RefreshCw, Video } from "lucide-react-native";
 import { MotiView } from "moti";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Animated,
   Dimensions,
@@ -79,6 +86,17 @@ export default function VideoFeed({
 
   // Referencia para la animación de desplazamiento
   const scrollIndicatorOpacity = useRef(new Animated.Value(0)).current;
+
+  // Memoizamos los colores con opacidad para evitar recálculos innecesarios
+  const errorWithOpacity = useMemo(
+    () => getColorWithOpacity("error", 0.7),
+    [getColorWithOpacity]
+  );
+
+  const primaryWithOpacity = useMemo(
+    () => getColorWithOpacity("primary", 0.7),
+    [getColorWithOpacity]
+  );
 
   // Determinar qué videos mostrar
   const videosToShow = initialVideos || videos;
@@ -249,12 +267,7 @@ export default function VideoFeed({
           style={styles.errorContainer}
         >
           <LinearGradient
-            colors={
-              [colors.error, getColorWithOpacity("error", 0.7)] as [
-                string,
-                string,
-              ]
-            }
+            colors={[colors.error, errorWithOpacity] as [string, string]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.errorBanner}
@@ -316,7 +329,7 @@ export default function VideoFeed({
           styles.scrollIndicator,
           {
             opacity: scrollIndicatorOpacity,
-            backgroundColor: getColorWithOpacity("primary", 0.7),
+            backgroundColor: primaryWithOpacity,
           },
         ]}
       >
