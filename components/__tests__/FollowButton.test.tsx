@@ -34,7 +34,8 @@ describe("FollowButton", () => {
         onUnfollow={jest.fn()}
       />
     );
-    fireEvent.press(getByText("Seguir"));
+    const label = getByText("Seguir");
+    fireEvent.press(label.parent || label);
     await waitFor(() => expect(onFollow).toHaveBeenCalled());
   });
 
@@ -47,7 +48,8 @@ describe("FollowButton", () => {
         onUnfollow={onUnfollow}
       />
     );
-    fireEvent.press(getByText("Siguiendo"));
+    const label = getByText("Siguiendo");
+    fireEvent.press(label.parent || label);
     await waitFor(() => expect(onUnfollow).toHaveBeenCalled());
   });
 });
