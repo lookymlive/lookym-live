@@ -59,7 +59,7 @@ import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { useAuthStore } from "../store/auth-store.ts";
 import { useChatStore } from "../store/chat-store.ts";
 import { useFollowsStore } from "../store/follows-store.ts";
-import ChatButton from "./ChatButton.ts";
+import ChatButton from "./ChatButton.tsx";
 import FollowButton from "./FollowButton.tsx";
 
 export interface ShowcaseViewProps {
