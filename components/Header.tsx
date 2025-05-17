@@ -3,7 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Bell, MessageCircle } from "lucide-react-native";
 import { MotiView } from "moti";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Platform,
   StyleSheet,
@@ -26,10 +26,21 @@ export default function Header({
   showBackButton = false,
   onBackPress = () => router.back(),
 }: HeaderProps) {
-  const { colors, isDark, gradients } = useColorScheme();
+  const { colors, isDark, gradients, getColorWithOpacity } = useColorScheme();
   const [messagePressed, setMessagePressed] = useState(false);
   const [notificationPressed, setNotificationPressed] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  // Memoizamos los colores con opacidad para mejorar el rendimiento
+  const primaryWithOpacity40 = useMemo(
+    () => getColorWithOpacity("primary", 0.4),
+    [getColorWithOpacity]
+  );
+
+  const primaryWithOpacity1A = useMemo(
+    () => getColorWithOpacity("primary", 0.1),
+    [getColorWithOpacity]
+  );
 
   // Función para animar el título cuando cambia
   const animateTitle = () => {
@@ -111,8 +122,8 @@ export default function Header({
               styles.iconButton,
               {
                 backgroundColor: messagePressed
-                  ? colors.primary + "40"
-                  : colors.primary + "1A",
+                  ? primaryWithOpacity40
+                  : primaryWithOpacity1A,
                 transform: [{ scale: messagePressed ? 0.92 : 1 }],
               },
             ]}
@@ -139,8 +150,8 @@ export default function Header({
               styles.iconButton,
               {
                 backgroundColor: notificationPressed
-                  ? colors.primary + "40"
-                  : colors.primary + "1A",
+                  ? primaryWithOpacity40
+                  : primaryWithOpacity1A,
                 transform: [{ scale: notificationPressed ? 0.92 : 1 }],
               },
             ]}
@@ -198,8 +209,19 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   titleWithBack: {
-    marginLeft: 8,
-    fontSize: 20,
+    marginLeft: 12,
+  },
+  iconContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
   },
   backButton: {
     width: 36,
@@ -209,24 +231,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   backButtonText: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
-    marginTop: -2,
-  },
-  iconContainer: {
-    flexDirection: "row",
-  },
-  iconButton: {
-    marginLeft: 16,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
   },
 });
