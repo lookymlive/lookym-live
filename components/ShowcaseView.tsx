@@ -41,7 +41,7 @@
  *   name: string;
  *   price: number;
  *   imageUrl: string;
- *   videoId?: string;
+ *   videoId?: string; // Optional link back to video
  *   description?: string;
  *   sizes?: string[];
  *   colors?: string[];
@@ -52,15 +52,52 @@
  * Última actualización: 2025-05-09
  */
 
+import { Ionicons } from "@expo/vector-icons";
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import { Image } from "expo-image";
-import { useState } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useAuthStore } from "../store/auth-store.ts";
 import { useChatStore } from "../store/chat-store.ts";
 import { useFollowsStore } from "../store/follows-store.ts";
+import { supabase } from "../utils/supabase.ts";
 import ChatButton from "./ChatButton.tsx";
 import FollowButton from "./FollowButton.tsx";
+import SuggestedStoreCard from "./SuggestedStoreCard.tsx";
+
+interface ProductTag {
+  id: string;
+  label: string;
+  x: number; // posición relativa (0-1)
+  y: number;
+  productId: string;
+}
+
+interface StoreVideo {
+  id: string;
+  videoUrl: string;
+  thumbnailUrl?: string;
+  tags: ProductTag[];
+}
+
+interface StoreProduct {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  videoId?: string; // Optional link back to video
+  description?: string;
+  sizes?: string[];
+  colors?: string[];
+}
 
 export interface ShowcaseViewProps {
   store: {
@@ -70,28 +107,8 @@ export interface ShowcaseViewProps {
     bio?: string;
     location?: string;
     category?: string;
-    videos: Array<{
-      id: string;
-      videoUrl: string;
-      thumbnailUrl?: string;
-      tags: Array<{
-        id: string;
-        label: string;
-        x: number;
-        y: number;
-        productId: string;
-      }>;
-    }>;
-    products: Array<{
-      id: string;
-      name: string;
-      price: number;
-      imageUrl: string;
-      videoId?: string;
-      description?: string;
-      sizes?: string[];
-      colors?: string[];
-    }>;
+    videos: StoreVideo[];
+    products: StoreProduct[];
   };
 }
 
@@ -116,6 +133,51 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
   const { isFollowing, followUser, unfollowUser } = useFollowsStore();
   const { createChat } = useChatStore();
   const [chatLoading, setChatLoading] = useState(false);
+  const router = useRouter();
+  const [videoContainerDimensions, setVideoContainerDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+  const [selectedProduct, setSelectedProduct] = useState<StoreProduct | null>(
+    null
+  );
+
+  const [suggestedStoresData, setSuggestedStoresData] = useState<
+    ShowcaseViewProps["store"][]
+  >([]);
+  const [loadingSuggestedStores, setLoadingSuggestedStores] = useState(true);
+
+  // TODO: Implement actual data fetching for suggested stores
+  const fetchSuggestedStores = async () => {
+    try {
+      setLoadingSuggestedStores(true);
+      // Replace with actual Supabase call or API fetch
+      // console.log("TODO: Fetch real suggested stores data");
+
+      const { data, error } = await supabase
+        .from("users")
+        .select("id, name, avatar")
+        .eq("role", "business")
+        .limit(10); // Limit the number of suggestions
+
+      if (error) {
+        console.error("Error fetching suggested stores:", error);
+        // Optionally set an error state here
+      } else if (data) {
+        // Supabase data might not exactly match StoreProfile interface, map if necessary
+        // For now, assuming it's close enough for SuggestedStoreCard
+        setSuggestedStoresData(data as any[]); // Cast as any[] for now, refine types later if needed
+      }
+    } catch (error) {
+      console.error("Error fetching suggested stores:", error);
+    } finally {
+      setLoadingSuggestedStores(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSuggestedStores();
+  }, []); // Empty dependency array means this runs once on mount
 
   // Acciones de follow/unfollow
   const handleFollow = async () => {
@@ -144,7 +206,12 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
       <View style={styles.phoneFrame}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.headerLeft}>{/* TODO: Botón volver */}</View>
+          <View style={styles.headerLeft}>
+            {/* TODO: Botón volver */}
+            <Pressable onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="#333" />
+            </Pressable>
+          </View>
           <View style={styles.headerCenter}>
             {/* Avatar y nombre */}
             <View style={styles.avatarCircle}>
@@ -182,25 +249,66 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
         <View style={styles.heroVideo}>
           {mainVideo ? (
             <>
-              <ExpoVideo
-                source={{ uri: mainVideo.videoUrl }}
-                style={{
-                  width: "100%",
-                  aspectRatio: 9 / 16,
-                  backgroundColor: "#000",
-                  borderRadius: 16,
+              {/* Container for video and tags */}
+              <View
+                style={styles.videoTagContainer}
+                onLayout={(event) => {
+                  const { width, height } = event.nativeEvent.layout;
+                  setVideoContainerDimensions({ width, height });
                 }}
-                useNativeControls
-                resizeMode={ResizeMode.COVER}
-                posterSource={
-                  mainVideo.thumbnailUrl
-                    ? { uri: mainVideo.thumbnailUrl }
-                    : undefined
-                }
-                posterStyle={{ resizeMode: "cover", borderRadius: 16 }}
-                shouldPlay={false}
-                isLooping
-              />
+              >
+                <ExpoVideo
+                  source={{ uri: mainVideo.videoUrl }}
+                  style={styles.mainVideoPlayer}
+                  useNativeControls
+                  resizeMode={ResizeMode.COVER}
+                  posterSource={
+                    mainVideo.thumbnailUrl
+                      ? { uri: mainVideo.thumbnailUrl }
+                      : undefined
+                  }
+                  posterStyle={{ resizeMode: "cover", borderRadius: 16 }}
+                  shouldPlay={false}
+                  isLooping
+                />
+                {/* Render tags */}
+                {videoContainerDimensions.width > 0 && // Only render tags if dimensions are known
+                  mainVideo.tags.map((tag) => {
+                    const product = store.products.find(
+                      (p) => p.id === tag.productId
+                    );
+                    if (!product) return null; // Don't render tag if product not found
+
+                    return (
+                      <Pressable
+                        key={tag.id}
+                        style={[
+                          styles.productTag,
+                          {
+                            left: tag.x * videoContainerDimensions.width,
+                            top: tag.y * videoContainerDimensions.height,
+                          },
+                        ]}
+                        onPress={() => {
+                          console.log(
+                            "Tag pressed:",
+                            tag.label,
+                            "Product ID:",
+                            tag.productId
+                          );
+                          const product = store.products.find(
+                            (p) => p.id === tag.productId
+                          );
+                          if (product) {
+                            setSelectedProduct(product);
+                          }
+                        }}
+                      >
+                        <Text style={styles.productTagText}>{tag.label}</Text>
+                      </Pressable>
+                    );
+                  })}
+              </View>
               <Text style={styles.heroVideoTextSmall}>
                 {mainVideo.tags.length > 0
                   ? `Etiquetas: ${mainVideo.tags.map((t) => t.label).join(", ")}`
@@ -214,6 +322,37 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
           )}
         </View>
 
+        {/* Selected product details overlay */}
+        {selectedProduct && (
+          <Pressable
+            style={styles.selectedProductOverlay}
+            onPress={() => {
+              console.log(
+                "TODO: Navigate to product detail screen for product ID:",
+                selectedProduct.id,
+                "and then close overlay"
+              );
+              // Implement navigation to product detail screen here
+              setSelectedProduct(null);
+            }}
+          >
+            <View style={styles.closeOverlayButton}>
+              <Ionicons name="close-circle" size={24} color="#fff" />
+            </View>
+            <Image
+              source={{ uri: selectedProduct.imageUrl }}
+              style={styles.selectedProductImage}
+              contentFit="cover"
+            />
+            <Text style={styles.selectedProductName}>
+              {selectedProduct.name}
+            </Text>
+            <Text style={styles.selectedProductPrice}>
+              ${selectedProduct.price}
+            </Text>
+          </Pressable>
+        )}
+
         {/* Grid de productos */}
         <View style={styles.productsGrid}>
           <Text style={styles.productsGridTitle}>Productos en vidriera</Text>
@@ -222,31 +361,59 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
               <Text style={styles.productsEmpty}>Sin productos aún</Text>
             ) : (
               store.products.slice(0, 6).map((product) => (
-                <View key={product.id} style={styles.productCard}>
-                  {product.imageUrl ? (
-                    <Image
-                      source={{ uri: product.imageUrl }}
-                      style={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: 8,
-                        marginBottom: 6,
-                      }}
-                      contentFit="cover"
-                    />
-                  ) : (
-                    <View style={styles.productImagePlaceholder} />
-                  )}
-                  <Text style={styles.productName}>{product.name}</Text>
-                  <Text style={styles.productPrice}>${product.price}</Text>
-                </View>
+                <Pressable
+                  key={product.id}
+                  onPress={() => {
+                    console.log(
+                      "TODO: Navigate to product detail screen for product ID:",
+                      product.id
+                    );
+                    // Implement navigation to product detail screen here
+                  }}
+                >
+                  <View style={styles.productCard}>
+                    {product.imageUrl ? (
+                      <Image
+                        source={{ uri: product.imageUrl }}
+                        style={{
+                          width: 80,
+                          height: 80,
+                          borderRadius: 8,
+                          marginBottom: 6,
+                        }}
+                        contentFit="cover"
+                      />
+                    ) : (
+                      <View style={styles.productImagePlaceholder} />
+                    )}
+                    <Text style={styles.productName}>{product.name}</Text>
+                    <Text style={styles.productPrice}>${product.price}</Text>
+                  </View>
+                </Pressable>
               ))
             )}
           </View>
         </View>
 
         {/* Carrusel de otras vidrieras (futuro) */}
-        {/* <View style={styles.otherStoresCarousel}></View> */}
+        <View style={styles.otherStoresSection}>
+          <Text style={styles.otherStoresTitle}>
+            Otras vidrieras que te pueden interesar
+          </Text>
+          {/* TODO: Implement suggested stores carousel here */}
+          {loadingSuggestedStores ? (
+            <Text>Cargando sugerencias...</Text>
+          ) : (
+            <FlatList
+              data={suggestedStoresData}
+              renderItem={({ item }) => <SuggestedStoreCard store={item} />}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.carouselContentContainer}
+            />
+          )}
+        </View>
       </View>
     </View>
   );
@@ -328,6 +495,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 12,
   },
+  videoTagContainer: {
+    width: "100%",
+    aspectRatio: 9 / 16,
+    position: "relative", // Crucial for absolute positioning of tags
+  },
+  mainVideoPlayer: {
+    width: "100%",
+    height: "100%", // Fill the container
+    borderRadius: 16,
+    backgroundColor: "#000", // Match container background
+  },
   heroVideoPlaceholder: {
     flex: 1,
     alignItems: "center",
@@ -399,5 +577,77 @@ const styles = StyleSheet.create({
     color: "#888",
     fontSize: 14,
     marginTop: 12,
+  },
+  productTag: {
+    position: "absolute",
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+  },
+  productTagText: {
+    color: "#fff",
+    fontSize: 12,
+  },
+  selectedProductOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    padding: 16,
+    alignItems: "center",
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  closeOverlayButton: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    zIndex: 1,
+  },
+  selectedProductImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  selectedProductName: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  selectedProductPrice: {
+    color: "#5E60CE",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  otherStoresSection: {
+    width: "100%",
+    paddingHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 16,
+  },
+  otherStoresTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: "#222",
+  },
+  carouselPlaceholder: {
+    width: "100%",
+    height: 100, // Placeholder height
+    backgroundColor: "#eee",
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  carouselPlaceholderText: {
+    color: "#888",
+    fontSize: 14,
+  },
+  carouselContentContainer: {
+    paddingRight: 16, // Add some padding at the end of the carousel
   },
 });
