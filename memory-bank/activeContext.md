@@ -23,6 +23,14 @@ Refinamiento del sistema de video y desarrollo de funcionalidades sociales clave
 - **AI Action:** Actualizado el uso de colores en interfaz para usar las propiedades correctas del tema.
 - **AI Action:** Optimizada la función de carga de videos para mantener la compatibilidad de tipos.
 - **AI Action:** Revisada y sincronizada toda la documentación del proyecto para mantener coherencia.
+- **AI Action:** Developed and refined the `ShowcaseView` component to serve as a virtual storefront for business profiles.
+- **AI Action:** Added a back button to the `ShowcaseView` header for improved navigation.
+- **AI Action:** Implemented interactive product tags on the hero video within `ShowcaseView`, displaying product details on press.
+- **AI Action:** Made product grid items in `ShowcaseView` pressable, preparing for navigation to product details.
+- **AI Action:** Created the `SuggestedStoreCard` component for displaying individual suggested businesses.
+- **AI Action:** Integrated a horizontal carousel (using `FlatList` and `SuggestedStoreCard`) in `ShowcaseView` to display suggested businesses, initially with dummy data.
+- **AI Action:** Replaced dummy data fetching with actual Supabase query for suggested businesses (note: a linter error related to Supabase client export persists, likely external to ShowcaseView).
+- **AI Action:** Made suggested store cards in the carousel pressable, preparing for navigation to their respective showcase views.
 
 ## Next Steps (Priorizado)
 
