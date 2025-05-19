@@ -1,5 +1,13 @@
 # Documentación del Proyecto Lookym Live
 
+> **Actualizado:** 19 de mayo de 2025
+
+## Resumen Ejecutivo
+
+LOOKYM es una plataforma móvil que conecta usuarios con negocios a través de contenido de video de formato corto. La aplicación permite a los negocios mostrar sus productos y servicios, mientras que los usuarios pueden descubrir, interactuar y comunicarse directamente con estos negocios.
+
+**Estado actual:** Fase de desarrollo activo con funcionalidades core implementadas y en proceso de refinamiento.
+
 ## Estructura Actual del Sistema
 
 ### Sistema de Autenticación
@@ -13,6 +21,7 @@ El sistema utiliza Supabase para la autenticación de usuarios y almacenamiento 
 - Inicio de sesión con Google (parcialmente implementado)
 - Actualización de perfil de usuario
 - Verificación de sesión al iniciar la aplicación
+- Roles diferenciados (usuario/negocio)
 
 ### Sistema de Notificaciones
 
@@ -78,6 +87,27 @@ Actualmente implementado con datos simulados (mock data) y almacenamiento local.
 
 - Reemplazar el uso de `any` con tipos específicos
 - Mejorar la definición de interfaces para entidades del sistema
+
+## Mejoras Recientes (Mayo 2025)
+
+### 1. Sistema de Testing Mejorado
+
+- Se han corregido los tests del componente `FollowButton` utilizando técnicas más robustas para testing de componentes React Native
+- Se ha creado documentación detallada sobre las mejores prácticas para testing en `components/__tests__/README.md`
+- Se ha implementado un enfoque más confiable para seleccionar componentes en tests usando `UNSAFE_getAllByType` en lugar de `getByRole`
+- Se han eliminado tests redundantes y consolidado la funcionalidad en archivos de test principales
+
+### 2. Organización de la Documentación
+
+- Se ha reorganizado la documentación relacionada con Canva en `docs/canva/`
+- Se ha actualizado la documentación de testing con las mejores prácticas actuales
+- Se ha mejorado la estructura del proyecto siguiendo las mejores prácticas de Expo para desarrollo web y móvil
+
+### 3. Optimización de Código
+
+- Se han eliminado archivos redundantes y código no utilizado
+- Se ha mejorado la organización de componentes y tests
+- Se han aplicado mejores prácticas para importaciones en TypeScript
 
 ## Próximas Tareas
 
@@ -152,5 +182,62 @@ Se ejecutaron los tests automáticos del proyecto con el comando `npm test`.
 - Los tests cubren stores, componentes y utilidades clave.
 - Se recomienda mantener y ampliar la cobertura de tests a medida que se agregan nuevas funcionalidades.
 - Documenta cualquier cambio relevante en `/docs/development-workflow.md` y en este archivo.
+
+---
+
+## Guía para Equipos
+
+### Para el AI Product Manager
+
+1. **Estado actual:** El proyecto está en fase de desarrollo activo con las funcionalidades core implementadas.
+2. **Prioridades recomendadas:**
+   - Completar la integración de chat con Supabase
+   - Finalizar la autenticación con Google
+   - Implementar notificaciones push
+3. **Documentación clave:**
+   - `/docs/progreso-y-roadmap.md` para el roadmap completo
+   - `/docs/3TODO.txt` para tareas pendientes específicas
+   - `/memory-bank/` para decisiones clave y contexto técnico
+   - `/docs/PROJECT_STATUS_UPDATED.md` para el estado actual detallado
+
+### Para el Equipo de UI/UX
+
+1. **Componentes disponibles:**
+   - Consultar `/docs/ui-components.md` para ver los componentes existentes
+   - El sistema de diseño está implementado en componentes reutilizables
+2. **Áreas de mejora:**
+   - Experiencia de chat
+   - Flujo de subida de videos
+   - Perfil de negocio
+3. **Documentación clave:**
+   - `/components/README.md` para entender la estructura de componentes
+   - `/docs/styling-guide.md` para guías de estilo
+
+### Para Desarrolladores
+
+1. **Configuración del entorno:**
+   - Seguir las instrucciones en el README principal
+   - Ejecutar `npm install` y `npm start` para iniciar el proyecto
+2. **Arquitectura:**
+   - Expo Router para navegación
+   - Zustand para gestión de estado
+   - Supabase para backend
+3. **Testing:**
+   - Seguir las mejores prácticas en `components/__tests__/README.md`
+   - Ejecutar `npm test` para correr los tests
+4. **Documentación clave:**
+   - `/docs/development-workflow.md` para el flujo de trabajo
+   - `/docs/architecture.md` para entender la arquitectura
+   - `/docs/authentication.md` para el sistema de autenticación
+   - `/docs/video-system.md` para el sistema de videos
+
+## Recomendaciones para Desarrollo
+
+- Seguir las convenciones de TypeScript y mantener el tipado estricto.
+- Mantener la estructura modular del proyecto.
+- Documentar nuevas funcionalidades y componentes.
+- Escribir tests para nuevas funcionalidades siguiendo las mejores prácticas documentadas.
+- Mantener y ampliar la cobertura de tests a medida que se agregan nuevas funcionalidades.
+- Documentar cualquier cambio relevante en `/docs/development-workflow.md` y en este archivo.
 
 ---
