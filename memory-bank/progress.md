@@ -45,14 +45,22 @@
 
 ## Business Profile: ShowcaseView
 
-- `ShowcaseView` integrado y documentado como vidriera virtual para perfiles de negocios.
+- `ShowcaseView` integrated and documentado as vidriera virtual para perfiles de negocios.
 - Avatar real del comercio usando `expo-image`.
 - Video principal mostrado con `expo-av` y controles nativos.
-- El grid de productos ahora muestra la imagen real (`product.imageUrl`) si está disponible, usando `expo-image`.
-- Documentación en `/docs/ui-components.md` actualizada tras cada mejora.
-- Mantener sincronía entre código y documentación.
-- Última actualización: 2025-05-10
-  - Botón para iniciar chat con negocios.
+- El grid de productos ahora muestra la imagen real (`product.imageUrl`) if available, usando `expo-image`.
+- Documentación en `/docs/ui-components.md` actualizada after each improvement.
+- Mantener sincronía between code and documentation.
+- Last update: 2025-05-14
+  - Added back button to header.
+  - Made product grid items pressable (navigation placeholder added).
+  - Implemented interactive video tags displaying product details overlay on press.
+  - Added state and logic for product details overlay visibility.
+  - Corrected TypeScript interface definitions for clarity.
+  - Integrated horizontal carousel for suggested businesses using `FlatList` and `SuggestedStoreCard`.
+  - Created `SuggestedStoreCard.tsx` component.
+  - Replaced dummy data fetch with Supabase query for suggested businesses (note: Supabase client export linter error persists, likely external).
+  - Made suggested store cards pressable (navigation placeholder added).
 - **Search Functionality:**
   - Búsqueda por videos, hashtags y usuarios.
   - Filtros por categoría para refinar resultados.
