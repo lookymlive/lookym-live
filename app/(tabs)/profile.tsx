@@ -107,6 +107,9 @@ export default function ProfileScreen() {
     videos,
     fetchVideosByUser,
     isLoading: videosLoading,
+    savedVideos,
+    fetchSavedVideos,
+    isLoadingSaved: savedVideosLoading,
   } = useVideoStore();
   const {
     followUser,
@@ -142,6 +145,7 @@ export default function ProfileScreen() {
           setProfileUser(currentUser);
           if (currentUser) {
             await fetchVideosByUser(currentUser.id);
+            await fetchSavedVideos(currentUser.id);
 
             // Inicializa datos de seguidores si no lo están
             if (!followsInitialized) {
@@ -497,14 +501,71 @@ export default function ProfileScreen() {
           />
         );
       case "saved":
+        // Saved Videos Tab Content
+        if (!isOwner) {
+          return (
+            <View style={styles.emptyContainer}>
+              {" "}
+              {/* Using emptyContainer for consistent padding */}
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                Esta información no está disponible para otros usuarios.
+              </Text>
+            </View>
+          );
+        }
+
+        if (savedVideosLoading) {
+          return (
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              style={styles.loadingIndicator}
+            />
+          );
+        }
+
+        if (!savedVideos || savedVideos.length === 0) {
+          return (
+            <View style={styles.emptyStateContainer}>
+              {" "}
+              {/* Using emptyStateContainer for consistent padding */}
+              <Text style={styles.emptyStateText}>
+                No has guardado ningún video aún.
+              </Text>
+              {/* Optionally add a button to discover videos */}
+            </View>
+          );
+        }
+
         return (
-          <View style={styles.emptyContainer}>
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-              {isOwner
-                ? "Aún no has guardado ningún video"
-                : "Esta información no está disponible"}
-            </Text>
-          </View>
+          <FlatList
+            data={savedVideos}
+            keyExtractor={(item) => item.id}
+            numColumns={3} // 3 columns for a grid layout
+            renderItem={({ item }) => (
+              <Pressable
+                style={styles.videoGridItem}
+                onPress={() => {
+                  console.log(
+                    "TODO: Navigate to video detail screen for saved video ID:",
+                    item.id
+                  );
+                  // Implement navigation to video detail screen here, e.g.:
+                  // router.push(`/videos/${item.id}`);
+                  router.push(`/videos/${item.id}`); // Assuming a dynamic route like app/videos/[id].tsx
+                }}
+              >
+                {/* Using Image for thumbnail for simplicity. Could use a small video preview */}
+                <Image
+                  source={{ uri: item.thumbnailUrl || item.videoUrl }} // Use thumbnail if available
+                  style={styles.videoThumbnail}
+                  contentFit="cover"
+                />
+                {/* Optionally add a play icon overlay */}
+              </Pressable>
+            )}
+            contentContainerStyle={styles.videoGrid}
+          />
         );
       case "products":
         return (
