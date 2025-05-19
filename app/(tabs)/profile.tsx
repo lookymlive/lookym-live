@@ -508,22 +508,21 @@ export default function ProfileScreen() {
         );
       case "products":
         return (
-          <View style={styles.productsContainer}>
-            <Text
-              style={[styles.emptyStateText, { color: colors.textSecondary }]}
-            >
+          <View style={styles.emptyStateContainer}>
+            <Text style={styles.emptyStateText}>
               {isOwner
-                ? "No has añadido ningún producto todavía"
-                : `${profileUser.username} no ha añadido ningún producto todavía`}
+                ? "No has añadido ningún producto todavía."
+                : `${profileUser.username} no ha añadido ningún producto todavía.`}
             </Text>
-            {isOwner && (
+            {isOwner && profileUser.role === 'business' && (
               <TouchableOpacity
-                style={[
-                  styles.addProductButton,
-                  { backgroundColor: colors.primary },
-                ]}
+                style={[styles.uploadButton, { backgroundColor: colors.primary }]}
+                onPress={() => {
+                  console.log('TODO: Navigate to add product screen');
+                  // router.push('/add-product');
+                }}
               >
-                <Text style={styles.addProductButtonText}>Añadir Producto</Text>
+                <Text style={styles.uploadButtonText}>Añadir Producto</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -638,7 +637,7 @@ export default function ProfileScreen() {
               {profileUser.bio || "No bio yet"}
             </Text>
 
-            {renderRoleSpecificContent()}
+            {/* Removed renderRoleSpecificContent() call */}
           </View>
 
           <View style={styles.actionButtons}>
@@ -760,7 +759,7 @@ export default function ProfileScreen() {
         </View>
 
         {renderTabs()}
-        {renderTabContent()}
+        <View style={styles.tabContent}>{renderTabContent()}</View>
       </ScrollView>
     </SafeAreaView>
   );
