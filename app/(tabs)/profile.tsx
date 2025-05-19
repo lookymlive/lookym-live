@@ -87,15 +87,15 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   Image,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  FlatList,
-  Pressable,
 } from "react-native";
 
 export default function ProfileScreen() {
@@ -439,15 +439,26 @@ export default function ProfileScreen() {
       case "posts":
         // Video Grid Tab Content
         if (videosLoading) {
-          return <ActivityIndicator size="large" color={colors.primary} style={styles.loadingIndicator} />;
+          return (
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              style={styles.loadingIndicator}
+            />
+          );
         }
 
         if (!videos || videos.length === 0) {
           return (
             <View style={styles.emptyStateContainer}>
-              <Text style={styles.emptyStateText}>No hay videos publicados aún.</Text>
+              <Text style={styles.emptyStateText}>
+                No hay videos publicados aún.
+              </Text>
               {isOwner && (
-                <TouchableOpacity style={styles.uploadButton} onPress={() => router.push('/upload')}>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                  onPress={() => router.push("/upload")}
+                >
                   <Text style={styles.uploadButtonText}>Subir Video</Text>
                 </TouchableOpacity>
               )}
@@ -464,9 +475,13 @@ export default function ProfileScreen() {
               <Pressable
                 style={styles.videoGridItem}
                 onPress={() => {
-                  console.log('TODO: Navigate to video detail screen for video ID:', item.id);
+                  console.log(
+                    "TODO: Navigate to video detail screen for video ID:",
+                    item.id
+                  );
                   // Implement navigation to video detail screen here, e.g.:
                   // router.push(`/videos/${item.id}`);
+                  router.push(`/videos/${item.id}`); // Assuming a dynamic route like app/videos/[id].tsx
                 }}
               >
                 {/* Using Image for thumbnail for simplicity. Could use a small video preview */}
