@@ -514,11 +514,14 @@ export default function ProfileScreen() {
                 ? "No has añadido ningún producto todavía."
                 : `${profileUser.username} no ha añadido ningún producto todavía.`}
             </Text>
-            {isOwner && profileUser.role === 'business' && (
+            {isOwner && profileUser.role === "business" && (
               <TouchableOpacity
-                style={[styles.uploadButton, { backgroundColor: colors.primary }]}
+                style={[
+                  styles.uploadButton,
+                  { backgroundColor: colors.primary },
+                ]}
                 onPress={() => {
-                  console.log('TODO: Navigate to add product screen');
+                  console.log("TODO: Navigate to add product screen");
                   // router.push('/add-product');
                 }}
               >
