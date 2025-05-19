@@ -94,6 +94,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  FlatList,
+  Pressable,
 } from "react-native";
 
 export default function ProfileScreen() {
@@ -435,36 +437,18 @@ export default function ProfileScreen() {
   const renderTabContent = () => {
     switch (activeTab) {
       case "posts":
+        // Video Grid Tab Content
         if (videosLoading) {
-          return (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="small" color={colors.primary} />
-              <Text style={[styles.loadingText, { color: colors.text }]}>
-                Cargando videos...
-              </Text>
-            </View>
-          );
+          return <ActivityIndicator size="large" color={colors.primary} style={styles.loadingIndicator} />;
         }
 
-        if (videos.length === 0) {
+        if (!videos || videos.length === 0) {
           return (
-            <View style={styles.emptyContainer}>
-              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-                {isOwner
-                  ? "Aún no has subido ningún video"
-                  : `${profileUser.username} aún no ha subido ningún video`}
-              </Text>
-              {isOwner && profileUser.role === "business" && (
-                <TouchableOpacity
-                  style={[
-                    styles.emptyActionButton,
-                    { backgroundColor: colors.primary },
-                  ]}
-                  onPress={() => router.push("/(tabs)/upload")}
-                >
-                  <Text style={styles.emptyActionButtonText}>
-                    Subir un video
-                  </Text>
+            <View style={styles.emptyStateContainer}>
+              <Text style={styles.emptyStateText}>No hay videos publicados aún.</Text>
+              {isOwner && (
+                <TouchableOpacity style={styles.uploadButton} onPress={() => router.push('/upload')}>
+                  <Text style={styles.uploadButtonText}>Subir Video</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -472,20 +456,30 @@ export default function ProfileScreen() {
         }
 
         return (
-          <View style={styles.postsGrid}>
-            {videos.map((video) => (
-              <TouchableOpacity
-                key={video.id}
-                style={styles.postItem}
-                onPress={() => router.push(`/video/${video.id}`)}
+          <FlatList
+            data={videos}
+            keyExtractor={(item) => item.id}
+            numColumns={3} // 3 columns for a grid layout
+            renderItem={({ item }) => (
+              <Pressable
+                style={styles.videoGridItem}
+                onPress={() => {
+                  console.log('TODO: Navigate to video detail screen for video ID:', item.id);
+                  // Implement navigation to video detail screen here, e.g.:
+                  // router.push(`/videos/${item.id}`);
+                }}
               >
+                {/* Using Image for thumbnail for simplicity. Could use a small video preview */}
                 <Image
-                  source={{ uri: video.thumbnailUrl || video.videoUrl }}
-                  style={styles.postImage}
+                  source={{ uri: item.thumbnailUrl || item.videoUrl }} // Use thumbnail if available
+                  style={styles.videoThumbnail}
+                  contentFit="cover"
                 />
-              </TouchableOpacity>
-            ))}
-          </View>
+                {/* Optionally add a play icon overlay */}
+              </Pressable>
+            )}
+            contentContainerStyle={styles.videoGrid}
+          />
         );
       case "saved":
         return (
@@ -915,17 +909,67 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    marginBottom: 16,
     textAlign: "center",
+    marginBottom: 16,
   },
-  addProductButton: {
+  emptyActionButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,
   },
-  addProductButtonText: {
-    color: "#ffffff",
+  emptyActionButtonText: {
+    color: "#fff",
     fontWeight: "500",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    minHeight: 200,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 14,
+  },
+  emptyContainer: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 200,
+  },
+  emptyStateContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  uploadButton: {
+    backgroundColor: "#5E60CE",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  uploadButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  loadingIndicator: {
+    marginTop: 20,
+  },
+  videoGrid: {
+    // Add padding if needed
+  },
+  videoGridItem: {
+    flex: 1,
+    aspectRatio: 1, // Square items
+    margin: 2,
+    backgroundColor: "#e0e0e0", // Placeholder background
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  videoThumbnail: {
+    width: "100%",
+    height: "100%",
   },
   notLoggedIn: {
     flex: 1,
@@ -948,35 +992,33 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    minHeight: 200,
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 14,
-  },
-  emptyContainer: {
-    padding: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 200,
-  },
-  emptyText: {
+  statsText: {
     fontSize: 16,
-    textAlign: "center",
-    marginBottom: 16,
+    color: "#333",
   },
-  emptyActionButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
+  tabContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    marginTop: 12,
+    marginBottom: 8,
   },
-  emptyActionButtonText: {
-    color: "#fff",
+  tabButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  tabButtonText: {
+    fontSize: 16,
     fontWeight: "500",
+  },
+  activeTabButtonText: {
+    fontWeight: "bold",
+  },
+  tabContent: {
+    flex: 1,
+    width: "100%",
+    paddingHorizontal: 16,
+    marginTop: 8,
   },
 });
