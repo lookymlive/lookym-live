@@ -305,6 +305,7 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
                         }}
                       >
                         <Text style={styles.productTagText}>{tag.label}</Text>
+                        <View style={styles.tagIndicator} />
                       </Pressable>
                     );
                   })}
@@ -324,33 +325,104 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
 
         {/* Selected product details overlay */}
         {selectedProduct && (
-          <Pressable
-            style={styles.selectedProductOverlay}
-            onPress={() => {
-              console.log(
-                "TODO: Navigate to product detail screen for product ID:",
-                selectedProduct.id,
-                "and then close overlay"
-              );
-              // Implement navigation to product detail screen here
-              setSelectedProduct(null);
-            }}
-          >
-            <View style={styles.closeOverlayButton}>
+          <View style={styles.selectedProductOverlayContainer}>
+            <Pressable
+              style={styles.closeOverlayButton}
+              onPress={() => setSelectedProduct(null)}
+            >
               <Ionicons name="close-circle" size={24} color="#fff" />
-            </View>
-            <Image
-              source={{ uri: selectedProduct.imageUrl }}
-              style={styles.selectedProductImage}
-              contentFit="cover"
-            />
-            <Text style={styles.selectedProductName}>
-              {selectedProduct.name}
-            </Text>
-            <Text style={styles.selectedProductPrice}>
-              ${selectedProduct.price}
-            </Text>
-          </Pressable>
+            </Pressable>
+            <Pressable
+              style={styles.selectedProductOverlay}
+              onPress={() => {
+                console.log("Dismissing product overlay");
+                setSelectedProduct(null);
+              }}
+            >
+              <Image
+                source={{ uri: selectedProduct.imageUrl }}
+                style={styles.selectedProductImage}
+                contentFit="cover"
+              />
+              <View style={styles.selectedProductInfo}>
+                <Text style={styles.selectedProductName} numberOfLines={1}>
+                  {selectedProduct.name}
+                </Text>
+                {selectedProduct.description && (
+                  <Text
+                    style={styles.selectedProductDescription}
+                    numberOfLines={2}
+                  >
+                    {selectedProduct.description}
+                  </Text>
+                )}
+                <Pressable
+                  style={styles.viewProductButton}
+                  onPress={() => {
+                    console.log(
+                      "Navigate to product detail screen for ID:",
+                      selectedProduct.id
+                    );
+                    // Implement navigation to product detail screen here
+                    router.push(`/product/${selectedProduct.id}`); // Assuming dynamic route
+                  }}
+                >
+                  <Text style={styles.viewProductButtonText}>
+                    ${selectedProduct.price}
+                  </Text>
+                </Pressable>
+              </View>
+              {/* Communication Buttons */}
+              <View style={styles.productOverlayActions}>
+                <Pressable
+                  style={styles.actionButtonOverlay}
+                  onPress={() => {
+                    // Initiate chat about the selected product
+                    if (currentUser && store.id && selectedProduct) {
+                      createChat(
+                        store.id,
+                        `Hola, estoy interesado en el producto: ${selectedProduct.name}.`
+                      );
+                      // Optionally navigate to the chat screen after initiating
+                      console.log(
+                        "Navigating to chat with store ID:",
+                        store.id
+                      );
+                      router.push(`/chat/${store.id}`); // Assuming a route like app/chat/[id].tsx
+                    } else if (!currentUser) {
+                      console.log("User not logged in, cannot initiate chat.");
+                      // TODO: Prompt user to log in
+                    }
+                  }}
+                >
+                  <Ionicons name="chatbubble-outline" size={20} color="#555" />
+                  <Text style={styles.actionButtonOverlayText}>Chat</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.actionButtonOverlay}
+                  onPress={() => {
+                    // Navigate to the comments section for the main video
+                    if (mainVideo?.id) {
+                      console.log(
+                        "Navigating to comments for video ID:",
+                        mainVideo.id
+                      );
+                      router.push(`/video/${mainVideo.id}`); // Navigate to video detail screen, TODO: clarify comments location
+                    } else {
+                      console.log(
+                        "Cannot navigate to comments: mainVideo or mainVideo.id is undefined."
+                      );
+                    }
+                  }}
+                >
+                  <Ionicons name="chatbox-outline" size={20} color="#555" />
+                  <Text style={styles.actionButtonOverlayText}>
+                    Comentarios
+                  </Text>
+                </Pressable>
+              </View>
+            </Pressable>
+          </View>
         )}
 
         {/* Grid de productos */}
@@ -364,29 +436,23 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
                 <Pressable
                   key={product.id}
                   onPress={() => {
-                    console.log(
-                      "TODO: Navigate to product detail screen for product ID:",
-                      product.id
-                    );
-                    // Implement navigation to product detail screen here
+                    // Navigate to product detail screen
+                    router.push(`/product/${product.id}`); // Assuming a dynamic route like app/product/[id].tsx
                   }}
                 >
                   <View style={styles.productCard}>
                     {product.imageUrl ? (
                       <Image
                         source={{ uri: product.imageUrl }}
-                        style={{
-                          width: 80,
-                          height: 80,
-                          borderRadius: 8,
-                          marginBottom: 6,
-                        }}
+                        style={styles.productImage}
                         contentFit="cover"
                       />
                     ) : (
                       <View style={styles.productImagePlaceholder} />
                     )}
-                    <Text style={styles.productName}>{product.name}</Text>
+                    <Text style={styles.productName} numberOfLines={1}>
+                      {product.name}
+                    </Text>
                     <Text style={styles.productPrice}>${product.price}</Text>
                   </View>
                 </Pressable>
@@ -554,6 +620,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  productImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginBottom: 6,
+  },
   productImagePlaceholder: {
     width: 80,
     height: 80,
@@ -566,6 +638,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#333",
     textAlign: "center",
+    marginTop: 4,
   },
   productPrice: {
     fontSize: 13,
@@ -588,39 +661,79 @@ const styles = StyleSheet.create({
   productTagText: {
     color: "#fff",
     fontSize: 12,
+    marginRight: 4,
+  },
+  tagIndicator: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#5E60CE",
+  },
+  selectedProductOverlayContainer: {
+    position: "absolute",
+    bottom: 20, // Position slightly above the bottom edge
+    left: 16,
+    right: 16,
+    zIndex: 1, // Ensure it's above other content
+    alignItems: "center", // Center the overlay content horizontally
   },
   selectedProductOverlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(0,0,0,0.7)",
-    padding: 16,
+    backgroundColor: "rgba(255,255,255,0.95)", // Semi-transparent white background
+    borderRadius: 12,
+    padding: 12,
+    flexDirection: "row", // Arrange image and info side by side
     alignItems: "center",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    maxWidth: 300, // Max width for the overlay card
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
   },
   closeOverlayButton: {
     position: "absolute",
-    top: 8,
-    right: 8,
-    zIndex: 1,
+    top: -10, // Position above the overlay card
+    right: -10,
+    zIndex: 2, // Ensure close button is tappable
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: 12,
   },
   selectedProductImage: {
-    width: 80,
-    height: 80,
+    width: 60, // Smaller image
+    height: 60,
     borderRadius: 8,
-    marginBottom: 8,
+    marginRight: 12,
+  },
+  selectedProductInfo: {
+    flex: 1, // Take remaining space
   },
   selectedProductName: {
-    color: "#fff",
-    fontSize: 16,
+    color: "#333", // Darker text color
+    fontSize: 15,
     fontWeight: "bold",
+    marginBottom: 2,
+  },
+  selectedProductDescription: {
+    color: "#555", // Grayish text color
+    fontSize: 12,
     marginBottom: 4,
   },
   selectedProductPrice: {
-    color: "#5E60CE",
+    color: "#5E60CE", // Accent color for price
     fontSize: 14,
+    fontWeight: "bold",
+  },
+  viewProductButton: {
+    backgroundColor: "#5E60CE", // Accent color background
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    marginTop: 4,
+    alignSelf: "flex-start", // Align button to the start
+  },
+  viewProductButtonText: {
+    color: "#fff",
+    fontSize: 13,
     fontWeight: "bold",
   },
   otherStoresSection: {
@@ -649,5 +762,25 @@ const styles = StyleSheet.create({
   },
   carouselContentContainer: {
     paddingRight: 16, // Add some padding at the end of the carousel
+  },
+  productOverlayActions: {
+    flexDirection: "row",
+    marginTop: 8,
+    gap: 12, // Space between buttons
+    justifyContent: "center", // Center buttons horizontally
+    width: "100%", // Take full width of the overlay content
+  },
+  actionButtonOverlay: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    backgroundColor: "#eee", // Light background for buttons
+  },
+  actionButtonOverlayText: {
+    marginLeft: 4,
+    fontSize: 12,
+    color: "#333",
   },
 });
