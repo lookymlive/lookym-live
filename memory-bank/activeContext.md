@@ -70,3 +70,23 @@ Refinamiento del sistema de video y desarrollo de funcionalidades sociales clave
 - Explorar la posibilidad de añadir historias efímeras.
 - Revisar y mejorar la seguridad general de la aplicación, especialmente en permisos y roles.
 - Corregir errores de bundling con react-native-url-polyfill.
+
+## Future Roadmap (2025)
+
+### Q2 2025
+
+- **Developer:** Implement Robust Navigation Routes (Product Details, Video Comments, Suggested Showcase), Address Supabase Client Export Error, Write Comprehensive Tests (initial).
+- **UI/UX:** Refined Interactive Tag Visuals, Implement "Nearby Product Info" Tooltip, Smooth Transitions and Animations.
+- **Product Manager:** (Planning and requirements gathering for Q3 features)
+
+### Q3 2025
+
+- **Product Manager:** Showcase Analytics Dashboard, Intuitive Tag Management Tool.
+- **Developer:** Optimize Video Playback Performance, Implement Pagination/Infinite Scrolling (Profile/Grids), Develop Backend for Analytics and Tag Management (initial), Continue Comprehensive Tests.
+- **UI/UX:** Clearer Business Profile Differentiation, Optimized Media Loading Feedback.
+
+### Q4 2025
+
+- **Product Manager:** Enhanced Product Catalog Integration, Curated Showcase Feeds.
+- **Developer:** Develop Backend for Analytics and Tag Management ( lanjutan), Continue Comprehensive Tests.
+- **UI/UX:** (Refining existing UI based on user feedback and testing)
