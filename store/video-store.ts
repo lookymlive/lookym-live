@@ -15,6 +15,8 @@ interface VideoState {
   videos: Video[];
   likedVideos: Record<string, boolean>;
   savedVideos: Record<string, boolean>;
+  mainVideo: Video | null;
+  mainVideoLoading: boolean;
   isLoading: boolean;
   error: string | null;
   likeVideo: (videoId: string) => Promise<void>;
@@ -31,6 +33,7 @@ interface VideoState {
   fetchVideos: (page?: number, limit?: number) => Promise<void>;
   fetchVideosByUser: (userId: string) => Promise<void>;
   fetchVideoById: (videoId: string) => Promise<Video | null>;
+  setMainVideo: (video: Video | null) => void;
 }
 
 export const useVideoStore = create<VideoState>()(
@@ -39,6 +42,8 @@ export const useVideoStore = create<VideoState>()(
       videos: [],
       likedVideos: {},
       savedVideos: {},
+      mainVideo: null,
+      mainVideoLoading: false,
       isLoading: false,
       error: null,
 
@@ -77,7 +82,7 @@ export const useVideoStore = create<VideoState>()(
               likedVideos: { ...state.likedVideos, [videoId]: true },
             };
           });
-          
+
           // Crear notificación para el propietario del video
           const videoToUpdate = get().videos.find((v) => v.id === videoId);
           if (videoToUpdate && videoToUpdate.user.id !== currentUser.id) {
@@ -530,75 +535,51 @@ export const useVideoStore = create<VideoState>()(
       },
 
       fetchVideoById: async (videoId: string) => {
+        set({ mainVideoLoading: true, error: null });
         try {
-          set({ isLoading: true, error: null });
-
-          // In a real app with Supabase
           const { data, error } = await supabase
             .from("videos")
-            .select(
-              `
-              *,
-              user:users(*),
-              comments:comments(
-                *,
-                user:users(*)
-              )
-            `
-            )
+            .select("*, user:users(*), products(*), tags(*)")
             .eq("id", videoId)
             .single();
 
           if (error) throw error;
 
-          // Format the video for our app
-          const formattedVideo: Video = {
-            id: data.id,
-            user: {
-              id: data.user.id,
-              username: data.user.username,
-              avatar: data.user.avatar_url,
-              verified: data.user.verified,
-              role: data.user.role,
-            },
-            videoUrl: data.video_url,
-            thumbnailUrl: data.thumbnail_url,
-            caption: data.caption,
-            hashtags: data.hashtags,
-            likes: data.likes,
-            comments: data.comments.map((comment: any) => ({
-              id: comment.id,
+          if (data) {
+            const video: Video = {
+              id: data.id,
+              videoUrl: data.videoUrl,
+              thumbnailUrl: data.thumbnailUrl,
+              caption: data.caption,
+              hashtags: data.hashtags || [],
+              created_at: data.created_at,
+              user_id: data.user_id,
               user: {
-                id: comment.user.id,
-                username: comment.user.username,
-                avatar: comment.user.avatar_url,
-                verified: comment.user.verified,
-                role: comment.user.role,
+                id: data.user.id,
+                username: data.user.username,
+                avatar_url: data.user.avatar_url,
+                role: data.user.role,
               },
-              text: comment.text,
-              timestamp: new Date(comment.created_at).getTime(),
-              likes: comment.likes,
-            })),
-            timestamp: new Date(data.created_at).getTime(),
-            mimeType: data.mime_type || inferMimeType(data.video_url),
-          };
-
-          // Helper to infer mime type from url
-          function inferMimeType(url: string): string {
-            const ext = url.split(".").pop()?.toLowerCase();
-            if (ext === "mov") return "video/quicktime";
-            if (ext === "webm") return "video/webm";
-            if (ext === "ogg") return "video/ogg";
-            return "video/mp4";
+              products: data.products || [],
+              tags: data.tags || [],
+              likes: data.likes || 0,
+              comments: [],
+            };
+            set({ mainVideo: video, mainVideoLoading: false });
+            return video;
+          } else {
+            set({ mainVideo: null, mainVideoLoading: false });
+            return null;
           }
-
-          set({ isLoading: false });
-          return formattedVideo;
         } catch (error: any) {
-          console.error("Fetch video by ID error:", error.message);
-          set({ error: error.message, isLoading: false });
-          return null;
+          console.error("Error fetching video by ID:", error.message);
+          set({ error: error.message, mainVideoLoading: false });
+          throw error;
         }
+      },
+
+      setMainVideo: (video: Video | null) => {
+        set({ mainVideo: video });
       },
     }),
     {
