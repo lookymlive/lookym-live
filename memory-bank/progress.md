@@ -124,3 +124,7 @@
 - Address chat message ordering issues.
 - Implementar funcionalidad de seguimiento de usuarios.
 - Complete tests for core components and stores.
+
+## Future Development Plan
+
+For a detailed breakdown of planned features and improvements by role and quarter for 2025, please refer to the [Future Roadmap (2025)] section in `memory-bank/activeContext.md`.
