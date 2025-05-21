@@ -1,3 +1,7 @@
+import { Comment } from "./comment"; // Assuming Comment is in comment.ts
+import { ProductTag, StoreProduct } from "./product"; // Import product types
+import { User } from "./user"; // Assuming User is in user.ts
+
 export interface User {
   id: string;
   username: string;
@@ -25,4 +29,6 @@ export interface Video {
   comments: Comment[];
   timestamp: number;
   mimeType?: string;
+  products?: StoreProduct[]; // Optional products associated with the video
+  tags?: ProductTag[]; // Optional product tags associated with the video
 }
