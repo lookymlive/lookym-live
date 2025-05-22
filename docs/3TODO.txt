@@ -1,3 +1,8 @@
+- [ ] Revisar y corregir el mapeo de snake_case a camelCase en todos los métodos del store de videos (especialmente fetchVideoById). [2025-05-22] Corregido y documentado.
+---
+22/05/2025 - Resolución de conflicto de rutas en Expo Router:
+  - Se eliminó `app/(tabs)/chat.tsx` porque coexistía con `app/(tabs)/chat/index.tsx` y causaba error de rutas duplicadas.
+  - Documentado en `docs/_AI_NOTES_ROUTING.md` para futuras automatizaciones y para la IA.
 # LOOKYM - TODO List
 
 > **This file contains granular tasks, bugs, and priorities. All contributors (human or AI) should check it frequently for up-to-date actionable items.**
