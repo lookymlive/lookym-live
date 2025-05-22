@@ -63,20 +63,24 @@ describe("useChatStore", () => {
   });
 
   it("should load chats without error", async () => {
-    await useChatStore.getState().loadChats();
+    await useChatStore.getState().fetchChats();
     expect(Array.isArray(useChatStore.getState().chats)).toBe(true);
   });
 
   it("should create a chat and add it to the store", async () => {
-    const chatId = await useChatStore.getState().createChat("user2", "Hola!");
+    const chatId = await useChatStore.getState().createChat(["user2"]);
     expect(typeof chatId).toBe("string");
+    expect(chatId).not.toBeNull();
   });
 
   it("should send a message without error", async () => {
     // First, create a chat
-    const chatId = await useChatStore.getState().createChat("user2", "Hola!");
-    await expect(
-      useChatStore.getState().sendMessage(chatId, "Mensaje")
-    ).resolves.toBeUndefined();
+    const chatId = await useChatStore.getState().createChat(["user2"]);
+    expect(chatId).not.toBeNull();
+    if (chatId) {
+      await expect(
+        useChatStore.getState().sendMessage(chatId, "Mensaje")
+      ).resolves.toBeUndefined();
+    }
   });
 });
