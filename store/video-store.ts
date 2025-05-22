@@ -546,18 +546,19 @@ export const useVideoStore = create<VideoState>()(
           if (error) throw error;
 
           if (data) {
+            // Aseguramos el mapeo correcto de snake_case a camelCase
             const video: Video = {
               id: data.id,
-              videoUrl: data.videoUrl,
-              thumbnailUrl: data.thumbnailUrl,
+              videoUrl: data.video_url, // <-- CORREGIDO: snake_case a camelCase
+              thumbnailUrl: data.thumbnail_url, // <-- CORREGIDO: snake_case a camelCase
               caption: data.caption,
               hashtags: data.hashtags || [],
-              created_at: data.created_at,
-              user_id: data.user_id,
+              timestamp: new Date(data.created_at).getTime(),
               user: {
                 id: data.user.id,
                 username: data.user.username,
-                avatar_url: data.user.avatar_url,
+                avatar: data.user.avatar_url,
+                verified: data.user.verified,
                 role: data.user.role,
               },
               products: data.products || [],
