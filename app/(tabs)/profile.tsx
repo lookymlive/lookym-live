@@ -108,8 +108,6 @@ export default function ProfileScreen() {
     fetchVideosByUser,
     isLoading: videosLoading,
     savedVideos,
-    fetchSavedVideos,
-    isLoadingSaved: savedVideosLoading,
   } = useVideoStore();
   const {
     followUser,
@@ -145,13 +143,10 @@ export default function ProfileScreen() {
           setProfileUser(currentUser);
           if (currentUser) {
             await fetchVideosByUser(currentUser.id);
-            await fetchSavedVideos(currentUser.id);
-
             // Inicializa datos de seguidores si no lo están
             if (!followsInitialized) {
               await refreshFollowsData();
             }
-
             // Obtener estadísticas de seguidores
             const stats = await getUserFollowsSummary(currentUser.id);
             setFollowsStats(stats);
@@ -440,7 +435,7 @@ export default function ProfileScreen() {
   // Render tab content based on active tab
   const renderTabContent = () => {
     switch (activeTab) {
-      case "posts":
+      case "posts": {
         // Video Grid Tab Content
         if (videosLoading) {
           return (
@@ -451,7 +446,6 @@ export default function ProfileScreen() {
             />
           );
         }
-
         if (!videos || videos.length === 0) {
           return (
             <View style={styles.emptyStateContainer}>
@@ -469,104 +463,86 @@ export default function ProfileScreen() {
             </View>
           );
         }
-
         return (
           <FlatList
             data={videos}
             keyExtractor={(item) => item.id}
-            numColumns={3} // 3 columns for a grid layout
+            numColumns={3}
             renderItem={({ item }) => (
               <Pressable
                 style={styles.videoGridItem}
                 onPress={() => {
-                  console.log(
-                    "TODO: Navigate to video detail screen for video ID:",
-                    item.id
-                  );
-                  // Implement navigation to video detail screen here, e.g.:
-                  // router.push(`/videos/${item.id}`);
-                  router.push(`/videos/${item.id}`); // Assuming a dynamic route like app/videos/[id].tsx
+                  router.push({
+                    pathname: "/video/[id]",
+                    params: { id: item.id },
+                  });
                 }}
               >
-                {/* Using Image for thumbnail for simplicity. Could use a small video preview */}
                 <Image
-                  source={{ uri: item.thumbnailUrl || item.videoUrl }} // Use thumbnail if available
+                  source={{ uri: item.thumbnailUrl || item.videoUrl }}
                   style={styles.videoThumbnail}
-                  contentFit="cover"
                 />
-                {/* Optionally add a play icon overlay */}
               </Pressable>
             )}
             contentContainerStyle={styles.videoGrid}
           />
         );
-      case "saved":
+      }
+      case "saved": {
         // Saved Videos Tab Content
         if (!isOwner) {
           return (
             <View style={styles.emptyContainer}>
-              {" "}
-              {/* Using emptyContainer for consistent padding */}
-              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+              <Text
+                style={[styles.emptyStateText, { color: colors.textSecondary }]}
+              >
                 Esta información no está disponible para otros usuarios.
               </Text>
             </View>
           );
         }
-
-        if (savedVideosLoading) {
-          return (
-            <ActivityIndicator
-              size="large"
-              color={colors.primary}
-              style={styles.loadingIndicator}
-            />
-          );
-        }
-
-        if (!savedVideos || savedVideos.length === 0) {
+        // savedVideos es un objeto { [videoId]: true }, así que filtramos videos
+        const savedVideosArray = videos.filter(
+          (v) => savedVideos && savedVideos[v.id]
+        );
+        if (
+          !savedVideos ||
+          Object.keys(savedVideos).length === 0 ||
+          savedVideosArray.length === 0
+        ) {
           return (
             <View style={styles.emptyStateContainer}>
-              {" "}
-              {/* Using emptyStateContainer for consistent padding */}
               <Text style={styles.emptyStateText}>
                 No has guardado ningún video aún.
               </Text>
-              {/* Optionally add a button to discover videos */}
             </View>
           );
         }
-
         return (
           <FlatList
-            data={savedVideos}
+            data={savedVideosArray}
             keyExtractor={(item) => item.id}
-            numColumns={3} // 3 columns for a grid layout
+            numColumns={3}
             renderItem={({ item }) => (
               <Pressable
                 style={styles.videoGridItem}
                 onPress={() => {
-                  console.log(
-                    "TODO: Navigate to video detail screen for saved video ID:",
-                    item.id
-                  );
-                  // Implement navigation to video detail screen here, e.g.:
-                  // router.push(`/videos/${item.id}`);
-                  router.push(`/videos/${item.id}`); // Assuming a dynamic route like app/videos/[id].tsx
+                  router.push({
+                    pathname: "/video/[id]",
+                    params: { id: item.id },
+                  });
                 }}
               >
-                {/* Using Image for thumbnail for simplicity. Could use a small video preview */}
                 <Image
-                  source={{ uri: item.thumbnailUrl || item.videoUrl }} // Use thumbnail if available
+                  source={{ uri: item.thumbnailUrl || item.videoUrl }}
                   style={styles.videoThumbnail}
-                  contentFit="cover"
                 />
-                {/* Optionally add a play icon overlay */}
               </Pressable>
             )}
             contentContainerStyle={styles.videoGrid}
           />
         );
+      }
       case "products":
         return (
           <View style={styles.emptyStateContainer}>
@@ -582,7 +558,6 @@ export default function ProfileScreen() {
                   { backgroundColor: colors.primary },
                 ]}
                 onPress={() => {
-                  console.log("TODO: Navigate to add product screen");
                   // router.push('/add-product');
                 }}
               >
