@@ -80,14 +80,10 @@ export default function ChatDetailScreen() {
     setActiveChat(chatId);
     fetchMessages(chatId);
 
-    // Mark messages as read when the chat is opened or messages are updated
-    // Need to ensure currentUser is available before calling markMessagesAsRead
-    // This will be handled inside the markMessagesAsRead action, but checking here too for clarity
     if (currentUser?.id) {
       markMessagesAsRead(chatId);
     }
 
-    // Set up real-time subscription for new messages
     const subscription = supabase
       .channel(`chat_messages_${chatId}`)
       .on(
@@ -150,50 +146,49 @@ export default function ChatDetailScreen() {
       // Optionally clear messages when leaving a chat
       useChatStore.setState({ messages: [] });
     };
-  }, [
-    chatId,
-    fetchMessages,
-    setActiveChat,
-    messages,
-    chats,
-    currentUser,
-    markMessagesAsRead,
-  ]);
+  }, [chatId, currentUser, setActiveChat, fetchMessages, markMessagesAsRead]);
 
   const handleSendMessage = async () => {
-    if (newMessageText.trim() === "" || !chatId) return;
+    if (!chatId) {
+      console.error("[Chat] chatId is undefined, cannot send message");
+      return;
+    }
+    if (!currentUser?.id) {
+      console.error("[Chat] currentUser.id is undefined, cannot send message");
+      return;
+    }
+    if (newMessageText.trim() === "") {
+      console.warn("[Chat] Message content is empty, not sending");
+      return;
+    }
 
     // Optimistically add the message to the UI before the API call completes
-    // This makes the chat feel faster.
     const optimisticMessage: Message = {
-      id: Math.random().toString(), // Temp ID
+      id: Math.random().toString(),
       chat_id: chatId,
-      user_id: currentUser?.id || "unknown", // Use current user's ID
+      user_id: currentUser.id,
       content: newMessageText.trim(),
-      created_at: new Date().toISOString(), // Use current time
-      users: currentUser
-        ? ({
-            id: currentUser.id,
-            username: currentUser.username,
-            avatar_url: currentUser.avatar || null,
-          } as any)
-        : undefined, // Use currentUser.avatar, cast to any temporarily due to type mismatch
+      created_at: new Date().toISOString(),
+      users: {
+        id: currentUser.id,
+        username: currentUser.username,
+        avatar_url: currentUser.avatar || null,
+      },
     };
 
-    // Add the optimistic message to the state
     useChatStore.setState((state) => ({
       messages: [...state.messages, optimisticMessage],
     }));
     setNewMessageText("");
 
-    // Scroll to the end (optional, might need refinement with optimistic updates)
-    // flatListRef.current?.scrollToEnd({ animated: true });
+    // Log data before sending
+    console.log("[Chat] Sending message:", {
+      chatId,
+      userId: currentUser.id,
+      content: optimisticMessage.content,
+    });
 
-    // Send the message via API
-    await sendMessage(chatId, optimisticMessage.content); // Use optimistic message content
-
-    // The real-time subscription will handle updating the message with the correct ID and timestamp from the DB
-    // and potentially user data if not included optimistically.
+    await sendMessage(chatId, optimisticMessage.content);
   };
 
   // Find the other user for the chat header
