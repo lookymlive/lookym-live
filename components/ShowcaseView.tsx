@@ -194,7 +194,7 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
     if (!currentUser) return;
     setChatLoading(true);
     try {
-      await createChat(store.id, "Hola! Me interesa tu negocio.");
+      await createChat([store.id]);
       // Aquí podrías navegar al chat si lo deseas
     } finally {
       setChatLoading(false);
@@ -379,10 +379,7 @@ export default function ShowcaseView({ store }: ShowcaseViewProps) {
                   onPress={() => {
                     // Initiate chat about the selected product
                     if (currentUser && store.id && selectedProduct) {
-                      createChat(
-                        store.id,
-                        `Hola, estoy interesado en el producto: ${selectedProduct.name}.`
-                      );
+                      createChat([store.id]);
                       // Optionally navigate to the chat screen after initiating
                       console.log(
                         "Navigating to chat with store ID:",
