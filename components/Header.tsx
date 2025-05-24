@@ -26,7 +26,7 @@ export default function Header({
   showBackButton = false,
   onBackPress = () => router.back(),
 }: HeaderProps) {
-  const { colors, isDark, gradients, getColorWithOpacity } = useColorScheme();
+  const { colors, isDark, getColorWithOpacity } = useColorScheme();
   const [messagePressed, setMessagePressed] = useState(false);
   const [notificationPressed, setNotificationPressed] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
