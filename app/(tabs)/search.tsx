@@ -40,12 +40,6 @@ interface UserItem {
   role: string;
 }
 
-// Extender el componente VideoThumbnail para permitir propiedad height
-interface VideoThumbnailProps {
-  video: Video;
-  height?: number;
-}
-
 export default function SearchScreen() {
   const { colors, isDark } = useColorScheme();
   const { videos, fetchVideos } = useVideoStore();
