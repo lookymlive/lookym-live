@@ -3,7 +3,7 @@ import { Heart, Home, PlusSquare, Search, User } from "lucide-react-native";
 import { useColorScheme } from "../../hooks/useColorScheme.ts";
 
 export default function TabLayout() {
-  const { isDark, colors, gradients } = useColorScheme();
+  const { colors } = useColorScheme();
 
   return (
     <Tabs
