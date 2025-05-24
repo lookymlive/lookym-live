@@ -1,13 +1,12 @@
-import { useColorScheme } from '@/hooks/useColorScheme.ts';
-import { initializeAuth, useAuthStore } from '@/store/auth-store.ts';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { initializeAuth } from "@/store/auth-store.ts";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
   const { isDark } = useColorScheme();
-  const { isInitialized, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     initializeAuth();
@@ -15,7 +14,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <StatusBar style={isDark ? "light" : "dark"} />
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="auth/login" options={{ title: "Log In" }} />
