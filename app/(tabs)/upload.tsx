@@ -115,7 +115,7 @@ export default function UploadScreen() {
         );
 
       // Add the video to our store, con progreso
-      const newVideo = await uploadVideo(videoUri, caption, hashtagArray);
+      await uploadVideo(videoUri, caption, hashtagArray);
 
       // Actualizar el progreso manualmente
       setUploadProgress(100);
