@@ -1,5 +1,4 @@
 // Integración de ShowcaseView para negocios
-import ShowcaseView, { ShowcaseViewProps } from "@/components/ShowcaseView.tsx";
 /**
  * ProfileScreen - Pantalla de perfil de usuario/negocio para LOOKYM
  *
@@ -101,7 +100,7 @@ import {
 export default function ProfileScreen() {
   const { userId } = useLocalSearchParams();
   const { currentUser, logout, updateProfile } = useAuthStore();
-  const { colors, isDark } = useColorScheme();
+  const { colors } = useColorScheme();
   const [activeTab, setActiveTab] = useState("posts");
   const {
     videos,
@@ -116,7 +115,6 @@ export default function ProfileScreen() {
     getUserFollowsSummary,
     refreshFollowsData,
     isInitialized: followsInitialized,
-    isLoading: followsLoading,
   } = useFollowsStore();
 
   const [profileUser, setProfileUser] = useState(currentUser);
@@ -329,45 +327,6 @@ export default function ProfileScreen() {
       </SafeAreaView>
     );
   }
-
-  // Business-specific data y estructura para ShowcaseView
-  const businessInfo =
-    profileUser.role === "business"
-      ? {
-          category: profileUser.category || "Sin categoría",
-          location: profileUser.location || "Sin ubicación",
-        }
-      : null;
-
-  // Estructura de datos para ShowcaseView
-  const showcaseStoreProfile: ShowcaseViewProps["store"] | null =
-    profileUser.role === "business"
-      ? {
-          id: profileUser.id,
-          name: profileUser.displayName || profileUser.username,
-          avatar: profileUser.avatar,
-          bio: profileUser.bio,
-          location: profileUser.location,
-          category: profileUser.category,
-          videos: videos.map((v) => ({
-            id: v.id,
-            videoUrl: v.videoUrl,
-            thumbnailUrl: v.thumbnailUrl,
-            tags: [], // TODO: mapear etiquetas de productos si existen
-          })),
-          products: [], // TODO: mapear productos si existen
-        }
-      : null;
-
-  // Render different content based on user role
-  const renderRoleSpecificContent = () => {
-    if (profileUser.role === "business" && showcaseStoreProfile) {
-      // Renderizar ShowcaseView para negocios
-      return <ShowcaseView store={showcaseStoreProfile} />;
-    }
-    // ... (mantener la lógica anterior para usuarios normales si se desea)
-    return null;
-  };
 
   // Render different tabs based on user role
   const renderTabs = () => {
@@ -675,8 +634,6 @@ export default function ProfileScreen() {
             <Text style={[styles.bio, { color: colors.textSecondary }]}>
               {profileUser.bio || "No bio yet"}
             </Text>
-
-            {/* Removed renderRoleSpecificContent() call */}
           </View>
 
           <View style={styles.actionButtons}>
