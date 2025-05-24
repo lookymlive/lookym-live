@@ -1,5 +1,4 @@
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
-import { useAuthStore } from "@/store/auth-store.ts";
 import { supabase } from "@/utils/supabase.ts";
 import { router, useLocalSearchParams } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
@@ -16,7 +15,6 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 export default function ChatScreen() {
   const { userId } = useLocalSearchParams();
   const { colors } = useColorScheme();
-  const { currentUser } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [recipientUser, setRecipientUser] = useState<{
     username: string;
