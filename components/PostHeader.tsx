@@ -10,7 +10,7 @@ interface PostHeaderProps {
 }
 
 export default function PostHeader({ user, location }: PostHeaderProps) {
-  const { colors, isDark } = useColorScheme();
+  const { colors } = useColorScheme();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.card }]}>
