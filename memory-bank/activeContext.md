@@ -90,3 +90,9 @@ Refinamiento del sistema de video y desarrollo de funcionalidades sociales clave
 - **Product Manager:** Enhanced Product Catalog Integration, Curated Showcase Feeds.
 - **Developer:** Develop Backend for Analytics and Tag Management ( lanjutan), Continue Comprehensive Tests.
 - **UI/UX:** (Refining existing UI based on user feedback and testing)
+
+### : UI Patterns & Reusable Components Analysis
+
+- Added a detailed section to systemPatterns.md documenting common UI patterns and proposed reusable components (UserInfo, AppCard, ActionBar, AppListItem, FullScreenStatusView, AppHeader, MediaGridItem, etc.).
+- Next step: Optionally create base files for these components in /components to accelerate UI refactor and ensure consistency.
+- All future UI work should reference these patterns/components for guidance.
