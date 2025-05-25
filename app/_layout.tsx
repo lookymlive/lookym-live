@@ -1,3 +1,4 @@
+import 'react-native-url-polyfill/auto';
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { initializeAuth } from "@/store/auth-store.ts";
 import { Stack } from "expo-router";
