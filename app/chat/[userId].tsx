@@ -1,19 +1,12 @@
+import { FullScreenStatusView } from "@/components/FullScreenStatusView";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { useAuthStore } from "@/store/auth-store.ts";
+import { useChatStore } from "@/store/chat-store.ts";
 import { supabase } from "@/utils/supabase.ts";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
-<<<<<<< Updated upstream
-import {
-  ActivityIndicator,
-  Alert,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-} from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function ResolveChatScreen() {
   const { userId: recipientUserIdParam } = useLocalSearchParams();
@@ -45,21 +38,75 @@ export default function ResolveChatScreen() {
           .eq("id", recipientUserId)
           .single();
 
-        if (error) throw error;
-
-        setRecipientUser({
-          username: data.username,
-          avatar: data.avatar_url,
-        });
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      } finally {
-        setLoading(false);
+        if (fetchError) throw fetchError;
+        if (data) {
+          setRecipientUser(data);
+        } else {
+          throw new Error("Recipient user not found.");
+        }
+      } catch (e: any) {
+        setError(e.message || "Failed to fetch recipient details.");
       }
     };
 
-    fetchUserData();
-  }, [userId]);
+    fetchRecipientData();
+  }, [recipientUserId]);
+
+  useEffect(() => {
+    if (!currentUser || !recipientUserId || !recipientUser) {
+      if (recipientUserId && !recipientUser && !error) {
+        setIsResolvingChat(true);
+      } else if (error) {
+        setIsResolvingChat(false);
+      }
+      return;
+    }
+
+    if (currentUser.id === recipientUserId) {
+      setError("No puedes iniciar un chat contigo mismo.");
+      setIsResolvingChat(false);
+      return;
+    }
+
+    const resolveChat = async () => {
+      setIsResolvingChat(true);
+      setError(null);
+      try {
+        let chatId = await findChatByParticipant(recipientUserId);
+
+        if (chatId) {
+          router.replace({
+            pathname: "/chat/[id]",
+            params: { id: chatId },
+          });
+        } else {
+          const newChatId = await createChatWithUser(recipientUserId);
+          if (newChatId) {
+            router.replace({
+              pathname: "/chat/[id]",
+              params: { id: newChatId },
+            });
+          } else {
+            throw new Error("Failed to create or find chat.");
+          }
+        }
+      } catch (e: any) {
+        setError(
+          e.message || "Could not initiate chat. Please try again later."
+        );
+        setIsResolvingChat(false);
+      }
+    };
+
+    resolveChat();
+  }, [
+    currentUser,
+    recipientUserId,
+    recipientUser,
+    findChatByParticipant,
+    createChatWithUser,
+    error,
+  ]);
 
   const navigateBack = () => {
     router.back();
@@ -69,20 +116,35 @@ export default function ResolveChatScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={navigateBack} style={styles.backButton}>
-          <ChevronLeft size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          {recipientUser?.username || "Chat"}
-        </Text>
-        <View style={styles.headerRight} />
-      </View>
-
-      <View style={styles.emptyContainer}>
-        <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-          La funcionalidad de chat será implementada próximamente
-        </Text>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: recipientUser?.username || "Chat",
+          headerTitleStyle: { color: colors.text },
+          headerStyle: { backgroundColor: colors.card },
+          headerLeft: () => (
+            <TouchableOpacity onPress={navigateBack} style={styles.backButton}>
+              <ChevronLeft size={24} color={colors.text} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <View style={styles.contentContainer}>
+        {isResolvingChat && (
+          <FullScreenStatusView
+            status="loading"
+            message={`Iniciando chat con ${recipientUser?.username || "usuario"}...`}
+            style={{ backgroundColor: "transparent" }}
+          />
+        )}
+        {error && !isResolvingChat && (
+          <FullScreenStatusView
+            status="error"
+            message={error}
+            onRetry={navigateBack}
+            style={{ backgroundColor: "transparent" }}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -92,15 +154,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-  },
   backButton: {
-    paddingHorizontal: 8, // Make it easier to tap
+    paddingHorizontal: 8,
   },
   contentContainer: {
     flex: 1,
@@ -108,20 +163,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-  emptyText: {
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  button: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-=======
->>>>>>> Stashed changes
 });
