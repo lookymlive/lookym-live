@@ -80,7 +80,7 @@ export default function VideoFeed({
   );
   const [lastScrollY, setLastScrollY] = useState(0);
   const flatListRef = useRef<FlatList>(null);
-  const { isDark, colors, gradients, getColorWithOpacity } = useColorScheme();
+  const { colors, gradients, getColorWithOpacity } = useColorScheme();
   // Ref for scroll indicator timeout
   const scrollIndicatorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
