@@ -1,4 +1,4 @@
-import { User } from './user';
+import { User } from './user.ts';
 
 export interface Message {
   id: string;
