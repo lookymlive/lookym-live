@@ -9,29 +9,6 @@ interface ChatParticipant {
   user_id: string;
   chat_id: string;
   users: {
-    // Joined user data
-    id: string;
-    username: string;
-    avatar_url: string | null;
-  };
-}
-
-interface Chat {
-  id: string;
-  created_at: string;
-  // Add other chat fields if necessary
-  participants?: ChatParticipant[]; // Optional: to store participant details
-  last_message?: any; // TODO: Define proper type for last message preview
-}
-
-interface Message {
-  id: string;
-  chat_id: string;
-  user_id: string;
-  content: string;
-  created_at: string;
-  users?: {
-    // Joined user data
     id: string;
     username: string;
     avatar_url: string | null;
@@ -49,8 +26,10 @@ interface ChatState {
 interface ChatActions {
   fetchChats: () => Promise<void>;
   fetchMessages: (chatId: string) => Promise<void>;
-  sendMessage: (chatId: string, content: string) => Promise<void>;
+  sendMessage: (chatId: string, text: string) => Promise<void>;
   createChat: (participantIds: string[]) => Promise<string | null>;
+  findChatByParticipant: (recipientUserId: string) => Promise<string | null>;
+  createChatWithUser: (recipientUserId: string) => Promise<string | null>;
   setActiveChat: (chatId: string | null) => void;
   reset: () => void;
   markMessagesAsRead: (chatId: string, messageIds?: string[]) => Promise<void>;
@@ -90,7 +69,7 @@ export const useChatStore = create<ChatState & ChatActions>()(
 
           if (participantsError) throw participantsError;
 
-          const chatIds = participantsData.map((p) => p.chat_id);
+          const chatIds = participantsData.map((p: any) => p.chat_id);
 
           if (chatIds.length === 0) {
             set({ chats: [], isLoading: false });
@@ -101,28 +80,49 @@ export const useChatStore = create<ChatState & ChatActions>()(
           const { data: chatsData, error: chatsError } = await supabase
             .from("chats")
             .select(
-              "id, created_at, participants:chat_participants(user_id, users(id, username, avatar_url)), last_message:messages(content, created_at)"
-            ) // Refined select statement
+              "id, participants:chat_participants(user_id, users(id, username, avatar_url)), messages(*)"
+            )
             .in("id", chatIds)
-            .order("created_at", { ascending: false }); // Order chats by creation date or last message date
-          // TODO: Ordering by last message timestamp is preferable but might require a different query structure or processing after fetching.
-          // The current join might not reliably give the *last* message this way.
+            .order("id", { ascending: false });
 
           if (chatsError) throw chatsError;
 
-          // Process chats data if needed (e.g., extract last message, format participants)
-          // For now, mapping to Chat interface and ensuring participant/message structure is correct.
-          const processedChats: Chat[] = (chatsData as any[]).map((chat) => ({
-            id: chat.id,
-            created_at: chat.created_at,
-            participants: chat.participants.map((p: any) => ({
-              // Map participants
-              user_id: p.user_id,
-              chat_id: chat.id, // chat_id is not in the joined users object, add it from the chat object
-              users: p.users, // Keep the nested users object
-            })),
-            last_message: chat.last_message ? chat.last_message[0] : undefined, // Assuming last_message is an array due to the join, take the first (most recent if order works)
-          }));
+          // Map to Chat type
+          const processedChats: Chat[] = (chatsData as any[]).map((chat) => {
+            // Participants
+            const participants = chat.participants.map((p: any) => ({
+              id: p.users.id,
+              email: "", // Not available here
+              username: p.users.username,
+              displayName: p.users.username, // Fallback
+              avatar: p.users.avatar_url || "",
+              bio: "",
+              role: "user",
+              verified: false,
+            }));
+            // Messages
+            const messages: Message[] = (chat.messages || []).map((m: any) => ({
+              id: m.id,
+              senderId: m.user_id,
+              text: m.content,
+              timestamp: new Date(m.created_at).getTime(),
+              read: m.read ?? false,
+            }));
+            // Last message
+            const lastMessage =
+              messages.length > 0 ? messages[messages.length - 1] : undefined;
+            // Unread count
+            const unreadCount = messages.filter(
+              (msg) => !msg.read && msg.senderId !== currentUser.id
+            ).length;
+            return {
+              id: chat.id,
+              participants,
+              messages,
+              lastMessage: lastMessage!,
+              unreadCount,
+            };
+          });
 
           set({ chats: processedChats, isLoading: false });
         } catch (error: any) {
@@ -136,20 +136,28 @@ export const useChatStore = create<ChatState & ChatActions>()(
         try {
           const { data, error } = await supabase
             .from("messages")
-            .select("*, users(*)") // Select message fields and join with users table
+            .select("*")
             .eq("chat_id", chatId)
-            .order("created_at", { ascending: true }); // Order by timestamp
+            .order("created_at", { ascending: true });
 
           if (error) throw error;
 
-          set({ messages: data as Message[], isLoading: false });
+          const messages: Message[] = (data as any[]).map((m) => ({
+            id: m.id,
+            senderId: m.user_id,
+            text: m.content,
+            timestamp: new Date(m.created_at).getTime(),
+            read: m.read ?? false,
+          }));
+
+          set({ messages, isLoading: false });
         } catch (error: any) {
           console.error("Error fetching messages:", error);
           set({ error: error.message, isLoading: false });
         }
       },
 
-      sendMessage: async (chatId, content) => {
+      sendMessage: async (chatId, text) => {
         set({ error: null });
         const { currentUser } = useAuthStore.getState();
 
@@ -159,31 +167,44 @@ export const useChatStore = create<ChatState & ChatActions>()(
         }
 
         try {
-          // Insert the new message
           const { data, error } = await supabase
             .from("messages")
             .insert({
               chat_id: chatId,
               user_id: currentUser.id,
-              content: content,
+              content: text,
+              read: false,
             })
-            .select("*, users(*)"); // Select the inserted message with user details
+            .select("*");
 
           if (error) throw error;
 
           if (data && data.length > 0) {
-            const newMessage = data[0] as Message;
-            // Append the new message to the current messages list if the active chat matches
+            const m = data[0];
+            const newMessage: Message = {
+              id: m.id,
+              senderId: m.user_id,
+              text: m.content,
+              timestamp: new Date(m.created_at).getTime(),
+              read: m.read ?? false,
+            };
             if (get().activeChatId === chatId) {
               set((state) => ({
                 messages: [...state.messages, newMessage],
               }));
             }
-            // Optionally update the last message preview in the chats list
             set((state) => ({
               chats: state.chats.map((chat) => {
                 if (chat.id === chatId) {
-                  return { ...chat, last_message: newMessage };
+                  const updatedMessages = [...chat.messages, newMessage];
+                  return {
+                    ...chat,
+                    messages: updatedMessages,
+                    lastMessage: newMessage,
+                    unreadCount: updatedMessages.filter(
+                      (msg) => !msg.read && msg.senderId !== currentUser.id
+                    ).length,
+                  };
                 }
                 return chat;
               }),
@@ -204,42 +225,35 @@ export const useChatStore = create<ChatState & ChatActions>()(
           return null;
         }
 
-        const allParticipantIds = [...participantIds, currentUser.id];
-        // Optional: Check if a chat already exists with these participants
-        // This can be complex depending on exact participant matching requirements.
-        // For now, we'll allow creating multiple chats with the same participants.
+        const allParticipantIds = [
+          ...new Set([...participantIds, currentUser.id]),
+        ];
 
         try {
-          // 1. Create the chat entry
           const { data: chatData, error: chatError } = await supabase
             .from("chats")
-            .insert({}) // Insert an empty row, other fields like created_at will be set by DB
-            .select("id") // Select the generated ID
-            .single(); // Expect a single row back
+            .insert({})
+            .select("id")
+            .single();
 
           if (chatError) throw chatError;
           if (!chatData) throw new Error("Failed to create chat entry");
-
           const newChatId = chatData.id;
 
-          // 2. Add participants to chat_participants table
           const participantInserts = allParticipantIds.map((userId) => ({
             chat_id: newChatId,
             user_id: userId,
           }));
-
           const { error: participantsError } = await supabase
             .from("chat_participants")
             .insert(participantInserts);
 
           if (participantsError) throw participantsError;
 
-          // Optional: Fetch the newly created chat with participant details
-          // and add it to the local chats state. This might duplicate effort with fetchChats.
-          // For now, we'll rely on a subsequent fetchChats call to update the list.
-
+          // Fetch and add the new chat to the store
+          await get().fetchChats();
           set({ isLoading: false });
-          return newChatId; // Return the ID of the newly created chat
+          return newChatId;
         } catch (error: any) {
           console.error("Error creating chat:", error);
           set({ error: error.message, isLoading: false });
@@ -247,57 +261,121 @@ export const useChatStore = create<ChatState & ChatActions>()(
         }
       },
 
+      findChatByParticipant: async (recipientUserId: string) => {
+        const { currentUser } = useAuthStore.getState();
+        if (!currentUser) {
+          console.error("User not authenticated");
+          return null;
+        }
+        // Check local store first
+        const existingChat = get().chats.find((chat) => {
+          if (chat.participants && chat.participants.length === 2) {
+            const participantIds = chat.participants.map((p) => p.id);
+            return (
+              participantIds.includes(currentUser.id) &&
+              participantIds.includes(recipientUserId)
+            );
+          }
+          return false;
+        });
+        if (existingChat) {
+          return existingChat.id;
+        }
+        // Fallback: fetch from Supabase (not optimal, but works for now)
+        try {
+          const { data: userChats, error: userChatsError } = await supabase
+            .from("chat_participants")
+            .select("chat_id")
+            .eq("user_id", currentUser.id);
+          if (userChatsError) throw userChatsError;
+          if (!userChats || userChats.length === 0) return null;
+          const currentUserChatIds = userChats.map((pc: any) => pc.chat_id);
+          const { data: commonChats, error: commonChatsError } = await supabase
+            .from("chat_participants")
+            .select("chat_id")
+            .eq("user_id", recipientUserId)
+            .in("chat_id", currentUserChatIds);
+          if (commonChatsError) throw commonChatsError;
+          for (const chat of commonChats || []) {
+            const { data: participants, error: pError } = await supabase
+              .from("chat_participants")
+              .select("user_id")
+              .eq("chat_id", chat.chat_id);
+            if (pError) continue;
+            if (participants && participants.length === 2) {
+              return chat.chat_id;
+            }
+          }
+          return null;
+        } catch (error) {
+          console.error("Error in findChatByParticipant:", error);
+          return null;
+        }
+      },
+
+      createChatWithUser: async (recipientUserId: string) => {
+        const { currentUser } = useAuthStore.getState();
+        if (!currentUser) {
+          set({ error: "User not authenticated" });
+          return null;
+        }
+        if (currentUser.id === recipientUserId) {
+          set({ error: "Cannot create chat with oneself." });
+          return null;
+        }
+        return get().createChat([recipientUserId]);
+      },
+
       reset: () => set(initialState),
 
       markMessagesAsRead: async (chatId: string, messageIds?: string[]) => {
         set({ error: null });
         const { currentUser } = useAuthStore.getState();
-
         if (!currentUser) {
           set({ error: "User not authenticated" });
           return;
         }
-
         try {
           let query = supabase
             .from("messages")
             .update({ read: true })
             .eq("chat_id", chatId)
-            .neq("user_id", currentUser.id); // Only mark messages sent by others
-
+            .neq("user_id", currentUser.id);
           if (messageIds && messageIds.length > 0) {
             query = query.in("id", messageIds);
           }
-
           const { error } = await query;
-
           if (error) throw error;
-
-          // Update local state: find the chat and mark relevant messages as read
           set((state) => ({
             chats: state.chats.map((chat) => {
               if (chat.id === chatId) {
+                const updatedMessages = chat.messages.map((msg) => {
+                  if (
+                    msg.senderId !== currentUser.id &&
+                    (!messageIds || messageIds.includes(msg.id)) &&
+                    !msg.read
+                  ) {
+                    return { ...msg, read: true };
+                  }
+                  return msg;
+                });
                 return {
                   ...chat,
-                  // Assuming unreadCount is calculated based on messages in the chat object
-                  // If not, this might need refinement.
-                  // A simpler approach for local state might be to just update the messages array.
-                  // Let's update the messages array within the store.
+                  messages: updatedMessages,
+                  unreadCount: updatedMessages.filter(
+                    (msg) => !msg.read && msg.senderId !== currentUser.id
+                  ).length,
                 };
               }
               return chat;
             }),
             messages: state.messages.map((msg) => {
-              // Mark messages as read if they belong to this chat, are not sent by the current user,
-              // and are included in messageIds (if provided), and are currently not read.
               if (
-                msg.chat_id === chatId &&
-                msg.user_id !== currentUser.id &&
+                msg.senderId !== currentUser.id &&
+                (!messageIds || messageIds.includes(msg.id)) &&
                 !msg.read
               ) {
-                if (!messageIds || messageIds.includes(msg.id)) {
-                  return { ...msg, read: true };
-                }
+                return { ...msg, read: true };
               }
               return msg;
             }),

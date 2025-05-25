@@ -1,11 +1,11 @@
-## 2025-05-22: Corrección de mapeo snake_case a camelCase en videos
+# 2025-05-22: Corrección de mapeo snake_case a camelCase en videos
 
 Se detectó y corrigió un error en el método `fetchVideoById` del store de videos, donde se accedía a `data.videoUrl` y `data.thumbnailUrl` en vez de mapear correctamente desde `data.video_url` y `data.thumbnail_url` (formato snake_case de Supabase).
 
 Ahora, todos los métodos del store de videos mapean correctamente los campos a camelCase, garantizando consistencia en la UI y evitando errores de visualización en la pantalla de perfil y otros componentes.
 
 Revisar y mantener esta convención en futuras integraciones de datos externos.
-# Notas de IA: Resolución de conflictos de rutas en Expo Router
+ Notas de IA: Resolución de conflictos de rutas en Expo Router
 
 ## Problema detectado
 

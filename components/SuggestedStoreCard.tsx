@@ -1,5 +1,4 @@
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface SuggestedStoreCardProps {
@@ -11,8 +10,6 @@ interface SuggestedStoreCardProps {
 }
 
 export default function SuggestedStoreCard({ store }: SuggestedStoreCardProps) {
-  const router = useRouter();
-
   return (
     <Pressable
       style={styles.cardContainer}

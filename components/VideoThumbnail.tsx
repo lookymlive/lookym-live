@@ -3,33 +3,29 @@ import { Video } from "@/types/video.ts";
 import { formatTimeAgo } from "@/utils/time-format.ts";
 import { Image } from "expo-image";
 import {
-    AlertTriangle,
-    Bookmark,
-    Heart,
-    MessageCircle,
-    MoreHorizontal,
-    Send,
+  AlertTriangle,
+  Bookmark,
+  Heart,
+  MessageCircle,
+  MoreHorizontal,
+  Send,
 } from "lucide-react-native";
 import React, { useState } from "react";
 import {
-    Dimensions,
-    Platform,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface VideoThumbnailProps {
   video: Video;
-  height?: number;
 }
-
-const { width } = Dimensions.get("window");
 
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 
-export default function VideoThumbnail({ video, height }: VideoThumbnailProps) {
+export default function VideoThumbnail({ video }: VideoThumbnailProps) {
   const [showPlayer, setShowPlayer] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [errorRetryCount, setErrorRetryCount] = useState(0);

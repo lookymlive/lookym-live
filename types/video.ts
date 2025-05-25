@@ -1,6 +1,5 @@
-import { Comment } from "./comment"; // Assuming Comment is in comment.ts
-import { ProductTag, StoreProduct } from "./product"; // Import product types
-import { User } from "./user"; // Assuming User is in user.ts
+// Assuming Comment is in comment.ts
+import { ProductTag, StoreProduct } from "./product.ts"; // Import product types
 
 export interface User {
   id: string;
