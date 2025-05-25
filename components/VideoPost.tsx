@@ -49,9 +49,6 @@ export default function VideoPost({
   } = useVideoStore();
   const { isDark, colors } = useColorScheme();
 
-  // Extiende explícitamente el tipo de `colors` para incluir `primaryLight`
-  const extendedColors = colors as typeof colors & { primaryLight: string };
-
   const isLiked = !!likedVideos[video.id];
   const isSaved = !!savedVideos[video.id];
 
