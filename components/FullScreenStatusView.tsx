@@ -32,8 +32,11 @@ export const FullScreenStatusView: React.FC<FullScreenStatusViewProps> = ({
   if (status === "loading") {
     content = <ActivityIndicator size="large" color="#6366F1" />;
   } else if (status === "empty") {
-    const Icon = LucideIcons[emptyIconName] || LucideIcons["Info"];
-    content = <Icon size={48} color="#94A3B8" style={{ marginBottom: 12 }} />;
+    const Icon =
+      (LucideIcons[emptyIconName] as React.ElementType) || LucideIcons.Info;
+    content = Icon ? (
+      <Icon size={48} color="#94A3B8" style={{ marginBottom: 12 }} />
+    ) : null;
   } else if (status === "error") {
     const Icon = LucideIcons["AlertTriangle"];
     content = <Icon size={48} color="#F59E42" style={{ marginBottom: 12 }} />;
