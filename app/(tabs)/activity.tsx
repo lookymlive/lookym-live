@@ -1,6 +1,6 @@
-import { AppHeader } from "@/components/AppHeader";
-import { AppListItem } from "@/components/AppListItem";
-import { FullScreenStatusView } from "@/components/FullScreenStatusView";
+import { AppHeader } from "@/components/AppHeader.tsx";
+import { AppListItem } from "@/components/AppListItem.tsx";
+import { FullScreenStatusView } from "@/components/FullScreenStatusView.tsx";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useNotificationsStore } from "@/store/notifications-store.ts";
