@@ -64,6 +64,9 @@
  * - [ ] Mejorar accesibilidad y responsividad
  * - [ ] Sincronizar cambios con /memory-bank/activeContext.md y /docs/README.md
  */
+import { AppHeader } from "@/components/AppHeader";
+import { FullScreenStatusView } from "@/components/FullScreenStatusView";
+import { MediaGridItem } from "@/components/MediaGridItem";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useFollowsStore } from "@/store/follows-store.ts";
@@ -78,7 +81,6 @@ import {
   Edit,
   Grid3X3,
   LogOut,
-  Settings,
   ShoppingBag,
   User,
 } from "lucide-react-native";
@@ -273,60 +275,100 @@ export default function ProfileScreen() {
     router.back();
   };
 
+  // Modern header
+  const renderHeader = () => (
+    <AppHeader
+      title={profileUser?.username || "Perfil"}
+      leftAccessory={
+        !isOwner ? (
+          <TouchableOpacity
+            onPress={navigateBack}
+            style={{ paddingHorizontal: 8 }}
+          >
+            <ChevronLeft size={24} color={colors.text} />
+          </TouchableOpacity>
+        ) : undefined
+      }
+      rightAccessory={
+        isOwner ? (
+          <TouchableOpacity
+            onPress={handleEditProfile}
+            style={{ paddingHorizontal: 8 }}
+          >
+            <Edit size={22} color={colors.text} />
+          </TouchableOpacity>
+        ) : undefined
+      }
+    />
+  );
+
+  // Modern loading, error, login required
   if (!currentUser) {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <View style={styles.notLoggedIn}>
-          <Text style={[styles.notLoggedInText, { color: colors.text }]}>
-            Please log in to view profiles
-          </Text>
-          <TouchableOpacity
-            style={[styles.loginButton, { backgroundColor: colors.primary }]}
-            onPress={() => router.push("/auth/login")}
-          >
-            <Text style={styles.loginButtonText}>Log In</Text>
-          </TouchableOpacity>
-        </View>
+        {renderHeader()}
+        <FullScreenStatusView
+          status="loginRequired"
+          message="Inicia sesión para ver tu perfil"
+          onLogin={() => router.push("/auth/login")}
+        />
       </SafeAreaView>
     );
   }
-
   if (loadingProfile) {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.text }]}>
-            Cargando perfil...
-          </Text>
-        </View>
+        {renderHeader()}
+        <FullScreenStatusView status="loading" message="Cargando perfil..." />
       </SafeAreaView>
     );
   }
-
   if (!profileUser) {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <View style={styles.notLoggedIn}>
-          <Text style={[styles.notLoggedInText, { color: colors.text }]}>
-            Usuario no encontrado
-          </Text>
-          <TouchableOpacity
-            style={[styles.loginButton, { backgroundColor: colors.primary }]}
-            onPress={navigateBack}
-          >
-            <Text style={styles.loginButtonText}>Volver</Text>
-          </TouchableOpacity>
-        </View>
+        {renderHeader()}
+        <FullScreenStatusView
+          status="error"
+          message="No se pudo cargar el perfil"
+          onRetry={navigateBack}
+        />
       </SafeAreaView>
     );
   }
+
+  // Modern video grid
+  const renderVideoGrid = () => (
+    <FlatList
+      data={videos}
+      keyExtractor={(item) => item.id}
+      numColumns={3}
+      renderItem={({ item }) => (
+        <MediaGridItem
+          mediaUri={item.thumbnailUrl || item.videoUrl}
+          mediaType="video"
+          title={item.caption}
+          onPress={() =>
+            router.push({ pathname: "/video/[id]", params: { id: item.id } })
+          }
+          cardStyle={{ margin: 2, width: 110 }}
+        />
+      )}
+      contentContainerStyle={{ padding: 8 }}
+      ListEmptyComponent={
+        <FullScreenStatusView
+          status="empty"
+          message="No hay videos aún"
+          emptyIconName="Video"
+        />
+      }
+    />
+  );
 
   // Render different tabs based on user role
   const renderTabs = () => {
@@ -395,57 +437,7 @@ export default function ProfileScreen() {
   const renderTabContent = () => {
     switch (activeTab) {
       case "posts": {
-        // Video Grid Tab Content
-        if (videosLoading) {
-          return (
-            <ActivityIndicator
-              size="large"
-              color={colors.primary}
-              style={styles.loadingIndicator}
-            />
-          );
-        }
-        if (!videos || videos.length === 0) {
-          return (
-            <View style={styles.emptyStateContainer}>
-              <Text style={styles.emptyStateText}>
-                No hay videos publicados aún.
-              </Text>
-              {isOwner && (
-                <TouchableOpacity
-                  style={styles.uploadButton}
-                  onPress={() => router.push("/upload")}
-                >
-                  <Text style={styles.uploadButtonText}>Subir Video</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          );
-        }
-        return (
-          <FlatList
-            data={videos}
-            keyExtractor={(item) => item.id}
-            numColumns={3}
-            renderItem={({ item }) => (
-              <Pressable
-                style={styles.videoGridItem}
-                onPress={() => {
-                  router.push({
-                    pathname: "/video/[id]",
-                    params: { id: item.id },
-                  });
-                }}
-              >
-                <Image
-                  source={{ uri: item.thumbnailUrl || item.videoUrl }}
-                  style={styles.videoThumbnail}
-                />
-              </Pressable>
-            )}
-            contentContainerStyle={styles.videoGrid}
-          />
-        );
+        return renderVideoGrid();
       }
       case "saved": {
         // Saved Videos Tab Content
@@ -530,26 +522,12 @@ export default function ProfileScreen() {
     }
   };
 
+  // Render principal
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <View style={styles.header}>
-        {!isOwner && (
-          <TouchableOpacity onPress={navigateBack} style={styles.backButton}>
-            <ChevronLeft size={24} color={colors.text} />
-          </TouchableOpacity>
-        )}
-        <Text style={[styles.username, { color: colors.text }]}>
-          {profileUser.username}
-        </Text>
-        {isOwner && (
-          <TouchableOpacity onPress={() => router.push("./settings")}>
-            <Settings size={24} color={colors.text} />
-          </TouchableOpacity>
-        )}
-      </View>
-
+      {renderHeader()}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.profileSection}>
           <View style={styles.profileHeader}>
