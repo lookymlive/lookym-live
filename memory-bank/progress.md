@@ -128,3 +128,7 @@
 ## Future Development Plan
 
 For a detailed breakdown of planned features and improvements by role and quarter for 2025, please refer to the [Future Roadmap (2025)] section in `memory-bank/activeContext.md`.
+
+## QA y Validación
+
+> Para checklist de QA y validación visual/fucional, consulta únicamente `docs/QA-checklist.md`.
