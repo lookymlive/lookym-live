@@ -17,6 +17,7 @@ This document provides information about the component tests in the Lookym proje
 3. **Verifying text content**
    - Use `UNSAFE_getAllByType()` to find Text components and check their content
    - Example:
+
      ```typescript
      const textComponents = UNSAFE_getAllByType(require('react-native').Text);
      const hasText = textComponents.some(component => 
@@ -50,16 +51,19 @@ This document provides information about the component tests in the Lookym proje
 ## Running Tests
 
 To run all tests:
-```
+
+```psh
 npm test
 ```
 
 To run a specific test file:
-```
+
+```psh
 npx jest path/to/test.tsx
 ```
 
 To run tests with verbose output:
-```
+
+```psh
 npx jest path/to/test.tsx --verbose
 ```
