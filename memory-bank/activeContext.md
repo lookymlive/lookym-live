@@ -96,3 +96,33 @@ Refinamiento del sistema de video y desarrollo de funcionalidades sociales clave
 - Added a detailed section to systemPatterns.md documenting common UI patterns and proposed reusable components (UserInfo, AppCard, ActionBar, AppListItem, FullScreenStatusView, AppHeader, MediaGridItem, etc.).
 - Next step: Optionally create base files for these components in /components to accelerate UI refactor and ensure consistency.
 - All future UI work should reference these patterns/components for guidance.
+
+### 2024-06: UI Refactor - Core Screens Migrated
+
+- Followers, Following, Profile, and Video screens have been fully migrated to use the new reusable UI components (AppHeader, FullScreenStatusView, AppListItem, UserInfo, ActionBar, MediaGridItem).
+- All loading, empty, and error states now use FullScreenStatusView for consistency.
+- User and video lists use AppListItem and MediaGridItem for a modern, unified look.
+- Action bars and headers are now consistent across the app.
+- The UI is now visually coherent and professional across web and mobile.
+- Next: QA review, polish, and update documentation as new patterns/components emerge.
+
+## QA y Validación
+
+> La checklist de QA y validación visual/fucional se encuentra centralizada en [`docs/QA-checklist.md`]. Mantén solo esa fuente para verificación y actualizaciones.
+
+## Guía de pasos realizados y siguientes
+
+### Pasos realizados
+
+- Migración de pantallas clave (seguidores, siguiendo, perfil, video) a componentes base modernos (`AppHeader`, `FullScreenStatusView`, `AppListItem`, `UserInfo`, `ActionBar`, `MediaGridItem`).
+- Unificación de estados de loading, vacío y error.
+- Refactor de headers, listas y grids para máxima coherencia visual y de código.
+- Actualización de la documentación y Memory Bank.
+
+### Siguientes pasos sugeridos
+
+- Realizar QA visual y funcional usando la checklist en `docs/QA-checklist.md`.
+- Ajustar detalles visuales o de UX según feedback de pruebas.
+- Actualizar la documentación si se agregan nuevos patrones o componentes.
+- (Opcional) Migrar pantallas secundarias o legacy restantes siguiendo el mismo patrón.
+- Mantener la coherencia visual y de código en futuras features.
