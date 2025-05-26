@@ -1,18 +1,19 @@
+import { ActionBar } from "@/components/ActionBar";
+import { AppHeader } from "@/components/AppHeader";
+import { FullScreenStatusView } from "@/components/FullScreenStatusView";
+import { UserInfo } from "@/components/UserInfo";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useVideoStore } from "@/store/video-store.ts";
-import type { Comment as CommentType, Video as VideoType } from "@/types/video.ts";
+import type {
+  Comment as CommentType,
+  Video as VideoType,
+} from "@/types/video.ts";
 import { formatLikes, formatTimeAgo } from "@/utils/time-format.ts";
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import {
-  ArrowLeft,
-  BookmarkIcon,
-  Heart,
-  Send,
-  Share,
-} from "lucide-react-native";
+import { ArrowLeft, Send } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -126,11 +127,26 @@ export default function VideoDetailScreen() {
     }
   };
 
+  // Modern header
+  const renderHeader = () => (
+    <AppHeader
+      title={video?.caption ? video.caption.slice(0, 24) : "Video"}
+      leftAccessory={
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={{ paddingHorizontal: 8 }}
+        >
+          <ArrowLeft size={24} color={colors.text} />
+        </TouchableOpacity>
+      }
+    />
+  );
+
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={{ color: colors.text }}>Loading video...</Text>
+        {renderHeader()}
+        <FullScreenStatusView status="loading" message="Cargando video..." />
       </View>
     );
   }
@@ -142,36 +158,20 @@ export default function VideoDetailScreen() {
       error.toLowerCase().includes("token");
     return (
       <View style={[styles.centered, { backgroundColor: colors.background }]}>
-        <Text style={{ color: colors.error, marginBottom: 12 }}>
-          {isSessionError
-            ? "Tu sesión ha expirado o es inválida. Por favor, vuelve a iniciar sesión para ver este video."
-            : error}
-        </Text>
-        {isSessionError ? (
-          <TouchableOpacity
-            onPress={() => router.push("/auth/login")}
-            style={[
-              styles.backButton,
-              { backgroundColor: colors.primaryLight },
-            ]}
-          >
-            <Text style={[styles.backButtonText, { color: colors.primary }]}>
-              Ir a Login
-            </Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={[
-              styles.backButton,
-              { backgroundColor: colors.primaryLight },
-            ]}
-          >
-            <Text style={[styles.backButtonText, { color: colors.primary }]}>
-              Go Back
-            </Text>
-          </TouchableOpacity>
-        )}
+        {renderHeader()}
+        <FullScreenStatusView
+          status="error"
+          message={
+            isSessionError
+              ? "Tu sesión ha expirado o es inválida. Por favor, vuelve a iniciar sesión para ver este video."
+              : error
+          }
+          onRetry={
+            isSessionError
+              ? () => router.push("/auth/login")
+              : () => router.back()
+          }
+        />
       </View>
     );
   }
@@ -179,18 +179,65 @@ export default function VideoDetailScreen() {
   if (!video) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.background }]}>
-        <Text style={{ color: colors.text }}>Video not found.</Text>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={[styles.backButton, { backgroundColor: colors.primaryLight }]}
-        >
-          <Text style={[styles.backButtonText, { color: colors.primary }]}>
-            Go Back
-          </Text>
-        </TouchableOpacity>
+        {renderHeader()}
+        <FullScreenStatusView
+          status="empty"
+          message="Video no encontrado."
+          emptyIconName="Video"
+          onRetry={() => router.back()}
+        />
       </View>
     );
   }
+
+  // Modern user info and actions
+  const renderUserInfo = () => (
+    <UserInfo
+      avatarUrl={video.user?.avatar}
+      name={video.user?.username || "Usuario"}
+      secondaryText={formatTimeAgo(new Date(video.createdAt).getTime())}
+      onPress={() => video.user?.id && router.push(`/profile/${video.user.id}`)}
+      avatarSize={40}
+      showRole
+      role={video.user?.role}
+    />
+  );
+
+  const renderActionBar = () => (
+    <ActionBar
+      actions={[
+        {
+          iconName: "Heart",
+          onPress: handleLike,
+          count: video.likes,
+          isActive: isLiked,
+          color: colors.text,
+          fillColor: colors.primary,
+        },
+        {
+          iconName: "BookmarkIcon",
+          onPress: handleSave,
+          isActive: isSaved,
+          color: colors.text,
+          fillColor: colors.primary,
+        },
+        {
+          iconName: "Share",
+          onPress: () => {},
+          color: colors.text,
+        },
+        {
+          iconName: "Send",
+          onPress: () => {},
+          color: colors.text,
+        },
+      ]}
+      iconSize={28}
+      spacing={24}
+      layout="iconWithText"
+      containerStyle={{ marginVertical: 12 }}
+    />
+  );
 
   return (
     <KeyboardAvoidingView
@@ -198,22 +245,8 @@ export default function VideoDetailScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
       keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
     >
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.headerButton}
-        >
-          <ArrowLeft color={colors.text} size={24} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          Video Details
-        </Text>
-        <TouchableOpacity style={styles.headerButton}>
-          <Share color={colors.text} size={24} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      {renderHeader()}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.videoContainer}>
           <ExpoVideo
             ref={videoRef}
@@ -231,8 +264,8 @@ export default function VideoDetailScreen() {
                 (e as any).nativeEvent?.error
                   ? (e as any).nativeEvent.error
                   : typeof e === "string"
-                  ? e
-                  : "Unknown video playback error";
+                    ? e
+                    : "Unknown video playback error";
               console.error("Video playback error:", errorMsg);
               setError(errorMsg);
             }}
@@ -240,123 +273,39 @@ export default function VideoDetailScreen() {
         </View>
 
         <View style={styles.infoContainer}>
-          <View style={styles.userInfo}>
-            <TouchableOpacity
-              onPress={() =>
-                router.push({
-                  pathname: "/(tabs)/profile",
-                  params: { userId: video.user.id },
-                })
-              }
-              style={styles.userContainer}
-            >
-              <Image
-                source={{ uri: video.user.avatar }}
-                style={styles.userAvatar}
-                contentFit="cover"
-              />
-              <View>
-                <Text style={[styles.username, { color: colors.text }]}>
-                  {video.user.username}
-                </Text>
-                <Text
-                  style={[styles.userRole, { color: colors.textSecondary }]}
-                >
-                  {video.user.role === "business" ? "Business" : "User"}
-                </Text>
-              </View>
-            </TouchableOpacity>
+          {renderUserInfo()}
+          <Text style={styles.caption}>{video.caption}</Text>
+          <Text style={styles.hashtags}>{video.hashtags?.join(" ")}</Text>
+          {renderActionBar()}
+        </View>
 
-            {video.user.role === "business" && (
-              <TouchableOpacity
-                style={[
-                  styles.chatButton,
-                  { backgroundColor: colors.primaryLight },
-                ]}
-                onPress={() => router.push(`/chat/${video.user.id}`)}
-              >
-                <Text
-                  style={[styles.chatButtonText, { color: colors.primary }]}
-                >
-                  Chat
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          <Text style={[styles.caption, { color: colors.text }]}>
-            {video.caption}
-          </Text>
-          <Text style={[styles.hashtags, { color: colors.primary }]}>
-            {video.hashtags?.map((tag) => `#${tag}`).join(" ")}
-          </Text>
-
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.text }]}>
-                {formatLikes(video.likes || 0)}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-                Likes
-              </Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.text }]}>
-                {video.comments?.length || 0}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-                Comments
-              </Text>
-            </View>
-            <Text style={[styles.timeAgo, { color: colors.textSecondary }]}>
-              {formatTimeAgo(video.timestamp)}
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={[styles.statValue, { color: colors.text }]}>
+              {formatLikes(video.likes || 0)}
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+              Likes
             </Text>
           </View>
-
-          <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-              <Heart
-                color={isLiked ? colors.error : colors.text}
-                fill={isLiked ? colors.error : "none"}
-                size={24}
-              />
-              <Text
-                style={[
-                  styles.actionText,
-                  {
-                    color: isLiked ? colors.error : colors.text,
-                  },
-                ]}
-              >
-                Like
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.actionButton} onPress={handleSave}>
-              <BookmarkIcon
-                color={isSaved ? colors.primary : colors.text}
-                fill={isSaved ? colors.primary : "none"}
-                size={24}
-              />
-              <Text
-                style={[
-                  styles.actionText,
-                  {
-                    color: isSaved ? colors.primary : colors.text,
-                  },
-                ]}
-              >
-                Save
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.commentsSection}>
-            <Text style={[styles.commentsSectionTitle, { color: colors.text }]}>
+          <View style={styles.statItem}>
+            <Text style={[styles.statValue, { color: colors.text }]}>
+              {video.comments?.length || 0}
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
               Comments
             </Text>
-            <CommentsList comments={video.comments || []} colors={colors} />
           </View>
+          <Text style={[styles.timeAgo, { color: colors.textSecondary }]}>
+            {formatTimeAgo(video.timestamp)}
+          </Text>
+        </View>
+
+        <View style={styles.commentsSection}>
+          <Text style={[styles.commentsSectionTitle, { color: colors.text }]}>
+            Comments
+          </Text>
+          <CommentsList comments={video.comments || []} colors={colors} />
         </View>
       </ScrollView>
 
@@ -463,24 +412,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: Platform.OS === "ios" ? 50 : 16,
-    paddingBottom: 8,
-  },
-  headerButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
   videoContainer: {
     width: "100%",
     aspectRatio: 9 / 16,
@@ -492,37 +423,6 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     padding: 16,
-  },
-  userInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  userContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  userAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  username: {
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  userRole: {
-    fontSize: 14,
-  },
-  chatButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
-  },
-  chatButtonText: {
-    fontWeight: "600",
   },
   caption: {
     fontSize: 16,
@@ -550,20 +450,6 @@ const styles = StyleSheet.create({
   timeAgo: {
     fontSize: 12,
     marginLeft: "auto",
-  },
-  actionsContainer: {
-    flexDirection: "row",
-    marginBottom: 24,
-    marginTop: 8,
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 24,
-  },
-  actionText: {
-    marginLeft: 8,
-    fontWeight: "500",
   },
   commentsSection: {
     marginTop: 8,
@@ -626,15 +512,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  backButton: {
-    alignSelf: "flex-start",
-    marginBottom: 16,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  backButtonText: {
-    fontSize: 16,
   },
 });
