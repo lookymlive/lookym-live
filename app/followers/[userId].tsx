@@ -1,3 +1,6 @@
+import { AppHeader } from "@/components/AppHeader";
+import { AppListItem } from "@/components/AppListItem";
+import { FullScreenStatusView } from "@/components/FullScreenStatusView";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useFollowsStore } from "@/store/follows-store.ts";
@@ -5,14 +8,13 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Check, ChevronLeft } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TouchableOpacity
 } from "react-native";
 
 interface User {
@@ -37,14 +39,11 @@ export default function FollowersScreen() {
   const { currentUser } = useAuthStore();
 
   const [followers, setFollowers] = useState<User[]>([]);
-  const [isActionLoading, setIsActionLoading] = useState<
-    Record<string, boolean>
-  >({});
+  const [isActionLoading, setIsActionLoading] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const loadFollowers = async () => {
       if (!userId) return;
-
       try {
         const data = await fetchFollowersOfUser(userId as string);
         setFollowers(data);
@@ -52,7 +51,6 @@ export default function FollowersScreen() {
         console.error("Error loading followers:", error);
       }
     };
-
     loadFollowers();
   }, [userId]);
 
@@ -61,12 +59,8 @@ export default function FollowersScreen() {
       router.push("/auth/login");
       return;
     }
-
-    // No permitir seguirse a sí mismo
     if (user.id === currentUser.id) return;
-
     setIsActionLoading((prev) => ({ ...prev, [user.id]: true }));
-
     try {
       if (isFollowing(user.id)) {
         await unfollowUser(user.id);
@@ -81,7 +75,6 @@ export default function FollowersScreen() {
   };
 
   const navigateToProfile = (userId: string) => {
-    // @ts-ignore - Dynamic routes in Expo Router
     router.push({ pathname: "/profile/[userId]", params: { userId } });
   };
 
@@ -89,93 +82,80 @@ export default function FollowersScreen() {
     const isCurrentUser = currentUser?.id === item.id;
     const isFollowingUser = isFollowing(item.id);
     const actionLoading = isActionLoading[item.id] || false;
-
     return (
-      <TouchableOpacity
-        style={styles.userItem}
-        onPress={() => navigateToProfile(item.id)}
-        activeOpacity={0.7}
-      >
-        <Image source={{ uri: item.avatar }} style={styles.avatar} />
-
-        <View style={styles.userInfo}>
-          <Text style={[styles.username, { color: colors.text }]}>
+      <AppListItem
+        leadingElement={
+          <Image source={{ uri: item.avatar }} style={{ width: 50, height: 50, borderRadius: 25 }} />
+        }
+        title={
+          <Text style={{ color: colors.text, fontWeight: "600" }}>
             {item.username}
             {item.verified && " ✓"}
           </Text>
-          <Text style={[styles.displayName, { color: colors.textSecondary }]}>
-            {item.displayName}
-          </Text>
-        </View>
-
-        {!isCurrentUser && currentUser && (
-          <TouchableOpacity
-            style={[
-              styles.followButton,
-              isFollowingUser
-                ? [styles.followingButton, { borderColor: colors.border }]
-                : { backgroundColor: colors.primary },
-            ]}
-            onPress={() => handleFollowAction(item)}
-            disabled={actionLoading}
-          >
-            {actionLoading ? (
-              <ActivityIndicator
-                size="small"
-                color={isFollowingUser ? colors.primary : "#fff"}
-              />
-            ) : (
-              <>
-                {isFollowingUser && (
-                  <Check
-                    size={14}
-                    color={colors.primary}
-                    style={styles.checkIcon}
-                  />
-                )}
-                <Text
-                  style={[
-                    styles.followButtonText,
-                    { color: isFollowingUser ? colors.primary : "#fff" },
-                  ]}
-                >
-                  {isFollowingUser ? "Siguiendo" : "Seguir"}
-                </Text>
-              </>
-            )}
-          </TouchableOpacity>
-        )}
-      </TouchableOpacity>
+        }
+        subtitle={<Text style={{ color: colors.textSecondary }}>{item.displayName}</Text>}
+        trailingElement={
+          !isCurrentUser && currentUser && (
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 14,
+                paddingVertical: 6,
+                borderRadius: 5,
+                minWidth: 90,
+                justifyContent: "center",
+                backgroundColor: isFollowingUser ? "transparent" : colors.primary,
+                borderWidth: isFollowingUser ? 1 : 0,
+                borderColor: isFollowingUser ? colors.border : undefined,
+              }}
+              onPress={() => handleFollowAction(item)}
+              disabled={actionLoading}
+            >
+              {actionLoading ? (
+                <ActivityIndicator
+                  size="small"
+                  color={isFollowingUser ? colors.primary : "#fff"}
+                />
+              ) : (
+                <>
+                  {isFollowingUser && (
+                    <Check size={14} color={colors.primary} style={{ marginRight: 4 }} />
+                  )}
+                  <Text
+                    style={{
+                      color: isFollowingUser ? colors.primary : "#fff",
+                      fontWeight: "500",
+                      fontSize: 14,
+                    }}
+                  >
+                    {isFollowingUser ? "Siguiendo" : "Seguir"}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )
+        }
+        onPress={() => navigateToProfile(item.id)}
+        containerStyle={{ marginBottom: 8 }}
+      />
     );
   };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ChevronLeft size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          Seguidores
-        </Text>
-        <View style={styles.headerRight} />
-      </View>
-
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }] }>
+      <AppHeader
+        title="Seguidores"
+        leftAccessory={
+          <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 8 }}>
+            <ChevronLeft size={24} color={colors.text} />
+          </TouchableOpacity>
+        }
+      />
       {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
+        <FullScreenStatusView status="loading" message="Cargando seguidores..." />
       ) : followers.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-            No hay seguidores todavía
-          </Text>
-        </View>
+        <FullScreenStatusView status="empty" message="No hay seguidores todavía" emptyIconName="User" />
       ) : (
         <FlatList
           data={followers}
@@ -192,83 +172,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-  },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    flex: 1,
-    textAlign: "center",
-  },
-  headerRight: {
-    width: 32,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  emptyText: {
-    fontSize: 16,
-    textAlign: "center",
-  },
   listContainer: {
     paddingHorizontal: 16,
-  },
-  userItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  userInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  username: {
-    fontWeight: "bold",
-    fontSize: 16,
-    marginBottom: 2,
-  },
-  displayName: {
-    fontSize: 14,
-  },
-  followButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 5,
-    minWidth: 90,
-    justifyContent: "center",
-  },
-  followingButton: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-  },
-  checkIcon: {
-    marginRight: 4,
-  },
-  followButtonText: {
-    fontWeight: "500",
-    fontSize: 14,
+    paddingTop: 8,
+    paddingBottom: 32,
   },
 });
