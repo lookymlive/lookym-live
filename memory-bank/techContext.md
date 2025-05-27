@@ -94,4 +94,43 @@
 - Known bundling error with `react-native-url-polyfill` needs resolution.
 - Video playback performance optimization needed, especially for slower connections.
 - Chat message ordering and realtime functionality needs refinement.
+
+## Fuente de verdad de la estructura de datos
+
+La estructura de datos de LOOKYM está definida y versionada en el archivo:
+
+- `sql/schema.sql` (fuente de verdad para todas las tablas, relaciones, funciones y triggers de la base de datos Supabase)
+
+Cualquier cambio en el modelo de datos debe realizarse y documentarse en este archivo. La documentación funcional y de producto en la memory-bank debe referenciar siempre este archivo como la definición oficial.
+
+---
+
+## Tablas principales (MVP)
+
+- **users:** Perfiles de usuario y negocio, enlazados a Supabase Auth.
+- **videos:** Videos subidos por negocios, con metadatos y relación a usuario.
+- **video_tags:** Etiquetas interactivas de productos sobre los videos de vidriera. Permite asociar nombre, precio, descripción y posición opcional a cada producto destacado en un video.
+- **video_likes:** Relación de likes de usuarios a videos.
+- **saved_videos:** Relación de guardados (bookmarks) de usuarios a videos.
+- **followers:** Seguimiento entre usuarios y negocios.
+- **chats, chat_participants, messages:** Sistema de mensajería en tiempo real.
+- **notifications:** Notificaciones in-app para usuarios.
+
+---
+
+## Arquitectura técnica
+
+- **Frontend:** React Native + Expo, Expo Router, Zustand para estado, componentes UI reutilizables, subida de video a Cloudinary, reproducción con expo-video.
+- **Backend:** Supabase (Auth, Database, Realtime, RLS), Cloudinary para videos.
+- **Integraciones:** Chat y notificaciones en tiempo real, etiquetas de producto en video.
+
+---
+
+## Relación con el MVP y wireframes
+
+Cada pantalla y funcionalidad del MVP tiene respaldo directo en la estructura de datos definida en `sql/schema.sql`. La tabla `video_tags` permite implementar la funcionalidad de etiquetas interactivas sobre los videos, alineando la base de datos con la visión de producto y los wireframes documentados.
+
+---
+
+> Para cualquier cambio estructural, primero modificar `sql/schema.sql` y luego actualizar la documentación funcional aquí y en los archivos de producto.
   
