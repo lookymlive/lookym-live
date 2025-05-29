@@ -1,120 +1,154 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react-native';
-import { useAuthStore } from '@/store/auth-store.ts';
-import { useColorScheme } from '@/hooks/useColorScheme.ts';
-import { router } from 'expo-router';
+import { useColorScheme } from "@/hooks/useColorScheme.ts";
+import { useAuthStore } from "@/store/auth-store.ts";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import React, { useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RegisterScreen() {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<'user' | 'business'>('user');
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<"user" | "business">("user");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  
+  const [error, setError] = useState("");
+
   const { register } = useAuthStore();
   const { isDark, colors } = useColorScheme();
-  
+
   const handleRegister = async () => {
     if (!email || !username || !password || !confirmPassword) {
-      setError('Please fill in all fields');
+      setError("Please fill in all fields");
       return;
     }
-    
+
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
-    
+
     setIsLoading(true);
-    setError('');
-    
+    setError("");
+
     try {
       // In a real app, this would connect to Supabase
       await register(email, password, username, role);
-      router.replace('/');
+      router.replace("/");
     } catch (err) {
-      setError('Failed to create account');
+      setError("Failed to create account");
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <StatusBar style={isDark ? "light" : "dark"} />
-      
-      <TouchableOpacity 
-        style={styles.backButton} 
-        onPress={() => router.back()}
-      >
-        <ArrowLeft size={24} color={colors.text} />
+
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color={colors.text} />
       </TouchableOpacity>
-      
-      <KeyboardAvoidingView 
-        style={styles.content} 
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}
+
+      <KeyboardAvoidingView
+        style={styles.content}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
       >
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
+            <Text style={[styles.title, { color: colors.text }]}>
+              Create Account
+            </Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
               Join LOOKYM today
             </Text>
           </View>
-          
+
           {error ? (
-            <View style={[styles.errorContainer, { backgroundColor: colors.error }]}>
-              <Text style={[styles.errorText, { color: '#fff' }]}>{error}</Text>
+            <View
+              style={[styles.errorContainer, { backgroundColor: colors.error }]}
+            >
+              <Text style={[styles.errorText, { color: "#fff" }]}>{error}</Text>
             </View>
           ) : null}
-          
+
           <View style={styles.form}>
             <View style={styles.roleSelector}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[
-                  styles.roleButton, 
-                  role === 'user' && [styles.roleButtonActive, { borderColor: colors.primary }]
-                ]} 
-                onPress={() => setRole('user')}
+                  styles.roleButton,
+                  role === "user" && [
+                    styles.roleButtonActive,
+                    { borderColor: colors.primary },
+                  ],
+                ]}
+                onPress={() => setRole("user")}
               >
-                <Text 
+                <Text
                   style={[
-                    styles.roleButtonText, 
-                    role === 'user' && [styles.roleButtonTextActive, { color: colors.primary }]
+                    styles.roleButtonText,
+                    role === "user" && [
+                      styles.roleButtonTextActive,
+                      { color: colors.primary },
+                    ],
                   ]}
                 >
                   User
                 </Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={[
-                  styles.roleButton, 
-                  role === 'business' && [styles.roleButtonActive, { borderColor: colors.primary }]
-                ]} 
-                onPress={() => setRole('business')}
+                  styles.roleButton,
+                  role === "business" && [
+                    styles.roleButtonActive,
+                    { borderColor: colors.primary },
+                  ],
+                ]}
+                onPress={() => setRole("business")}
               >
-                <Text 
+                <Text
                   style={[
-                    styles.roleButtonText, 
-                    role === 'business' && [styles.roleButtonTextActive, { color: colors.primary }]
+                    styles.roleButtonText,
+                    role === "business" && [
+                      styles.roleButtonTextActive,
+                      { color: colors.primary },
+                    ],
                   ]}
                 >
                   Business
                 </Text>
               </TouchableOpacity>
             </View>
-            
+
             <View style={styles.inputGroup}>
-              <View style={[styles.inputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <Mail size={20} color={colors.textSecondary} style={styles.inputIcon} />
+              <View
+                style={[
+                  styles.inputContainer,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
+                <Ionicons
+                  name="mail-outline"
+                  size={20}
+                  color={colors.textSecondary}
+                  style={styles.inputIcon}
+                />
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
                   placeholder="Email"
@@ -126,10 +160,20 @@ export default function RegisterScreen() {
                 />
               </View>
             </View>
-            
+
             <View style={styles.inputGroup}>
-              <View style={[styles.inputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <User size={20} color={colors.textSecondary} style={styles.inputIcon} />
+              <View
+                style={[
+                  styles.inputContainer,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
+                <Ionicons
+                  name="person-outline"
+                  size={20}
+                  color={colors.textSecondary}
+                  style={styles.inputIcon}
+                />
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
                   placeholder="Username"
@@ -140,10 +184,20 @@ export default function RegisterScreen() {
                 />
               </View>
             </View>
-            
+
             <View style={styles.inputGroup}>
-              <View style={[styles.inputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <Lock size={20} color={colors.textSecondary} style={styles.inputIcon} />
+              <View
+                style={[
+                  styles.inputContainer,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={20}
+                  color={colors.textSecondary}
+                  style={styles.inputIcon}
+                />
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
                   placeholder="Password"
@@ -152,22 +206,40 @@ export default function RegisterScreen() {
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
                 />
-                <TouchableOpacity 
-                  style={styles.passwordToggle} 
+                <TouchableOpacity
+                  style={styles.passwordToggle}
                   onPress={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff size={20} color={colors.textSecondary} />
+                    <Ionicons
+                      name="eye-off-outline"
+                      size={20}
+                      color={colors.textSecondary}
+                    />
                   ) : (
-                    <Eye size={20} color={colors.textSecondary} />
+                    <Ionicons
+                      name="eye-outline"
+                      size={20}
+                      color={colors.textSecondary}
+                    />
                   )}
                 </TouchableOpacity>
               </View>
             </View>
-            
+
             <View style={styles.inputGroup}>
-              <View style={[styles.inputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <Lock size={20} color={colors.textSecondary} style={styles.inputIcon} />
+              <View
+                style={[
+                  styles.inputContainer,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={20}
+                  color={colors.textSecondary}
+                  style={styles.inputIcon}
+                />
                 <TextInput
                   style={[styles.input, { color: colors.text }]}
                   placeholder="Confirm Password"
@@ -178,24 +250,26 @@ export default function RegisterScreen() {
                 />
               </View>
             </View>
-            
-            <TouchableOpacity 
-              style={[styles.button, { backgroundColor: colors.primary }]} 
+
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: colors.primary }]}
               onPress={handleRegister}
               disabled={isLoading}
             >
               <Text style={styles.buttonText}>
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                {isLoading ? "Creating Account..." : "Create Account"}
               </Text>
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.footer}>
             <Text style={[styles.footerText, { color: colors.textSecondary }]}>
               Already have an account?
             </Text>
-            <TouchableOpacity onPress={() => router.push('/auth/login')}>
-              <Text style={[styles.footerLink, { color: colors.primary }]}>Sign In</Text>
+            <TouchableOpacity onPress={() => router.push("/auth/login")}>
+              <Text style={[styles.footerLink, { color: colors.primary }]}>
+                Sign In
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -217,12 +291,12 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 32,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   subtitle: {
@@ -235,39 +309,39 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
   form: {
     marginBottom: 24,
   },
   roleSelector: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 24,
   },
   roleButton: {
     flex: 1,
     height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
-    borderColor: '#dbdbdb',
+    borderColor: "#dbdbdb",
   },
   roleButtonActive: {
     borderWidth: 2,
   },
   roleButtonText: {
     fontSize: 16,
-    color: '#8e8e8e',
+    color: "#8e8e8e",
   },
   roleButtonTextActive: {
-    fontWeight: '600',
+    fontWeight: "600",
   },
   inputGroup: {
     marginBottom: 16,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderRadius: 8,
     height: 50,
@@ -286,18 +360,18 @@ const styles = StyleSheet.create({
   button: {
     height: 50,
     borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 8,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginBottom: 24,
   },
   footerText: {
@@ -306,6 +380,6 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
