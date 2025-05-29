@@ -5,9 +5,9 @@ import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useNotificationsStore } from "@/store/notifications-store.ts";
 import { formatTimeAgo } from "@/utils/time-format.ts";
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { Bell, Check, Heart, MessageCircle, User } from "lucide-react-native";
 import React, { useEffect } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -26,6 +26,7 @@ export default function ActivityScreen() {
   } = useNotificationsStore();
 
   useEffect(() => {
+    console.log("Current user in ActivityScreen:", currentUser);
     if (currentUser) {
       fetchNotifications();
     }
@@ -49,15 +50,15 @@ export default function ActivityScreen() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "new_follower":
-        return <User size={20} color={colors.primary} />;
+        return <Ionicons name="person" size={20} color={colors.primary} />;
       case "video_like":
-        return <Heart size={20} color={colors.error} />;
+        return <Ionicons name="heart" size={20} color={colors.error} />;
       case "new_comment":
-        return <MessageCircle size={20} color={colors.success} />;
+        return <Ionicons name="chatbubbles" size={20} color={colors.success} />;
       case "new_message":
-        return <MessageCircle size={20} color={colors.primary} />;
+        return <Ionicons name="chatbubbles" size={20} color={colors.primary} />;
       default:
-        return <Bell size={20} color={colors.text} />;
+        return <Ionicons name="notifications" size={20} color={colors.text} />;
     }
   };
 
@@ -103,7 +104,7 @@ export default function ActivityScreen() {
               justifyContent: "center",
             }}
           >
-            <User size={20} color={colors.textSecondary} />
+            <Ionicons name="person" size={20} color={colors.textSecondary} />
           </View>
         )
       }
@@ -142,7 +143,11 @@ export default function ActivityScreen() {
         rightAccessory={
           unreadCount > 0 ? (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Check size={16} color={colors.primary} />
+              <Ionicons
+                name="checkmark-circle"
+                size={16}
+                color={colors.primary}
+              />
               <Text
                 style={{
                   color: colors.primary,
