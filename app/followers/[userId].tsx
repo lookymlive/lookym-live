@@ -1,20 +1,20 @@
-import { AppHeader } from "@/components/AppHeader";
-import { AppListItem } from "@/components/AppListItem";
-import { FullScreenStatusView } from "@/components/FullScreenStatusView";
+import { AppHeader } from "@/components/AppHeader.tsx";
+import { AppListItem } from "@/components/AppListItem.tsx";
+import { FullScreenStatusView } from "@/components/FullScreenStatusView.tsx";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useFollowsStore } from "@/store/follows-store.ts";
+import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { Check, ChevronLeft } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity
+  ActivityIndicator,
+  FlatList,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
 } from "react-native";
 
 interface User {
@@ -39,7 +39,9 @@ export default function FollowersScreen() {
   const { currentUser } = useAuthStore();
 
   const [followers, setFollowers] = useState<User[]>([]);
-  const [isActionLoading, setIsActionLoading] = useState<Record<string, boolean>>({});
+  const [isActionLoading, setIsActionLoading] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     const loadFollowers = async () => {
@@ -85,7 +87,10 @@ export default function FollowersScreen() {
     return (
       <AppListItem
         leadingElement={
-          <Image source={{ uri: item.avatar }} style={{ width: 50, height: 50, borderRadius: 25 }} />
+          <Image
+            source={{ uri: item.avatar }}
+            style={{ width: 50, height: 50, borderRadius: 25 }}
+          />
         }
         title={
           <Text style={{ color: colors.text, fontWeight: "600" }}>
@@ -93,9 +98,14 @@ export default function FollowersScreen() {
             {item.verified && " ✓"}
           </Text>
         }
-        subtitle={<Text style={{ color: colors.textSecondary }}>{item.displayName}</Text>}
+        subtitle={
+          <Text style={{ color: colors.textSecondary }}>
+            {item.displayName}
+          </Text>
+        }
         trailingElement={
-          !isCurrentUser && currentUser && (
+          !isCurrentUser &&
+          currentUser && (
             <TouchableOpacity
               style={{
                 flexDirection: "row",
@@ -105,7 +115,9 @@ export default function FollowersScreen() {
                 borderRadius: 5,
                 minWidth: 90,
                 justifyContent: "center",
-                backgroundColor: isFollowingUser ? "transparent" : colors.primary,
+                backgroundColor: isFollowingUser
+                  ? "transparent"
+                  : colors.primary,
                 borderWidth: isFollowingUser ? 1 : 0,
                 borderColor: isFollowingUser ? colors.border : undefined,
               }}
@@ -120,7 +132,12 @@ export default function FollowersScreen() {
               ) : (
                 <>
                   {isFollowingUser && (
-                    <Check size={14} color={colors.primary} style={{ marginRight: 4 }} />
+                    <Ionicons
+                      name="checkmark"
+                      size={14}
+                      color={colors.primary}
+                      style={{ marginRight: 4 }}
+                    />
                   )}
                   <Text
                     style={{
@@ -143,19 +160,31 @@ export default function FollowersScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }] }>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <AppHeader
         title="Seguidores"
         leftAccessory={
-          <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 8 }}>
-            <ChevronLeft size={24} color={colors.text} />
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={{ paddingHorizontal: 8 }}
+          >
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
         }
       />
       {isLoading ? (
-        <FullScreenStatusView status="loading" message="Cargando seguidores..." />
+        <FullScreenStatusView
+          status="loading"
+          message="Cargando seguidores..."
+        />
       ) : followers.length === 0 ? (
-        <FullScreenStatusView status="empty" message="No hay seguidores todavía" emptyIconName="User" />
+        <FullScreenStatusView
+          status="empty"
+          message="No hay seguidores todavía"
+          emptyIconName="User"
+        />
       ) : (
         <FlatList
           data={followers}
