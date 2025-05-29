@@ -64,33 +64,23 @@
  * - [ ] Mejorar accesibilidad y responsividad
  * - [ ] Sincronizar cambios con /memory-bank/activeContext.md y /docs/README.md
  */
-import { AppHeader } from "@/components/AppHeader";
-import { FullScreenStatusView } from "@/components/FullScreenStatusView";
-import { MediaGridItem } from "@/components/MediaGridItem";
+import { AppHeader } from "@/components/AppHeader.tsx";
+import { FullScreenStatusView } from "@/components/FullScreenStatusView.tsx";
+import { MediaGridItem } from "@/components/MediaGridItem.tsx";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useFollowsStore } from "@/store/follows-store.ts";
 import { useVideoStore } from "@/store/video-store.ts";
 import { supabase } from "@/utils/supabase.ts";
+import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
-import {
-  Bookmark,
-  Camera,
-  ChevronLeft,
-  Edit,
-  Grid3X3,
-  LogOut,
-  ShoppingBag,
-  User,
-} from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   FlatList,
   Image,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -280,24 +270,24 @@ export default function ProfileScreen() {
     <AppHeader
       title={profileUser?.username || "Perfil"}
       leftAccessory={
-        !isOwner ? (
+        !isOwner && (
           <TouchableOpacity
             onPress={navigateBack}
             style={{ paddingHorizontal: 8 }}
           >
-            <ChevronLeft size={24} color={colors.text} />
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-        ) : undefined
+        )
       }
       rightAccessory={
-        isOwner ? (
+        isOwner && (
           <TouchableOpacity
-            onPress={handleEditProfile}
+            onPress={handleLogout}
             style={{ paddingHorizontal: 8 }}
           >
-            <Edit size={22} color={colors.text} />
+            <Ionicons name="log-out-outline" size={24} color={colors.text} />
           </TouchableOpacity>
-        ) : undefined
+        )
       }
     />
   );
@@ -376,7 +366,8 @@ export default function ProfileScreen() {
       {
         id: "posts",
         icon: (
-          <Grid3X3
+          <Ionicons
+            name="grid-outline"
             size={24}
             color={
               activeTab === "posts" ? colors.primary : colors.textSecondary
@@ -387,7 +378,8 @@ export default function ProfileScreen() {
       {
         id: "saved",
         icon: (
-          <Bookmark
+          <Ionicons
+            name="bookmark-outline"
             size={24}
             color={
               activeTab === "saved" ? colors.primary : colors.textSecondary
@@ -402,7 +394,8 @@ export default function ProfileScreen() {
       tabs.push({
         id: "products",
         icon: (
-          <ShoppingBag
+          <Ionicons
+            name="cart-outline"
             size={24}
             color={
               activeTab === "products" ? colors.primary : colors.textSecondary
@@ -443,13 +436,11 @@ export default function ProfileScreen() {
         // Saved Videos Tab Content
         if (!isOwner) {
           return (
-            <View style={styles.emptyContainer}>
-              <Text
-                style={[styles.emptyStateText, { color: colors.textSecondary }]}
-              >
-                Esta información no está disponible para otros usuarios.
-              </Text>
-            </View>
+            <FullScreenStatusView
+              status="empty"
+              message="Esta información no está disponible para otros usuarios."
+              emptyIconName="Info"
+            />
           );
         }
         // savedVideos es un objeto { [videoId]: true }, así que filtramos videos
@@ -462,11 +453,11 @@ export default function ProfileScreen() {
           savedVideosArray.length === 0
         ) {
           return (
-            <View style={styles.emptyStateContainer}>
-              <Text style={styles.emptyStateText}>
-                No has guardado ningún video aún.
-              </Text>
-            </View>
+            <FullScreenStatusView
+              status="empty"
+              message="No has guardado ningún video aún."
+              emptyIconName="Bookmark"
+            />
           );
         }
         return (
@@ -475,47 +466,34 @@ export default function ProfileScreen() {
             keyExtractor={(item) => item.id}
             numColumns={3}
             renderItem={({ item }) => (
-              <Pressable
-                style={styles.videoGridItem}
-                onPress={() => {
+              <MediaGridItem
+                mediaUri={item.thumbnailUrl || item.videoUrl}
+                mediaType="video"
+                title={item.caption}
+                onPress={() =>
                   router.push({
                     pathname: "/video/[id]",
                     params: { id: item.id },
-                  });
-                }}
-              >
-                <Image
-                  source={{ uri: item.thumbnailUrl || item.videoUrl }}
-                  style={styles.videoThumbnail}
-                />
-              </Pressable>
+                  })
+                }
+                cardStyle={{ margin: 2, width: 110 }}
+              />
             )}
-            contentContainerStyle={styles.videoGrid}
+            contentContainerStyle={{ padding: 8 }}
           />
         );
       }
       case "products":
         return (
-          <View style={styles.emptyStateContainer}>
-            <Text style={styles.emptyStateText}>
-              {isOwner
+          <FullScreenStatusView
+            status="empty"
+            message={
+              isOwner
                 ? "No has añadido ningún producto todavía."
-                : `${profileUser.username} no ha añadido ningún producto todavía.`}
-            </Text>
-            {isOwner && profileUser.role === "business" && (
-              <TouchableOpacity
-                style={[
-                  styles.uploadButton,
-                  { backgroundColor: colors.primary },
-                ]}
-                onPress={() => {
-                  // router.push('/add-product');
-                }}
-              >
-                <Text style={styles.uploadButtonText}>Añadir Producto</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+                : `${profileUser.username} no ha añadido ningún producto todavía.`
+            }
+            emptyIconName="ShoppingBag"
+          />
         );
       default:
         return null;
@@ -544,7 +522,7 @@ export default function ProfileScreen() {
                   ]}
                   onPress={handleChangePhoto}
                 >
-                  <Camera size={16} color="#ffffff" />
+                  <Ionicons name="camera-outline" size={16} color="#ffffff" />
                 </TouchableOpacity>
               )}
             </View>
@@ -627,7 +605,8 @@ export default function ProfileScreen() {
                   ]}
                   onPress={handleEditProfile}
                 >
-                  <Edit
+                  <Ionicons
+                    name="create-outline"
                     size={16}
                     color={colors.text}
                     style={styles.actionButtonIcon}
@@ -649,7 +628,8 @@ export default function ProfileScreen() {
                   ]}
                   onPress={handleLogout}
                 >
-                  <LogOut
+                  <Ionicons
+                    name="log-out-outline"
                     size={16}
                     color={colors.text}
                     style={styles.actionButtonIcon}
@@ -685,7 +665,8 @@ export default function ProfileScreen() {
                     />
                   ) : (
                     <>
-                      <User
+                      <Ionicons
+                        name="person-outline"
                         size={16}
                         color={
                           isFollowing(profileUser.id) ? colors.text : "#fff"
