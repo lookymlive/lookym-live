@@ -2,9 +2,9 @@ import VideoThumbnail from "@/components/VideoThumbnail.tsx";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useVideoStore } from "@/store/video-store.ts";
 import type { Video } from "@/types/video.ts";
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { Hash, Search, User, Video as VideoIcon, X } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -181,7 +181,11 @@ export default function SearchScreen() {
                 ]}
                 onPress={() => selectHashtag(item.tag)}
               >
-                <Hash size={14} color={colors.primary} />
+                <Ionicons
+                  name="pricetag-outline"
+                  size={14}
+                  color={colors.primary}
+                />
                 <Text style={[styles.tagText, { color: colors.primary }]}>
                   {item.tag}
                 </Text>
@@ -267,7 +271,8 @@ export default function SearchScreen() {
             ]}
             onPress={() => setCategory("videos")}
           >
-            <VideoIcon
+            <Ionicons
+              name="videocam-outline"
               size={14}
               color={category === "videos" ? colors.primary : colors.text}
             />
@@ -288,7 +293,8 @@ export default function SearchScreen() {
             ]}
             onPress={() => setCategory("users")}
           >
-            <User
+            <Ionicons
+              name="person-outline"
               size={14}
               color={category === "users" ? colors.primary : colors.text}
             />
@@ -311,7 +317,8 @@ export default function SearchScreen() {
             ]}
             onPress={() => setCategory("hashtags")}
           >
-            <Hash
+            <Ionicons
+              name="pricetag-outline"
               size={14}
               color={category === "hashtags" ? colors.primary : colors.text}
             />
@@ -345,7 +352,11 @@ export default function SearchScreen() {
                     ]}
                     onPress={() => selectHashtag(tag)}
                   >
-                    <Hash size={14} color={colors.primary} />
+                    <Ionicons
+                      name="pricetag-outline"
+                      size={14}
+                      color={colors.primary}
+                    />
                     <Text style={[styles.tagText, { color: colors.primary }]}>
                       {tag}
                     </Text>
@@ -452,7 +463,8 @@ export default function SearchScreen() {
           },
         ]}
       >
-        <Search
+        <Ionicons
+          name="search-outline"
           size={20}
           color={colors.textSecondary}
           style={styles.searchIcon}
@@ -468,7 +480,11 @@ export default function SearchScreen() {
         />
         {query !== "" && (
           <TouchableOpacity onPress={resetSearch} style={styles.clearButton}>
-            <X size={16} color={colors.textSecondary} />
+            <Ionicons
+              name="close-outline"
+              size={16}
+              color={colors.textSecondary}
+            />
           </TouchableOpacity>
         )}
       </View>
