@@ -1,6 +1,6 @@
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { PostUser } from "@/types/post.ts";
-import { BadgeCheck, MoreHorizontal } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -22,7 +22,8 @@ export default function PostHeader({ user, location }: PostHeaderProps) {
               {user.username}
             </Text>
             {user.verified && (
-              <BadgeCheck
+              <Ionicons
+                name="checkmark-circle"
                 size={16}
                 color={colors.primary}
                 style={styles.verifiedBadge}
@@ -37,7 +38,7 @@ export default function PostHeader({ user, location }: PostHeaderProps) {
         </View>
       </View>
       <TouchableOpacity style={styles.moreButton}>
-        <MoreHorizontal size={24} color={colors.text} />
+        <Ionicons name="ellipsis-horizontal" size={24} color={colors.text} />
       </TouchableOpacity>
     </View>
   );

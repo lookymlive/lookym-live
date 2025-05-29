@@ -1,4 +1,4 @@
-import * as LucideIcons from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
   Image,
@@ -46,7 +46,7 @@ export const MediaGridItem: React.FC<MediaGridItemProps> = ({
         />
         {mediaType === "video" && (
           <View style={styles.videoIconOverlay}>
-            <LucideIcons.PlayCircle size={32} color="#fff" />
+            <Ionicons name="play-circle" size={32} color="#fff" />
           </View>
         )}
       </View>

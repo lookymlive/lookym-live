@@ -1,11 +1,11 @@
-import { AppHeader } from "@/components/AppHeader";
-import { AppListItem } from "@/components/AppListItem";
-import { FullScreenStatusView } from "@/components/FullScreenStatusView";
+import { AppHeader } from "@/components/AppHeader.tsx";
+import { AppListItem } from "@/components/AppListItem.tsx";
+import { FullScreenStatusView } from "@/components/FullScreenStatusView.tsx";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useFollowsStore } from "@/store/follows-store.ts";
+import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { Check, ChevronLeft } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -132,7 +132,8 @@ export default function FollowingScreen() {
               ) : (
                 <>
                   {isFollowingUser && (
-                    <Check
+                    <Ionicons
+                      name="checkmark"
                       size={14}
                       color={colors.primary}
                       style={{ marginRight: 4 }}
@@ -169,7 +170,7 @@ export default function FollowingScreen() {
             onPress={() => router.back()}
             style={{ paddingHorizontal: 8 }}
           >
-            <ChevronLeft size={24} color={colors.text} />
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
         }
       />

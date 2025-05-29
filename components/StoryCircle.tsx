@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Image } from 'expo-image';
-import { Plus, CheckCircle } from 'lucide-react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface StoryCircleProps {
   username: string;
@@ -27,10 +27,14 @@ export default function StoryCircle({
           isYourStory && styles.yourStoryBorder,
         ]}
       >
-        <Image source={{ uri: avatar }} style={styles.avatar} contentFit="cover" />
+        <Image
+          source={{ uri: avatar }}
+          style={styles.avatar}
+          contentFit="cover"
+        />
         {isYourStory && (
           <View style={styles.addButton}>
-            <Plus size={14} color="#fff" />
+            <Ionicons name="add-circle" size={14} color="#fff" />
           </View>
         )}
       </View>
@@ -39,7 +43,12 @@ export default function StoryCircle({
           {username}
         </Text>
         {isVerified && (
-          <CheckCircle size={12} color="#007AFF" fill="#007AFF" style={styles.verifiedBadge} />
+          <Ionicons
+            name="checkmark-circle"
+            size={12}
+            color="#007AFF"
+            style={styles.verifiedBadge}
+          />
         )}
       </View>
     </TouchableOpacity>
@@ -48,7 +57,7 @@ export default function StoryCircle({
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: "center",
     marginHorizontal: 8,
     width: 70,
   },
@@ -57,44 +66,44 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 32,
     padding: 2,
-    position: 'relative',
+    position: "relative",
   },
   hasStoryBorder: {
     borderWidth: 2,
-    borderColor: '#FF3B30',
+    borderColor: "#FF3B30",
   },
   yourStoryBorder: {
     borderWidth: 0,
   },
   avatar: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     borderRadius: 30,
   },
   addButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 10,
     width: 20,
     height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: "#fff",
   },
   usernameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 4,
-    width: '100%',
+    width: "100%",
   },
   username: {
     fontSize: 12,
-    textAlign: 'center',
-    maxWidth: '85%',
+    textAlign: "center",
+    maxWidth: "85%",
   },
   verifiedBadge: {
     marginLeft: 2,

@@ -25,7 +25,7 @@ import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useVideoStore } from "@/store/video-store.ts";
 import { Video as VideoType } from "@/types/video.ts";
 import { LinearGradient } from "expo-linear-gradient";
-import { RefreshCw, Video } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import React, {
   useCallback,
@@ -243,7 +243,7 @@ export default function VideoFeed({
               animate={{ rotate: "360deg" }}
               transition={{ type: "timing", duration: 2000, loop: true }}
             >
-              <RefreshCw size={32} color="white" style={{ opacity: 0.9 }} />
+              <Ionicons name="refresh-circle-outline" size={32} color="white" style={{ opacity: 0.9 }} />
             </MotiView>
             <Text style={styles.loadingText}>Cargando videos...</Text>
           </LinearGradient>
@@ -300,7 +300,7 @@ export default function VideoFeed({
             end={{ x: 1, y: 0.8 }}
             style={styles.emptyBanner}
           >
-            <Video size={48} color="white" style={styles.emptyIcon} />
+            <Ionicons name="refresh-circle-outline" size={48} color="white" style={styles.emptyIcon} />
             <Text style={styles.emptyTitle}>
               {isExplore
                 ? "Exploración vacía"

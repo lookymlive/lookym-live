@@ -1,10 +1,10 @@
-import 'react-native-url-polyfill/auto';
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { initializeAuth } from "@/store/auth-store.ts";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import "react-native-url-polyfill/auto";
 
 export default function RootLayout() {
   const { isDark } = useColorScheme();

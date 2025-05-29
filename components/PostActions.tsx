@@ -1,4 +1,4 @@
-import { Bookmark, Heart, MessageCircle, Send } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -17,24 +17,24 @@ export default function PostActions({ saved: initialSaved }: PostActionsProps) {
           style={styles.actionButton}
           onPress={() => setLiked(!liked)}
         >
-          <Heart
+          <Ionicons
+            name={liked ? "heart" : "heart-outline"}
             size={24}
             color={liked ? "#E1306C" : "#000"}
-            fill={liked ? "#E1306C" : "transparent"}
           />
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <MessageCircle size={24} color="#000" />
+          <Ionicons name="chatbubbles-outline" size={24} color="#000" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Send size={24} color="#000" />
+          <Ionicons name="send-outline" size={24} color="#000" />
         </TouchableOpacity>
       </View>
       <TouchableOpacity onPress={() => setSaved(!saved)}>
-        <Bookmark
+        <Ionicons
+          name={saved ? "bookmark" : "bookmark-outline"}
           size={24}
           color="#000"
-          fill={saved ? "#000" : "transparent"}
         />
       </TouchableOpacity>
     </View>

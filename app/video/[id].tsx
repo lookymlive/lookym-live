@@ -1,7 +1,7 @@
-import { ActionBar } from "@/components/ActionBar";
-import { AppHeader } from "@/components/AppHeader";
-import { FullScreenStatusView } from "@/components/FullScreenStatusView";
-import { UserInfo } from "@/components/UserInfo";
+import { ActionBar } from "@/components/ActionBar.tsx";
+import { AppHeader } from "@/components/AppHeader.tsx";
+import { FullScreenStatusView } from "@/components/FullScreenStatusView.tsx";
+import { UserInfo } from "@/components/UserInfo.tsx";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useVideoStore } from "@/store/video-store.ts";
@@ -10,10 +10,10 @@ import type {
   Video as VideoType,
 } from "@/types/video.ts";
 import { formatLikes, formatTimeAgo } from "@/utils/time-format.ts";
+import { Ionicons } from "@expo/vector-icons";
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import { ArrowLeft, Send } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -136,7 +136,7 @@ export default function VideoDetailScreen() {
           onPress={() => router.back()}
           style={{ paddingHorizontal: 8 }}
         >
-          <ArrowLeft size={24} color={colors.text} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
       }
     />
@@ -195,7 +195,7 @@ export default function VideoDetailScreen() {
     <UserInfo
       avatarUrl={video.user?.avatar}
       name={video.user?.username || "Usuario"}
-      secondaryText={formatTimeAgo(new Date(video.createdAt).getTime())}
+      secondaryText={formatTimeAgo(video.timestamp)}
       onPress={() => video.user?.id && router.push(`/profile/${video.user.id}`)}
       avatarSize={40}
       showRole
@@ -207,7 +207,7 @@ export default function VideoDetailScreen() {
     <ActionBar
       actions={[
         {
-          iconName: "Heart",
+          iconName: "heart-outline",
           onPress: handleLike,
           count: video.likes,
           isActive: isLiked,
@@ -215,19 +215,19 @@ export default function VideoDetailScreen() {
           fillColor: colors.primary,
         },
         {
-          iconName: "BookmarkIcon",
+          iconName: "bookmark-outline",
           onPress: handleSave,
           isActive: isSaved,
           color: colors.text,
           fillColor: colors.primary,
         },
         {
-          iconName: "Share",
+          iconName: "share-outline",
           onPress: () => {},
           color: colors.text,
         },
         {
-          iconName: "Send",
+          iconName: "send-outline",
           onPress: () => {},
           color: colors.text,
         },
@@ -348,7 +348,7 @@ export default function VideoDetailScreen() {
           {submittingComment ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Send color="#fff" size={18} />
+            <Ionicons name="send" size={18} color="#fff" />
           )}
         </TouchableOpacity>
       </View>

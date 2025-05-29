@@ -1,17 +1,10 @@
 import { useVideoStore } from "@/store/video-store.ts";
 import { Video } from "@/types/video.ts";
 import { formatLikes, formatTimeAgo } from "@/utils/time-format.ts";
+import { Ionicons } from "@expo/vector-icons";
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import {
-  AlertTriangle,
-  Bookmark,
-  Heart,
-  MessageCircle,
-  Play,
-  Send,
-} from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -229,7 +222,7 @@ export default function VideoPost({
             contentFit="cover"
           />
           <View style={styles.errorOverlay}>
-            <AlertTriangle size={40} color="#fff" />
+            <Ionicons name="warning-outline" size={40} color="#fff" />
             <Text style={styles.errorText}>Error de reproducción</Text>
             <TouchableOpacity
               style={styles.retryButton}
@@ -320,7 +313,12 @@ export default function VideoPost({
                     />
                   </View>
                 ) : (
-                  <Play size={24} color="#fff" fill="#fff" />
+                  <Ionicons
+                    name="play-circle-outline"
+                    size={24}
+                    color="#fff"
+                    fill="#fff"
+                  />
                 )}
               </View>
             </TouchableOpacity>
@@ -331,21 +329,23 @@ export default function VideoPost({
       <View style={styles.actions}>
         <View style={styles.leftActions}>
           <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-            <Heart
+            <Ionicons
+              name={isLiked ? "heart" : "heart-outline"}
               size={26}
               color={isLiked ? colors.error : colors.text}
               fill={isLiked ? colors.error : "transparent"}
             />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={handleComment}>
-            <MessageCircle size={26} color={colors.text} />
+            <Ionicons name="chatbubble-outline" size={26} color={colors.text} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-            <Send size={26} color={colors.text} />
+            <Ionicons name="send-outline" size={26} color={colors.text} />
           </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={handleSave}>
-          <Bookmark
+          <Ionicons
+            name={isSaved ? "bookmark" : "bookmark-outline"}
             size={26}
             color={colors.text}
             fill={isSaved ? colors.text : "transparent"}

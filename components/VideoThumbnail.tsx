@@ -1,15 +1,8 @@
 import { useVideoStore } from "@/store/video-store.ts";
 import { Video } from "@/types/video.ts";
 import { formatTimeAgo } from "@/utils/time-format.ts";
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import {
-  AlertTriangle,
-  Bookmark,
-  Heart,
-  MessageCircle,
-  MoreHorizontal,
-  Send,
-} from "lucide-react-native";
 import React, { useState } from "react";
 import {
   Platform,
@@ -21,11 +14,12 @@ import {
 
 interface VideoThumbnailProps {
   video: Video;
+  height?: number;
 }
 
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 
-export default function VideoThumbnail({ video }: VideoThumbnailProps) {
+export default function VideoThumbnail({ video, height }: VideoThumbnailProps) {
   const [showPlayer, setShowPlayer] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [errorRetryCount, setErrorRetryCount] = useState(0);
@@ -140,7 +134,7 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
               contentFit="cover"
             />
             <View style={styles.errorOverlay}>
-              <AlertTriangle size={30} color="#fff" />
+              <Ionicons name="warning-outline" size={30} color="#fff" />
               <Text style={styles.errorText}>Error de reproducción</Text>
               <TouchableOpacity
                 style={styles.retryButton}
@@ -185,7 +179,7 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, height ? { height } : null]}>
       <View style={styles.header}>
         <View style={styles.userInfo}>
           <Image
@@ -201,7 +195,7 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
           </View>
         </View>
         <TouchableOpacity>
-          <MoreHorizontal size={24} color="#000" />
+          <Ionicons name="ellipsis-horizontal" size={24} color="#000" />
         </TouchableOpacity>
       </View>
 
@@ -209,29 +203,29 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
 
       <View style={styles.actions}>
         <TouchableOpacity style={styles.action} onPress={handleLike}>
-          <Heart
+          <Ionicons
+            name={isLiked ? "heart" : "heart-outline"}
             size={24}
             color={isLiked ? "#F91880" : "#000"}
-            fill={isLiked ? "#F91880" : "none"}
           />
           <Text style={styles.actionText}>{video.likes}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.action}>
-          <MessageCircle size={24} color="#000" />
+          <Ionicons name="chatbubble-outline" size={24} color="#000" />
           <Text style={styles.actionText}>{video.comments?.length || 0}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.action} onPress={handleSave}>
-          <Bookmark
+          <Ionicons
+            name={isSaved ? "bookmark" : "bookmark-outline"}
             size={24}
             color={isSaved ? "#FFCC00" : "#000"}
-            fill={isSaved ? "#FFCC00" : "none"}
           />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.action}>
-          <Send size={24} color="#000" />
+          <Ionicons name="send-outline" size={24} color="#000" />
         </TouchableOpacity>
       </View>
 
@@ -249,6 +243,7 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
 const styles = StyleSheet.create({
   container: {
     marginVertical: 16,
+    width: "100%",
   },
   header: {
     flexDirection: "row",

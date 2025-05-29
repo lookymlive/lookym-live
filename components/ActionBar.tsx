@@ -1,9 +1,9 @@
-import * as LucideIcons from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 
 export interface ActionBarAction {
-  iconName: keyof typeof LucideIcons;
+  iconName: string;
   onPress: () => void;
   text?: string;
   color?: string;
@@ -30,7 +30,17 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   return (
     <View style={[styles.row, containerStyle]}>
       {actions.map((action, idx) => {
-        const Icon = LucideIcons[action.iconName] || LucideIcons["Circle"];
+        const ionicIconName =
+          action.isActive && action.iconName.endsWith("-outline")
+            ? action.iconName.replace("-outline", "")
+            : action.isActive &&
+              !action.iconName.endsWith("-outline") &&
+              !action.iconName.endsWith("-sharp")
+            ? action.iconName
+            : action.iconName.endsWith("-outline")
+            ? action.iconName
+            : action.iconName + "-outline";
+
         return (
           <Pressable
             key={action.iconName + idx}
@@ -42,14 +52,10 @@ export const ActionBar: React.FC<ActionBarProps> = ({
             }}
           >
             {layout !== "textOnly" && (
-              <Icon
+              <Ionicons
+                name={ionicIconName as any}
                 size={iconSize}
-                color={
-                  action.isActive
-                    ? action.fillColor || "#6366F1"
-                    : action.color || "#18181B"
-                }
-                fill={action.isActive ? action.fillColor || "#6366F1" : "none"}
+                color={action.color || "#18181B"}
               />
             )}
             {layout !== "iconOnly" &&

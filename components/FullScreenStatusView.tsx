@@ -1,4 +1,4 @@
-import * as LucideIcons from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
   ActivityIndicator,
@@ -10,6 +10,15 @@ import {
 } from "react-native";
 
 export type StatusType = "loading" | "empty" | "error" | "loginRequired";
+
+// Mapeo de nombres de iconos de lucide-react-native a Ionicons
+const iconMap: Record<string, string> = {
+  Info: "information-circle-outline",
+  AlertTriangle: "warning-outline",
+  User: "person-outline",
+  Bell: "notifications-outline",
+  Search: "search-outline",
+};
 
 export interface FullScreenStatusViewProps {
   status: StatusType;
@@ -32,17 +41,35 @@ export const FullScreenStatusView: React.FC<FullScreenStatusViewProps> = ({
   if (status === "loading") {
     content = <ActivityIndicator size="large" color="#6366F1" />;
   } else if (status === "empty") {
-    const Icon =
-      (LucideIcons[emptyIconName] as React.ElementType) || LucideIcons.Info;
-    content = Icon ? (
-      <Icon size={48} color="#94A3B8" style={{ marginBottom: 12 }} />
-    ) : null;
+    const iconName = iconMap[emptyIconName] || iconMap.Info;
+    content = (
+      <Ionicons
+        name={iconName as any}
+        size={48}
+        color="#94A3B8"
+        style={{ marginBottom: 12 }}
+      />
+    );
   } else if (status === "error") {
-    const Icon = LucideIcons["AlertTriangle"];
-    content = <Icon size={48} color="#F59E42" style={{ marginBottom: 12 }} />;
+    const iconName = iconMap.AlertTriangle;
+    content = (
+      <Ionicons
+        name={iconName as any}
+        size={48}
+        color="#F59E42"
+        style={{ marginBottom: 12 }}
+      />
+    );
   } else if (status === "loginRequired") {
-    const Icon = LucideIcons["User"];
-    content = <Icon size={48} color="#6366F1" style={{ marginBottom: 12 }} />;
+    const iconName = iconMap.User;
+    content = (
+      <Ionicons
+        name={iconName as any}
+        size={48}
+        color="#6366F1"
+        style={{ marginBottom: 12 }}
+      />
+    );
   }
   return (
     <View style={[styles.center, style]}>

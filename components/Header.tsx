@@ -1,7 +1,7 @@
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Bell, MessageCircle } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { MotiView } from "moti";
 import React, { useMemo, useState } from "react";
 import {
@@ -132,7 +132,8 @@ export default function Header({
             onPressOut={() => setMessagePressed(false)}
             activeOpacity={0.7}
           >
-            <MessageCircle
+            <Ionicons
+              name="chatbubbles-outline"
               size={22}
               color={colors.primary}
               style={messagePressed ? { opacity: 0.9 } : { opacity: 1 }}
@@ -159,7 +160,8 @@ export default function Header({
             onPressOut={() => setNotificationPressed(false)}
             activeOpacity={0.7}
           >
-            <Bell
+            <Ionicons
+              name="notifications-outline"
               size={22}
               color={colors.primary}
               style={notificationPressed ? { opacity: 0.9 } : { opacity: 1 }}
