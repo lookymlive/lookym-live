@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Heart, Home, PlusSquare, Search, User } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "../../hooks/useColorScheme.ts";
 
 export default function TabLayout() {
@@ -31,7 +31,7 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-            <Home size={size} color={color} />
+            <Ionicons name="home" size={size} color={color} />
           ),
         }}
       />
@@ -40,7 +40,7 @@ export default function TabLayout() {
         options={{
           title: "Search",
           tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-            <Search size={size} color={color} />
+            <Ionicons name="search" size={size} color={color} />
           ),
         }}
       />
@@ -49,7 +49,7 @@ export default function TabLayout() {
         options={{
           title: "Upload",
           tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-            <PlusSquare size={size} color={color} />
+            <Ionicons name="add-circle-outline" size={size} color={color} />
           ),
         }}
       />
@@ -58,7 +58,7 @@ export default function TabLayout() {
         options={{
           title: "Activity",
           tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-            <Heart size={size} color={color} />
+            <Ionicons name="heart" size={size} color={color} />
           ),
         }}
       />
@@ -67,7 +67,7 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-            <User size={size} color={color} />
+            <Ionicons name="person" size={size} color={color} />
           ),
         }}
       />
