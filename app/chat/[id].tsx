@@ -2,11 +2,9 @@ import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useChatStore } from "@/store/chat-store.ts";
 import { supabase } from "@/utils/supabase.ts";
-import { formatMessageTimestamp } from "@/utils/time-format.ts";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -21,38 +19,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-// Define Message type again for clarity in this file, or import from types/index.ts
-interface Message {
-  id: string;
-  chat_id: string;
-  user_id: string;
-  content: string;
-  created_at: string;
-  users?: {
-    // Joined user data
-    id: string;
-    username: string;
-    avatar_url: string | null;
-  };
-}
-
-interface ChatParticipant {
-  user_id: string;
-  chat_id: string;
-  users: {
-    // Joined user data
-    id: string;
-    username: string;
-    avatar_url: string | null;
-  };
-}
-
-interface Chat {
-  id: string;
-  created_at: string;
-  participants?: ChatParticipant[];
-}
+import { Message } from "../../types/chat";
+import { User } from "../../types/user";
+import { formatTimeAgo } from "../../utils/time-format";
 
 export default function ChatDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -73,6 +42,11 @@ export default function ChatDetailScreen() {
 
   const chatId = Array.isArray(id) ? id[0] : id;
   const chat = chats.find((c) => c.id === chatId);
+
+  // Obtener el otro usuario (no el actual) de los participantes
+  const otherUser: User | undefined = chat?.participants.find(
+    (u) => u.id !== currentUser?.id
+  );
 
   useEffect(() => {
     if (!chatId) return;
@@ -119,9 +93,7 @@ export default function ChatDetailScreen() {
                 } else if (data) {
                   useChatStore.setState((state) => ({
                     messages: [...state.messages, data as Message].sort(
-                      (a, b) =>
-                        new Date(a.created_at).getTime() -
-                        new Date(b.created_at).getTime()
+                      (a, b) => a.timestamp - b.timestamp
                     ),
                   }));
                   // Mark the newly added message as read immediately if it's not from the current user
@@ -148,6 +120,7 @@ export default function ChatDetailScreen() {
     };
   }, [chatId, currentUser, setActiveChat, fetchMessages, markMessagesAsRead]);
 
+  // Enviar mensaje optimista
   const handleSendMessage = async () => {
     if (!chatId) {
       console.error("[Chat] chatId is undefined, cannot send message");
@@ -161,40 +134,19 @@ export default function ChatDetailScreen() {
       console.warn("[Chat] Message content is empty, not sending");
       return;
     }
-
-    // Optimistically add the message to the UI before the API call completes
     const optimisticMessage: Message = {
       id: Math.random().toString(),
-      chat_id: chatId,
-      user_id: currentUser.id,
-      content: newMessageText.trim(),
-      created_at: new Date().toISOString(),
-      users: {
-        id: currentUser.id,
-        username: currentUser.username,
-        avatar_url: currentUser.avatar || null,
-      },
+      senderId: currentUser.id,
+      text: newMessageText.trim(),
+      timestamp: Date.now(),
+      read: false,
     };
-
     useChatStore.setState((state) => ({
       messages: [...state.messages, optimisticMessage],
     }));
     setNewMessageText("");
-
-    // Log data before sending
-    console.log("[Chat] Sending message:", {
-      chatId,
-      userId: currentUser.id,
-      content: optimisticMessage.content,
-    });
-
-    await sendMessage(chatId, optimisticMessage.content);
+    await sendMessage(chatId, optimisticMessage.text);
   };
-
-  // Find the other user for the chat header
-  const otherUser = chat?.participants?.find(
-    (p) => p.users.id !== currentUser?.id
-  )?.users;
 
   if (isLoading && messages.length === 0) {
     return (
@@ -225,7 +177,7 @@ export default function ChatDetailScreen() {
             title: "Chat",
             headerLeft: () => (
               <TouchableOpacity onPress={() => router.back()}>
-                <ArrowLeft size={24} color={colors.text} />
+                <Ionicons name="arrow-back" size={24} color={colors.text} />
               </TouchableOpacity>
             ),
           }}
@@ -255,12 +207,11 @@ export default function ChatDetailScreen() {
               onPress={() => router.back()}
               style={styles.backButton}
             >
-              <ArrowLeft size={24} color={colors.text} />
+              <Ionicons name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
           ),
         }}
       />
-
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -283,8 +234,7 @@ export default function ChatDetailScreen() {
               flatListRef.current?.scrollToEnd({ animated: false })
             }
             renderItem={({ item }) => {
-              const isCurrentUser = item.user_id === currentUser?.id;
-
+              const isCurrentUser = item.senderId === currentUser?.id;
               return (
                 <View
                   style={[
@@ -294,9 +244,9 @@ export default function ChatDetailScreen() {
                       : styles.otherUserMessage,
                   ]}
                 >
-                  {!isCurrentUser && otherUser?.avatar_url && (
+                  {!isCurrentUser && otherUser?.avatar && (
                     <Image
-                      source={{ uri: otherUser.avatar_url }}
+                      source={{ uri: otherUser.avatar }}
                       style={styles.messageAvatar}
                       contentFit="cover"
                     />
@@ -318,26 +268,23 @@ export default function ChatDetailScreen() {
                     <Text
                       style={[{ color: isCurrentUser ? "#fff" : colors.text }]}
                     >
-                      {item.users?.username ||
-                        otherUser?.username ||
-                        "Unknown User"}
+                      {isCurrentUser
+                        ? currentUser?.username
+                        : otherUser?.username || "Usuario"}
                     </Text>
                     <Text
                       style={[{ color: isCurrentUser ? "#fff" : colors.text }]}
                     >
-                      {item.content}
+                      {item.text}
                     </Text>
-                    {item.created_at && (
+                    {item.timestamp && (
                       <Text
                         style={[
-                          {
-                            color: isCurrentUser
-                              ? "rgba(255,255,255,0.7)"
-                              : "rgba(0,0,0,0.5)",
-                          },
+                          styles.messageTime,
+                          { color: isCurrentUser ? "#fff" : colors.text },
                         ]}
                       >
-                        {formatMessageTimestamp(item.created_at)}
+                        {formatTimeAgo(item.timestamp)}
                       </Text>
                     )}
                   </View>
@@ -346,39 +293,33 @@ export default function ChatDetailScreen() {
             }}
           />
         )}
-
-        <View
-          style={[
-            styles.inputContainer,
-            { backgroundColor: colors.card, borderTopColor: colors.border },
-          ]}
-        >
+        <View style={styles.inputContainer}>
           <TextInput
             style={[
               styles.input,
-              { backgroundColor: colors.background, color: colors.text },
+              { backgroundColor: colors.card, color: colors.text },
             ]}
             placeholder="Type a message..."
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={colors.text + "99"}
             value={newMessageText}
             onChangeText={setNewMessageText}
             multiline
-            editable={!isLoading}
+            maxLength={500}
           />
           <Pressable
-            style={[
+            style={({ pressed }) => [
               styles.sendButton,
-              {
-                backgroundColor: newMessageText.trim()
-                  ? colors.primary
-                  : "#cccccc",
-              },
-              isLoading && styles.sendButtonDisabled,
+              (pressed || newMessageText.trim() === "") &&
+                styles.sendButtonDisabled,
             ]}
             onPress={handleSendMessage}
-            disabled={isLoading || newMessageText.trim() === ""}
+            disabled={newMessageText.trim() === ""}
           >
-            <Ionicons name="send" size={24} color="#fff" />
+            <Ionicons
+              name="send"
+              size={22}
+              color={newMessageText.trim() === "" ? "#888" : colors.primary}
+            />
           </Pressable>
         </View>
       </KeyboardAvoidingView>
