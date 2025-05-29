@@ -1,10 +1,10 @@
-import { FullScreenStatusView } from "@/components/FullScreenStatusView";
+import { FullScreenStatusView } from "@/components/FullScreenStatusView.tsx";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useChatStore } from "@/store/chat-store.ts";
 import { supabase } from "@/utils/supabase.ts";
+import { Ionicons } from "@expo/vector-icons";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { ChevronLeft } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -124,7 +124,7 @@ export default function ResolveChatScreen() {
           headerStyle: { backgroundColor: colors.card },
           headerLeft: () => (
             <TouchableOpacity onPress={navigateBack} style={styles.backButton}>
-              <ChevronLeft size={24} color={colors.text} />
+              <Ionicons name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
           ),
         }}
