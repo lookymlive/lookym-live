@@ -1,10 +1,10 @@
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
 import { useVideoStore } from "@/store/video-store.ts";
+import { Ionicons } from "@expo/vector-icons";
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { Camera, Info, Plus, Tag, Upload, X } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   Alert,
@@ -149,7 +149,12 @@ export default function UploadScreen() {
         style={[styles.container, { backgroundColor: colors.background }]}
       >
         <View style={styles.notBusinessContainer}>
-          <Info size={60} color={colors.primary} style={styles.infoIcon} />
+          <Ionicons
+            name="information-circle-outline"
+            size={60}
+            color={colors.primary}
+            style={styles.infoIcon}
+          />
           <Text style={[styles.notBusinessTitle, { color: colors.text }]}>
             Business Account Required
           </Text>
@@ -230,7 +235,7 @@ export default function UploadScreen() {
                 ]}
                 onPress={() => setVideoUri(null)}
               >
-                <X size={20} color={colors.error} />
+                <Ionicons name="close-outline" size={20} color={colors.error} />
               </TouchableOpacity>
             </View>
           ) : (
@@ -242,7 +247,11 @@ export default function UploadScreen() {
                 ]}
                 onPress={pickVideo}
               >
-                <Plus size={32} color={colors.primary} />
+                <Ionicons
+                  name="add-circle-outline"
+                  size={32}
+                  color={colors.primary}
+                />
                 <Text style={[styles.uploadText, { color: colors.text }]}>
                   Select Video
                 </Text>
@@ -255,7 +264,11 @@ export default function UploadScreen() {
                 ]}
                 onPress={recordVideo}
               >
-                <Camera size={32} color={colors.primary} />
+                <Ionicons
+                  name="camera-outline"
+                  size={32}
+                  color={colors.primary}
+                />
                 <Text style={[styles.uploadText, { color: colors.text }]}>
                   Record Video
                 </Text>
@@ -285,7 +298,11 @@ export default function UploadScreen() {
 
           <View style={styles.labelRow}>
             <Text style={[styles.label, { color: colors.text }]}>Hashtags</Text>
-            <Tag size={16} color={colors.primary} />
+            <Ionicons
+              name="pricetag-outline"
+              size={16}
+              color={colors.primary}
+            />
           </View>
           <TextInput
             style={[
@@ -333,7 +350,12 @@ export default function UploadScreen() {
               onPress={handleUpload}
               disabled={!videoUri || !caption || isUploading}
             >
-              <Upload size={20} color="#fff" style={styles.submitIcon} />
+              <Ionicons
+                name="cloud-upload-outline"
+                size={20}
+                color="#fff"
+                style={styles.submitIcon}
+              />
               <Text style={styles.submitText}>Upload Video</Text>
             </TouchableOpacity>
           )}
