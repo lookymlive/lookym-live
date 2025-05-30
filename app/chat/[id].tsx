@@ -58,62 +58,62 @@ export default function ChatDetailScreen() {
       markMessagesAsRead(chatId);
     }
 
-    const subscription = supabase
-      .channel(`chat_messages_${chatId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `chat_id=eq.${chatId}`,
-        },
-        (payload) => {
-          console.log("New message received:", payload.new);
-          const newMessage = payload.new as Message;
-          // Check if the message is not already in the state (handle potential duplicates from initial fetch)
-          if (!messages.some((msg) => msg.id === newMessage.id)) {
-            // We need user data for the message. Supabase subscription payload only includes the inserted row.
-            // A common pattern is to fetch the full message data with user join after receiving the insert event.
-            // For simplicity here, we'll assume the payload might contain basic user_id and add a TODO.
-            // A more robust approach would be an RPC or a separate select query for the new message ID.
+    let subscription: any = null;
+    if (Platform.OS !== "web") {
+      subscription = supabase
+        .channel(`chat_messages_${chatId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "messages",
+            filter: `chat_id=eq.${chatId}`,
+          },
+          (payload) => {
+            console.log("New message received:", payload.new);
+            const newMessage = payload.new as Message;
+            // Check if the message is not already in the state (handle potential duplicates from initial fetch)
+            if (!messages.some((msg) => msg.id === newMessage.id)) {
+              // We need user data for the message. Supabase subscription payload only includes the inserted row.
+              // A common pattern is to fetch the full message data with user join after receiving the insert event.
+              // For simplicity here, we'll assume the payload might contain basic user_id and add a TODO.
+              // A more robust approach would be an RPC or a separate select query for the new message ID.
 
-            // OPTION 1: Basic append (user data might be missing)
-            // set(state => ({ messages: [...state.messages, newMessage] }));
+              // OPTION 1: Basic append (user data might be missing)
+              // set(state => ({ messages: [...state.messages, newMessage] }));
 
-            // OPTION 2: Fetch full message data (more reliable)
-            supabase
-              .from("messages")
-              .select("*, users(*)")
-              .eq("id", newMessage.id)
-              .single()
-              .then(({ data, error }) => {
-                if (error) {
-                  console.error("Error fetching new message details:", error);
-                } else if (data) {
-                  useChatStore.setState((state) => ({
-                    messages: [...state.messages, data as Message].sort(
-                      (a, b) => a.timestamp - b.timestamp
-                    ),
-                  }));
-                  // Mark the newly added message as read immediately if it's not from the current user
-                  if (data.user_id !== currentUser?.id) {
-                    markMessagesAsRead(chatId, [data.id]);
+              // OPTION 2: Fetch full message data (more reliable)
+              supabase
+                .from("messages")
+                .select("*, users(*)")
+                .eq("id", newMessage.id)
+                .single()
+                .then(({ data, error }) => {
+                  if (error) {
+                    console.error("Error fetching new message details:", error);
+                  } else if (data) {
+                    useChatStore.setState((state) => ({
+                      messages: [...state.messages, data as Message].sort(
+                        (a, b) => a.timestamp - b.timestamp
+                      ),
+                    }));
+                    // Mark the newly added message as read immediately if it's not from the current user
+                    if (data.user_id !== currentUser?.id) {
+                      markMessagesAsRead(chatId, [data.id]);
+                    }
                   }
-                }
-              });
+                });
+            }
           }
-        }
-      )
-      .subscribe();
-
-    // TODO: Implement mechanism to mark messages as read when user views them
-    // This is partially handled above on new message insert, but could be more robust
-    // if the user scrolls to view older unread messages.
+        )
+        .subscribe();
+    }
 
     return () => {
-      // Clean up subscription and active chat state
-      supabase.removeChannel(subscription);
+      if (Platform.OS !== "web" && subscription) {
+        supabase.removeChannel(subscription);
+      }
       setActiveChat(null);
       // Optionally clear messages when leaving a chat
       useChatStore.setState({ messages: [] });
