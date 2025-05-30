@@ -23,7 +23,7 @@ const iconMap: Record<string, string> = {
 export interface FullScreenStatusViewProps {
   status: StatusType;
   message?: string;
-  emptyIconName?: keyof typeof LucideIcons;
+  emptyIconName?: keyof typeof iconMap;
   onRetry?: () => void;
   onLogin?: () => void;
   style?: ViewStyle;
