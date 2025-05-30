@@ -6,6 +6,17 @@ import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "react-native-url-polyfill/auto";
 
+// Polyfills para dependencias de Node en web
+if (typeof window !== "undefined") {
+  // @ts-ignore
+  window.global = window;
+  // Polyfill vacío para 'net' y 'tls'
+  // @ts-ignore
+  window.net = {};
+  // @ts-ignore
+  window.tls = {};
+}
+
 export default function RootLayout() {
   const { isDark } = useColorScheme();
 
