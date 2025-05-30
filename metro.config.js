@@ -32,8 +32,11 @@ config.resolver.extraNodeModules = {
   dns: require.resolve("empty-module"), // Add dns polyfill
   dgram: require.resolve("empty-module"), // Add dgram polyfill
   child_process: require.resolve("empty-module"), // Add child_process polyfill
+  net: require.resolve("empty-module"), // Polyfill para net
+  tls: require.resolve("empty-module"), // Polyfill para tls
+  ws: require.resolve("empty-module"), // Polyfill para ws
 };
 
 // Ensure these packages are installed: empty-module, readable-stream, crypto-browserify, buffer, process, util, url, timers-browserify, tty-browserify, constants-browserify
 
-module.exports = config; 
+module.exports = config;
