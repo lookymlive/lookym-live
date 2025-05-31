@@ -8,21 +8,16 @@ import { Platform } from "react-native";
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Create a custom storage adapter for Supabase
-const ExpoSecureStoreAdapter = {
-  getItem: (key: string) => {
-    return SecureStore.getItemAsync(key);
-  },
-  setItem: (key: string, value: string) => {
-    return SecureStore.setItemAsync(key, value);
-  },
-  removeItem: (key: string) => {
-    return SecureStore.deleteItemAsync(key);
-  },
-};
-
 // Use different storage mechanisms based on platform
-const storage = Platform.OS === "web" ? AsyncStorage : ExpoSecureStoreAdapter;
+const storage =
+  Platform.OS === "web"
+    ? AsyncStorage
+    : {
+        getItem: (key: string) => SecureStore.getItemAsync(key),
+        setItem: (key: string, value: string) =>
+          SecureStore.setItemAsync(key, value),
+        removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+      };
 
 // Initialize the Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
