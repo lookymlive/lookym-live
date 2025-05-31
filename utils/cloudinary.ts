@@ -25,7 +25,15 @@ export const uploadVideo = async (
     if (typeof videoUri !== "string") {
       throw new Error("videoUri must be a string");
     }
-    let file: Blob | { uri: string; type: string; name: string };
+    // Validación extra para evitar errores en tests
+    if (
+      typeof videoUri !== "string" ||
+      !videoUri ||
+      typeof videoUri.startsWith !== "function"
+    ) {
+      throw new Error("videoUri inválido o no es string");
+    }
+    let file;
     if (videoUri.startsWith("file://") || videoUri.startsWith("content://")) {
       // Para plataformas nativas
       const fileType = videoUri.split(".").pop() || "mp4";
