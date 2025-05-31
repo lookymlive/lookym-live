@@ -6,7 +6,7 @@ module.exports = {
     "^react-native$": "<rootDir>/__mocks__/react-native.js",
   },
   transform: {
-    "^.+\\.(ts|tsx)$": "babel-jest",
+    "^.+\\.(ts|tsx|js|jsx)$": "babel-jest",
   },
   transformIgnorePatterns: [
     // Restaurar patrón más permisivo para Expo/React Native ESM (estado funcional anterior)
