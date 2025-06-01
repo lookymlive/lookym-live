@@ -21,7 +21,11 @@
       ]
     },
     "moduleSuffixes": [".ts", ".d.ts", ".tsx", ".js", ".jsx", ""],
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "types": [
+      "@types/node",
+      "@types/estree"
+    ]
   },
   "include": [
     "**/*.ts",
