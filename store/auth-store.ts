@@ -366,7 +366,7 @@ export const useAuthStore = create<AuthState>()(
             console.log(
               "[updateProfile] Uploading to Supabase avatars bucket..."
             );
-            let uploadResult: { id: string; path: string; fullPath: string };
+            let uploadResult: { path: string };
             try {
               uploadResult = await uploadFile(
                 "avatars", // Ensure this bucket name is correct
@@ -582,7 +582,14 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() =>
+        Platform.OS === "web"
+          ? typeof globalThis !== "undefined" &&
+            typeof (globalThis as any).window !== "undefined"
+            ? (globalThis as any).window.localStorage
+            : undefined
+          : AsyncStorage
+      ),
       partialize: (state) => ({
         // Only persist these fields
         currentUser: state.currentUser,
