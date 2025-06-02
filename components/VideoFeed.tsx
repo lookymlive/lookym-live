@@ -218,6 +218,14 @@ export default function VideoFeed({
     itemVisiblePercentThreshold: 50,
   };
 
+  // DEBUG: Log de videos y errores de Supabase
+  useEffect(() => {
+    console.log("[VideoFeed] videos:", videos);
+    if (error) {
+      console.error("[VideoFeed] error:", error);
+    }
+  }, [videos, error]);
+
   if (isLoading && videosToShow.length === 0) {
     return (
       <View
@@ -315,15 +323,15 @@ export default function VideoFeed({
               {isExplore
                 ? "Exploración vacía"
                 : userId
-                  ? "Sin videos"
-                  : "Sin contenido"}
+                ? "Sin videos"
+                : "Sin contenido"}
             </Text>
             <Text style={styles.emptyText}>
               {isExplore
                 ? "No hay videos disponibles para explorar ahora."
                 : userId
-                  ? "Este usuario aún no ha publicado videos."
-                  : "No hay videos disponibles. ¡Regresa pronto!"}
+                ? "Este usuario aún no ha publicado videos."
+                : "No hay videos disponibles. ¡Regresa pronto!"}
             </Text>
           </LinearGradient>
         </MotiView>
