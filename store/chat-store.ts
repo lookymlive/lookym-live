@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { Chat, Message } from "../types/chat.ts";
@@ -388,7 +389,32 @@ export const useChatStore = create<ChatState & ChatActions>()(
     }),
     {
       name: "chat-storage",
-      storage: createJSONStorage(() => AsyncStorage),
+      /**
+       * Persistencia multiplataforma segura para Zustand:
+       * - En web: usa localStorage solo si window existe (acceso seguro con globalThis)
+       * - En móvil: usa AsyncStorage
+       *
+       * Patrón recomendado para evitar errores de tipado y compatibilidad:
+       *
+       * storage: createJSONStorage(() =>
+       *   Platform.OS === "web"
+       *     ? typeof globalThis !== "undefined" && typeof (globalThis as any).window !== "undefined"
+       *       ? (globalThis as any).window.localStorage
+       *       : undefined
+       *     : AsyncStorage
+       * )
+       *
+       * - No declarar 'window' globalmente ni usar @ts-expect-error
+       * - Usar siempre este patrón en todos los stores Zustand
+       */
+      storage: createJSONStorage(() =>
+        Platform.OS === "web"
+          ? typeof globalThis !== "undefined" &&
+            typeof (globalThis as any).window !== "undefined"
+            ? (globalThis as any).window.localStorage
+            : undefined
+          : AsyncStorage
+      ),
     }
   )
 );
