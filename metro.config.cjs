@@ -35,6 +35,7 @@ config.resolver.extraNodeModules = {
   dns: require.resolve("empty-module"), // Add dns polyfill
   dgram: require.resolve("empty-module"), // Add dgram polyfill
   child_process: require.resolve("empty-module"), // Add child_process polyfill
+  idb: require.resolve("empty-module"),
 };
 
 module.exports = config;
