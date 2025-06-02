@@ -1,6 +1,7 @@
 import { posts as initialPosts } from "@/mocks/posts.ts";
 import { Post, Comment as PostComment } from "@/types/post.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -86,7 +87,14 @@ export const useFeedStore = create<FeedState>()(
     }),
     {
       name: "feed-storage",
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() =>
+        Platform.OS === "web"
+          ? typeof globalThis !== "undefined" &&
+            typeof (globalThis as any).window !== "undefined"
+            ? (globalThis as any).window.localStorage
+            : undefined
+          : AsyncStorage
+      ),
       partialize: (state) => ({
         likedPosts: state.likedPosts,
         savedPosts: state.savedPosts,
