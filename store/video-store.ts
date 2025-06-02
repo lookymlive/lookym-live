@@ -6,6 +6,7 @@ import {
 import { createVideoLikeNotification } from "@/utils/notifications.ts";
 import { supabase } from "@/utils/supabase.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -276,9 +277,11 @@ export const useVideoStore = create<VideoState>()(
             videoUri
           );
           // Subir video a Cloudinary
-          const uploadResult = await cloudinaryUpload(videoUri, options);
-          if (!uploadResult || !uploadResult.secure_url)
-            throw new Error("Error subiendo a Cloudinary");
+          const uploadResult = (await cloudinaryUpload(videoUri, options)) as {
+            secure_url?: string;
+          };
+          if (!uploadResult || typeof uploadResult.secure_url !== "string")
+            throw new Error("Error subiendo a Cloudinary: respuesta inválida");
           console.log(
             "[uploadVideo] Video subido a Cloudinary:",
             uploadResult.secure_url
@@ -585,7 +588,14 @@ export const useVideoStore = create<VideoState>()(
     }),
     {
       name: "video-store",
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() =>
+        Platform.OS === "web"
+          ? typeof globalThis !== "undefined" &&
+            typeof (globalThis as any).window !== "undefined"
+            ? (globalThis as any).window.localStorage
+            : undefined
+          : AsyncStorage
+      ),
       partialize: (state) => ({
         likedVideos: state.likedVideos,
         savedVideos: state.savedVideos,
