@@ -6,6 +6,13 @@ import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import {
+  Bookmark,
+  Heart,
+  MessageCircle,
+  Play,
+  Send,
+} from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -306,55 +313,58 @@ export default function VideoPost({
         >
           {renderVideoContent()}
 
-        {showControls && !videoError && (
-          <View style={styles.videoControls}>
+          {showControls && !videoError && (
+            <View style={styles.videoControls}>
+              <TouchableOpacity
+                style={styles.playButton}
+                onPress={handlePlayPause}
+              >
+                <View style={styles.playButtonInner}>
+                  {isPlaying ? (
+                    <View style={styles.pauseIcon}>
+                      <View
+                        style={[styles.pauseBar, { backgroundColor: "#fff" }]}
+                      />
+                      <View
+                        style={[styles.pauseBar, { backgroundColor: "#fff" }]}
+                      />
+                    </View>
+                  ) : (
+                    <Play size={24} color="#fff" fill="#fff" />
+                  )}
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+        </TouchableOpacity>
+
+        <View style={styles.actions}>
+          <View style={styles.leftActions}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
+              <Heart
+                size={26}
+                color={isLiked ? colors.error : colors.text}
+                fill={isLiked ? colors.error : "transparent"}
+              />
+            </TouchableOpacity>
             <TouchableOpacity
-              style={styles.playButton}
-              onPress={handlePlayPause}
+              style={styles.actionButton}
+              onPress={handleComment}
             >
-              <View style={styles.playButtonInner}>
-                {isPlaying ? (
-                  <View style={styles.pauseIcon}>
-                    <View
-                      style={[styles.pauseBar, { backgroundColor: "#fff" }]}
-                    />
-                    <View
-                      style={[styles.pauseBar, { backgroundColor: "#fff" }]}
-                    />
-                  </View>
-                ) : (
-                  <Play size={24} color="#fff" fill="#fff" />
-                )}
-              </View>
+              <MessageCircle size={26} color={colors.text} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
+              <Send size={26} color={colors.text} />
             </TouchableOpacity>
           </View>
-        )}
-      </TouchableOpacity>
-
-      <View style={styles.actions}>
-        <View style={styles.leftActions}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-            <Heart
+          <TouchableOpacity onPress={handleSave}>
+            <Bookmark
               size={26}
-              color={isLiked ? colors.error : colors.text}
-              fill={isLiked ? colors.error : "transparent"}
+              color={colors.text}
+              fill={isSaved ? colors.text : "transparent"}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={handleComment}>
-            <MessageCircle size={26} color={colors.text} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-            <Send size={26} color={colors.text} />
-          </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={handleSave}>
-          <Bookmark
-            size={26}
-            color={colors.text}
-            fill={isSaved ? colors.text : "transparent"}
-          />
-        </TouchableOpacity>
-      </View>
 
         <View style={styles.content}>
           <Text style={[styles.likes, { color: colors.text }]}>
