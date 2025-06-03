@@ -291,7 +291,8 @@ export const useVideoStore = create<VideoState>()(
           let thumbnailUrl = "";
           if (typeof getVideoThumbnailUrl === "function") {
             try {
-              thumbnailUrl = getVideoThumbnailUrl(uploadResult.secure_url);
+              // CORREGIDO: usar public_id, no secure_url
+              thumbnailUrl = getVideoThumbnailUrl(uploadResult.public_id);
             } catch (e) {
               console.warn("No se pudo obtener thumbnail automáticamente:", e);
             }
