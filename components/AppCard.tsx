@@ -16,23 +16,25 @@ export const AppCard: React.FC<AppCardProps> = ({
   children,
   style,
   onPress,
-  padding = 16,
+  padding = 18,
   margin,
-  marginBottom = 12,
+  marginBottom = 16,
   useThemeColor = "#fff",
-  elevation = 2,
+  elevation = 4,
 }) => {
   const cardStyle: ViewStyle = {
     backgroundColor: useThemeColor,
-    borderRadius: 12,
+    borderRadius: 18,
     padding,
     margin,
     marginBottom,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
+    shadowColor: "#6366F1",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.16,
+    shadowRadius: 16,
     elevation,
+    // Gradiente visual: se puede reemplazar por LinearGradient si se usa expo-linear-gradient
+    // background: 'linear-gradient(90deg, #6366F1 0%, #22D3EE 100%)',
   };
   const content = <View style={[cardStyle, style]}>{children}</View>;
   if (onPress) {
