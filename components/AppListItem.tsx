@@ -72,32 +72,43 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: "#F8FAFC",
-    marginBottom: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderRadius: 18,
+    backgroundColor: "#fff",
+    marginBottom: 10,
+    shadowColor: "#6366F1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 4,
+    // Gradiente visual: se puede reemplazar por LinearGradient si se usa expo-linear-gradient
+    // background: 'linear-gradient(90deg, #6366F1 0%, #22D3EE 100%)',
   },
   leading: {
-    marginRight: 12,
+    marginRight: 14,
   },
   textContainer: {
     flex: 1,
   },
   title: {
-    fontWeight: "600",
-    fontSize: 16,
+    fontWeight: "700",
+    fontSize: 17,
     color: "#18181B",
+    letterSpacing: 0.2,
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: 14,
     color: "#64748B",
+    fontWeight: "500",
   },
   trailing: {
-    marginLeft: 12,
+    marginLeft: 14,
   },
   unread: {
-    backgroundColor: "#E0E7FF",
+    backgroundColor: "#C7D2FE",
+    borderWidth: 1,
+    borderColor: "#6366F1",
   },
 });
 
