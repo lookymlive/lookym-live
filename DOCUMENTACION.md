@@ -241,3 +241,18 @@ Se ejecutaron los tests automáticos del proyecto con el comando `npm test`.
 - Documentar cualquier cambio relevante en `/docs/development-workflow.md` y en este archivo.
 
 ---
+
+## Lecciones aprendidas y buenas prácticas (2025-06-03)
+
+### Bug Cloudinary Thumbnails (junio 2025)
+- **Síntoma:** Las miniaturas de video en web daban error 400 (Bad Request) porque la URL generada para la miniatura era inválida (se pasaba la URL completa del video en vez del public_id).
+- **Causa:** Se usaba `getVideoThumbnailUrl(uploadResult.secure_url)` en vez de `getVideoThumbnailUrl(uploadResult.public_id)`.
+- **Solución:** Usar siempre el `public_id` devuelto por Cloudinary para construir URLs de miniatura. Ver función `uploadVideo` en `store/video-store.ts`.
+- **Referencia rápida:**
+  - `secure_url` = URL completa del video subido
+  - `public_id` = identificador Cloudinary (ej: `folder/filename`)
+  - Para thumbnails: `getVideoThumbnailUrl(public_id)`
+
+### Proceso de documentación para IA, DEV y UI/UX
+- Documentar cada bug relevante y su solución en `/docs/3TODO.txt` y en esta sección.
+- Mantener trazabilidad de cambios técnicos y decisiones en la documentación para facilitar onboarding y automatización futura.
