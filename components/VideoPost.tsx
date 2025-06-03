@@ -4,6 +4,7 @@ import { formatLikes, formatTimeAgo } from "@/utils/time-format.ts";
 import { Ionicons } from "@expo/vector-icons";
 import { Video as ExpoVideo, ResizeMode } from "expo-av";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -254,47 +255,56 @@ export default function VideoPost({
     console.log("video object:", video);
   }
   return (
-    <View style={[styles.container, { backgroundColor: colors.card }]}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.userInfo} onPress={handleUserProfile}>
-          <Image
-            source={{ uri: video.user.avatar }}
-            style={styles.avatar}
-            contentFit="cover"
-          />
-          <View>
-            <Text style={[styles.username, { color: colors.text }]}>
-              {video.user.username}
-            </Text>
-            {video.user.role === "business" && (
-              <Text style={[styles.businessTag, { color: colors.primary }]}>
-                Business
+    <LinearGradient
+      colors={[
+        isActive ? "#4f8cff" : "#22223b",
+        isActive ? "#a259f7" : "#4a4e69",
+      ]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.gradientBg}
+    >
+      <View style={[styles.container, isActive && styles.activeContainer]}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.userInfo} onPress={handleUserProfile}>
+            <Image
+              source={{ uri: video.user.avatar }}
+              style={styles.avatar}
+              contentFit="cover"
+            />
+            <View>
+              <Text style={[styles.username, { color: colors.text }]}>
+                {video.user.username}
               </Text>
-            )}
-          </View>
-        </TouchableOpacity>
-
-        {video.user.role === "business" && (
-          <TouchableOpacity
-            style={[
-              styles.chatButton,
-              { backgroundColor: colors.primaryLight },
-            ]}
-            onPress={handleChatWithBusiness}
-          >
-            <Text style={[styles.chatButtonText, { color: colors.primary }]}>
-              Chat
-            </Text>
+              {video.user.role === "business" && (
+                <Text style={[styles.businessTag, { color: colors.primary }]}>
+                  Business
+                </Text>
+              )}
+            </View>
           </TouchableOpacity>
-        )}
-      </View>
 
-      <TouchableOpacity
-        activeOpacity={1}
-        style={styles.videoContainer}
-        onPress={handleVideoPress}
-      >
-        {renderVideoContent()}
+          {video.user.role === "business" && (
+            <TouchableOpacity
+              style={[
+                styles.chatButton,
+                { backgroundColor: colors.primaryLight },
+              ]}
+              onPress={handleChatWithBusiness}
+            >
+              <Text style={[styles.chatButtonText, { color: colors.primary }]}>
+                Chat
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.videoContainer}
+          onPress={handleVideoPress}
+        >
+          {renderVideoContent()}
 
         {showControls && !videoError && (
           <View style={styles.videoControls}>
@@ -313,12 +323,7 @@ export default function VideoPost({
                     />
                   </View>
                 ) : (
-                  <Ionicons
-                    name="play-circle-outline"
-                    size={24}
-                    color="#fff"
-                    fill="#fff"
-                  />
+                  <Play size={24} color="#fff" fill="#fff" />
                 )}
               </View>
             </TouchableOpacity>
@@ -329,23 +334,21 @@ export default function VideoPost({
       <View style={styles.actions}>
         <View style={styles.leftActions}>
           <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-            <Ionicons
-              name={isLiked ? "heart" : "heart-outline"}
+            <Heart
               size={26}
               color={isLiked ? colors.error : colors.text}
               fill={isLiked ? colors.error : "transparent"}
             />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={handleComment}>
-            <Ionicons name="chatbubble-outline" size={26} color={colors.text} />
+            <MessageCircle size={26} color={colors.text} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-            <Ionicons name="send-outline" size={26} color={colors.text} />
+            <Send size={26} color={colors.text} />
           </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={handleSave}>
-          <Ionicons
-            name={isSaved ? "bookmark" : "bookmark-outline"}
+          <Bookmark
             size={26}
             color={colors.text}
             fill={isSaved ? colors.text : "transparent"}
@@ -353,50 +356,80 @@ export default function VideoPost({
         </TouchableOpacity>
       </View>
 
-      <View style={styles.content}>
-        <Text style={[styles.likes, { color: colors.text }]}>
-          {formatLikes(video.likes)} likes
-        </Text>
+        <View style={styles.content}>
+          <Text style={[styles.likes, { color: colors.text }]}>
+            {formatLikes(video.likes)} likes
+          </Text>
 
-        <View style={styles.captionContainer}>
-          <Text style={[styles.caption, { color: colors.text }]}>
-            <Text style={styles.username}>{video.user.username}</Text>{" "}
-            {video.caption}{" "}
-            {video.hashtags.map((tag) => (
+          <View style={styles.captionContainer}>
+            <Text style={[styles.caption, { color: colors.text }]}>
+              <Text style={styles.username}>{video.user.username}</Text>{" "}
+              {video.caption}{" "}
+              {video.hashtags.map((tag) => (
+                <Text
+                  key={tag}
+                  style={[styles.hashtag, { color: colors.primary }]}
+                >
+                  #{tag}{" "}
+                </Text>
+              ))}
+            </Text>
+          </View>
+
+          {video.comments.length > 0 && (
+            <TouchableOpacity onPress={handleComment}>
               <Text
-                key={tag}
-                style={[styles.hashtag, { color: colors.primary }]}
+                style={[styles.viewComments, { color: colors.textSecondary }]}
               >
-                #{tag}{" "}
+                View{" "}
+                {video.comments.length > 1
+                  ? `all ${video.comments.length} comments`
+                  : "comment"}
               </Text>
-            ))}
+            </TouchableOpacity>
+          )}
+
+          <Text style={[styles.timestamp, { color: colors.textSecondary }]}>
+            {formatTimeAgo(video.timestamp)} ago
           </Text>
         </View>
-
-        {video.comments.length > 0 && (
-          <TouchableOpacity onPress={handleComment}>
-            <Text
-              style={[styles.viewComments, { color: colors.textSecondary }]}
-            >
-              View{" "}
-              {video.comments.length > 1
-                ? `all ${video.comments.length} comments`
-                : "comment"}
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        <Text style={[styles.timestamp, { color: colors.textSecondary }]}>
-          {formatTimeAgo(video.timestamp)} ago
-        </Text>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradientBg: {
+    flex: 1,
+    borderRadius: 32,
+    margin: 0,
+    padding: 0,
+    minHeight: 520,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.22,
+    shadowRadius: 24,
+    elevation: 12,
+    // Fondo más vibrante
+    overflow: "hidden",
+  },
   container: {
-    marginBottom: 8,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 28,
+    padding: 8,
+    margin: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  activeContainer: {
+    borderWidth: 2,
+    borderColor: "#fff",
+    shadowColor: "#4f8cff",
+    shadowOpacity: 0.25,
+    elevation: 12,
   },
   header: {
     flexDirection: "row",
@@ -437,10 +470,15 @@ const styles = StyleSheet.create({
     aspectRatio: 9 / 16,
     position: "relative",
     backgroundColor: "#000",
+    borderRadius: 24,
+    overflow: "hidden",
+    marginBottom: 8,
+    marginTop: 0,
   },
   video: {
     width: "100%",
     height: "100%",
+    borderRadius: 24,
   },
   poster: {
     width: "100%",
