@@ -37,7 +37,16 @@ export const UserInfo: React.FC<UserInfoProps> = ({
   showRole,
   role,
 }) => {
-  const avatarStyles: ImageStyle = {
+  const avatarImageStyles: ImageStyle = {
+    width: avatarSize,
+    height: avatarSize,
+    borderRadius: avatarSize / 2,
+    backgroundColor: "#E5E7EB",
+    marginRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  };
+  const avatarViewStyles: ViewStyle = {
     width: avatarSize,
     height: avatarSize,
     borderRadius: avatarSize / 2,
@@ -54,9 +63,9 @@ export const UserInfo: React.FC<UserInfoProps> = ({
       disabled={!onPress}
     >
       {avatarUrl ? (
-        <Image source={{ uri: avatarUrl }} style={avatarStyles} />
+        <Image source={{ uri: avatarUrl }} style={avatarImageStyles} />
       ) : (
-        <View style={avatarStyles}>
+        <View style={avatarViewStyles}>
           <Text style={styles.avatarInitial}>
             {avatarInitial || name.charAt(0)}
           </Text>
@@ -88,26 +97,38 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    shadowColor: "#6366F1",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
   },
   name: {
-    fontWeight: "600",
-    fontSize: 16,
+    fontWeight: "700",
+    fontSize: 17,
     color: "#18181B",
+    letterSpacing: 0.2,
   },
   secondary: {
-    fontSize: 13,
+    fontSize: 14,
     color: "#6B7280",
+    fontWeight: "500",
   },
   avatarInitial: {
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 20,
     color: "#6366F1",
     textAlign: "center",
   },
   role: {
-    fontSize: 12,
+    fontSize: 13,
     color: "#22D3EE",
-    fontWeight: "500",
+    fontWeight: "700",
+    marginTop: 2,
   },
 });
 
