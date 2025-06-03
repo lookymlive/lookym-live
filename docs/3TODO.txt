@@ -35,6 +35,7 @@
 - [ ] Ensure proper error handling in authentication
 - [ ] Fix video playback issues on web
 - [ ] Address chat message ordering
+- [x] [2025-06-03] Corregido bug de miniaturas Cloudinary: se usaba uploadResult.secure_url en vez de uploadResult.public_id al llamar a getVideoThumbnailUrl, lo que generaba URLs inválidas y error 400. Ahora se usa correctamente el public_id devuelto por Cloudinary.
 
 ## Documentation
 - [ ] Update README with setup instructions
