@@ -2,6 +2,7 @@ import { useVideoStore } from "@/store/video-store.ts";
 import { Video } from "@/types/video.ts";
 import { formatTimeAgo } from "@/utils/time-format.ts";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   AlertTriangle,
   Bookmark,
@@ -185,124 +186,165 @@ export default function VideoThumbnail({ video }: VideoThumbnailProps) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.userInfo}>
-          <Image
-            source={{ uri: video.user.avatar }}
-            style={styles.avatar}
-            contentFit="cover"
-          />
-          <View>
-            <Text style={styles.username}>{video.user.username}</Text>
-            {video.user.verified && (
-              <Text style={styles.verified}>Verified</Text>
-            )}
+    <LinearGradient
+      colors={["#4f8cff", "#a259f7"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.gradientBg}
+    >
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.userInfo}>
+            <Image
+              source={{ uri: video.user.avatar }}
+              style={styles.avatar}
+              contentFit="cover"
+            />
+            <View>
+              <Text style={styles.username}>{video.user.username}</Text>
+              {video.user.verified && (
+                <Text style={styles.verified}>Verified</Text>
+              )}
+            </View>
           </View>
+          <TouchableOpacity>
+            <MoreHorizontal size={24} color="#fff" />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity>
-          <MoreHorizontal size={24} color="#000" />
-        </TouchableOpacity>
+
+        {renderVideoContent()}
+
+        <View style={styles.actions}>
+          <TouchableOpacity style={styles.action} onPress={handleLike}>
+            <Heart
+              size={28}
+              color={isLiked ? "#F91880" : "#4f8cff"}
+              fill={isLiked ? "#F91880" : "none"}
+            />
+            <Text style={styles.actionText}>{video.likes}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.action}>
+            <MessageCircle size={28} color="#4f8cff" />
+            <Text style={styles.actionText}>{video.comments?.length || 0}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.action} onPress={handleSave}>
+            <Bookmark
+              size={28}
+              color={isSaved ? "#FFCC00" : "#4f8cff"}
+              fill={isSaved ? "#FFCC00" : "none"}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.action}>
+            <Send size={28} color="#4f8cff" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.captionContainer}>
+          <Text style={styles.caption}>{video.caption}</Text>
+          <Text style={styles.hashtags}>
+            {video.hashtags?.map((tag) => `#${tag}`).join(" ")}
+          </Text>
+          <Text style={styles.timestamp}>{formatTimeAgo(video.timestamp)}</Text>
+        </View>
       </View>
-
-      {renderVideoContent()}
-
-      <View style={styles.actions}>
-        <TouchableOpacity style={styles.action} onPress={handleLike}>
-          <Heart
-            size={24}
-            color={isLiked ? "#F91880" : "#000"}
-            fill={isLiked ? "#F91880" : "none"}
-          />
-          <Text style={styles.actionText}>{video.likes}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.action}>
-          <MessageCircle size={24} color="#000" />
-          <Text style={styles.actionText}>{video.comments?.length || 0}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.action} onPress={handleSave}>
-          <Bookmark
-            size={24}
-            color={isSaved ? "#FFCC00" : "#000"}
-            fill={isSaved ? "#FFCC00" : "none"}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.action}>
-          <Send size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.captionContainer}>
-        <Text style={styles.caption}>{video.caption}</Text>
-        <Text style={styles.hashtags}>
-          {video.hashtags?.map((tag) => `#${tag}`).join(" ")}
-        </Text>
-        <Text style={styles.timestamp}>{formatTimeAgo(video.timestamp)}</Text>
-      </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradientBg: {
+    borderRadius: 28,
+    margin: 12,
+    padding: 0,
+    minHeight: 480,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    elevation: 8,
+  },
   container: {
-    marginVertical: 16,
+    backgroundColor: "rgba(255,255,255,0.10)",
+    borderRadius: 24,
+    padding: 16,
+    margin: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   userInfo: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 8,
   },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 12,
+    marginRight: 8,
+    borderWidth: 2,
+    borderColor: "#fff",
   },
   username: {
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 18,
+    color: "#fff",
   },
   verified: {
-    color: "#1D9BF0",
-    fontSize: 14,
+    fontSize: 12,
+    color: "#a259f7",
+    fontWeight: "bold",
   },
   actions: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 12,
-    paddingHorizontal: 8,
+    justifyContent: "space-around",
+    marginVertical: 16,
   },
   action: {
-    flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 10,
+    marginHorizontal: 6,
+    shadowColor: "#4f8cff",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
   },
   actionText: {
-    marginLeft: 4,
-    fontWeight: "600",
+    fontSize: 16,
+    color: "#4f8cff",
+    fontWeight: "bold",
+    marginTop: 2,
   },
   captionContainer: {
-    paddingHorizontal: 4,
+    marginTop: 8,
   },
   caption: {
-    fontSize: 14,
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "600",
     marginBottom: 4,
   },
   hashtags: {
     fontSize: 14,
-    color: "#1D9BF0",
-    marginBottom: 4,
+    color: "#e0e0e0",
+    marginBottom: 2,
   },
   timestamp: {
     fontSize: 12,
-    color: "#71767B",
+    color: "#bdbdbd",
   },
   errorContainer: {
     position: "relative",
