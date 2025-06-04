@@ -6,21 +6,21 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
-  AlertTriangle,
-  Bookmark,
-  Heart,
-  MessageCircle,
-  Play,
-  Send,
+    AlertTriangle,
+    Bookmark,
+    Heart,
+    MessageCircle,
+    Play,
+    Send,
 } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Alert,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    Platform,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useColorScheme } from "../hooks/useColorScheme.ts";
 
@@ -192,13 +192,6 @@ export default function VideoPost({
     }
   };
 
-  const handleDownloadPrevention = () => {
-    Alert.alert(
-      "Download Disabled",
-      "Downloading videos is not allowed in this app."
-    );
-  };
-
   // Renderizar componente de video o fallback de imagen según el estado
   const renderVideoContent = () => {
     if (Platform.OS === "web") {
@@ -211,10 +204,6 @@ export default function VideoPost({
           muted
           poster={video.thumbnailUrl}
           onError={(e) => handleVideoError(e)}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            handleDownloadPrevention();
-          }}
         >
           <source src={video.videoUrl} type={video.mimeType || "video/mp4"} />
           Your browser does not support the video tag.
