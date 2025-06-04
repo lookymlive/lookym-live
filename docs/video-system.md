@@ -1,10 +1,17 @@
-# LOOKYM - Video System
+# LOOKYM - Sistema de Video
 
-This document outlines the video system used in the LOOKYM application.
+Este documento describe el sistema de video utilizado en la aplicación LOOKYM.
 
-## Video Architecture
+## Arquitectura de Video
 
-LOOKYM uses a combination of Cloudinary for video storage and delivery, and Supabase for metadata storage and interactions.
+LOOKYM utiliza una combinación de Cloudinary para almacenamiento y entrega de videos, y Supabase para almacenamiento de metadatos e interacciones. El sistema ha sido optimizado para ofrecer una experiencia fluida y eficiente.
+
+### Características Principales
+
+- Reproducción optimizada con buffering inteligente
+- Compresión adaptativa según la conexión del usuario
+- Generación automática de miniaturas de alta calidad
+- Sistema de caché para mejorar el rendimiento
 
 ## Video Upload Flow
 
