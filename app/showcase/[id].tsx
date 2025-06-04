@@ -135,7 +135,7 @@ export default function ShowcaseDetailScreen() {
           style={styles.videoPlayer}
           player={player}
           nativeControls
-          contentFit={"contain"}
+          contentFit={"cover"}
         />
         {videoDimensions.width > 0 &&
           videoDimensions.height > 0 &&
