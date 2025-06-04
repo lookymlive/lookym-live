@@ -1,10 +1,18 @@
-# LOOKYM - Chat Implementation
+# LOOKYM - Implementación del Chat
 
-This document outlines the chat system used in the LOOKYM application.
+Este documento describe el sistema de chat utilizado en la aplicación LOOKYM.
 
-## Chat Architecture
+## Arquitectura del Chat
 
-LOOKYM uses Supabase for storing chat messages and Supabase Realtime for real-time message delivery.
+LOOKYM utiliza Supabase para el almacenamiento de mensajes y Supabase Realtime para la entrega de mensajes en tiempo real. El sistema ha sido optimizado para proporcionar una experiencia de chat fluida y eficiente.
+
+### Características Principales
+
+- Entrega instantánea de mensajes con Supabase Realtime
+- Sistema de notificaciones push para mensajes nuevos
+- Indicadores de estado de lectura y escritura
+- Soporte para mensajes multimedia
+- Historial de chat con paginación eficiente
 
 ## Chat Data Structure
 
