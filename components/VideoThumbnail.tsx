@@ -112,6 +112,7 @@ export default function VideoThumbnail({ video, height }: VideoThumbnailProps) {
         <video
           src={video.videoUrl}
           controls
+          controlsList="nodownload"
           autoPlay={false}
           playsInline
           muted={false}
@@ -163,9 +164,8 @@ export default function VideoThumbnail({ video, height }: VideoThumbnailProps) {
               aspectRatio: 9 / 16,
               backgroundColor: "#000",
             }}
-            useNativeControls
+            useNativeControls={false}
             resizeMode={ResizeMode.COVER}
-            shouldPlay
             onError={handleVideoError}
           />
         );
