@@ -1,9 +1,9 @@
 import GoogleSignInButton from "@/components/GoogleSignInButton.tsx";
 import { useColorScheme } from "@/hooks/useColorScheme.ts";
 import { useAuthStore } from "@/store/auth-store.ts";
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -97,8 +97,7 @@ export default function LoginScreen() {
                 { backgroundColor: colors.card, borderColor: colors.border },
               ]}
             >
-              <Ionicons
-                name="mail-outline"
+              <Mail
                 size={20}
                 color={colors.textSecondary}
                 style={styles.inputIcon}
@@ -122,8 +121,7 @@ export default function LoginScreen() {
                 { backgroundColor: colors.card, borderColor: colors.border },
               ]}
             >
-              <Ionicons
-                name="lock-closed-outline"
+              <Lock
                 size={20}
                 color={colors.textSecondary}
                 style={styles.inputIcon}
@@ -141,17 +139,9 @@ export default function LoginScreen() {
                 onPress={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <Ionicons
-                    name="eye-off-outline"
-                    size={20}
-                    color={colors.textSecondary}
-                  />
+                  <EyeOff size={20} color={colors.textSecondary} />
                 ) : (
-                  <Ionicons
-                    name="eye-outline"
-                    size={20}
-                    color={colors.textSecondary}
-                  />
+                  <Eye size={20} color={colors.textSecondary} />
                 )}
               </TouchableOpacity>
             </View>

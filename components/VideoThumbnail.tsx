@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import {
+  AlertTriangle,
   Bookmark,
   Heart,
   MessageCircle,
