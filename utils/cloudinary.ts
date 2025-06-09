@@ -22,8 +22,8 @@ export const uploadVideo = async (
   options: CloudinaryOptions & { onProgress?: (progress: number) => void } = {}
 ) => {
   try {
-    if (typeof videoUri !== "string") {
-      throw new Error("videoUri must be a string");
+    if (typeof videoUri !== "string" || videoUri.trim() === "") {
+      throw new Error("videoUri must be a non-empty string");
     }
     // Validación extra para evitar errores en tests
     if (
