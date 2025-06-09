@@ -43,11 +43,17 @@ export default function FollowButton({
       disabled={loading}
     >
       {loading ? (
-        <ActivityIndicator color="#fff" />
+        <ActivityIndicator color="#fff" testID="ActivityIndicator" />
       ) : (
-        <Text style={styles.text}>{isFollowing ? "Siguiendo" : "Seguir"}</Text>
+        <Text style={styles.text} testID="FollowButtonText">
+          {isFollowing ? "Siguiendo" : "Seguir"}
+        </Text>
       )}
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && (
+        <Text style={styles.error} testID="FollowButtonError">
+          {error}
+        </Text>
+      )}
     </Pressable>
   );
 }
