@@ -279,12 +279,13 @@ export const useVideoStore = create<VideoState>()(
           const uploadResult = await cloudinaryUpload(videoUri, options);
           if (!uploadResult || !uploadResult.secure_url)
             throw new Error("Error subiendo a Cloudinary");
+
           console.log(
             "[uploadVideo] Video subido a Cloudinary:",
             uploadResult.secure_url
           );
 
-          // Opcional: obtener thumbnail (si tienes lógica, si no, deja string vacío)
+          // Get thumbnail URL
           let thumbnailUrl = "";
           if (typeof getVideoThumbnailUrl === "function") {
             try {
@@ -421,8 +422,6 @@ export const useVideoStore = create<VideoState>()(
 
           if (error) throw error;
 
-          console.log("[fetchVideos] Raw data from Supabase:", data);
-
           // Format the videos for our app
           const formattedVideos: Video[] = data.map((video: any) => ({
             id: video.id,
@@ -453,8 +452,6 @@ export const useVideoStore = create<VideoState>()(
             })),
             timestamp: new Date(video.created_at).getTime(),
           }));
-
-          console.log("[fetchVideos] Formatted videos:", formattedVideos);
 
           // Update local state
           set((state) => ({
@@ -580,20 +577,17 @@ export const useVideoStore = create<VideoState>()(
         }
       },
 
-      setMainVideo: (video: Video | null) => {
-        set({ mainVideo: video });
-      },
+      setMainVideo: (video: Video | null) => set({ mainVideo: video }),
     }),
     {
-      name: "video-store",
+      name: "video-storage",
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({
-        likedVideos: state.likedVideos,
-        savedVideos: state.savedVideos,
-      }),
-      // Limpia videos del estado al rehidratar para evitar mostrar videos viejos
       onRehydrateStorage: (state) => {
-        if (state) state.videos = [];
+        return (state, error) => {
+          if (error) {
+            console.error("Error on rehydrate storage:", error);
+          }
+        };
       },
     }
   )
