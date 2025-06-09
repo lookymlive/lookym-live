@@ -1,4 +1,3 @@
-import { posts as initialPosts } from "@/mocks/posts.ts";
 import { Post, Comment as PostComment } from "@/types/post.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
@@ -19,7 +18,7 @@ interface FeedState {
 export const useFeedStore = create<FeedState>()(
   persist(
     (set) => ({
-      posts: initialPosts,
+      posts: [], // Inicialmente vacío, se debe poblar con datos reales desde Supabase
       likedPosts: {},
       savedPosts: {},
       likePost: (postId: string) =>
