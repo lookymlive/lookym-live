@@ -27,3 +27,29 @@ global.__reanimatedWorkletInit = () => {};
 jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock")
 );
+
+// Mock zustand/middleware's persist to use a simple in-memory storage for tests
+jest.mock("zustand/middleware", () => ({
+  ...jest.requireActual("zustand/middleware"),
+  // Directly mock the persist function
+  persist:
+    (config: (set: any, get: any, api: any) => any) =>
+    (set: any, get: any, api: any) => {
+      // console.log('Mocking persist middleware'); // For debugging
+      return config(set, get, api);
+    },
+  createJSONStorage: () => ({
+    getItem: jest.fn((name) => {
+      // console.log(`Mock getItem for ${name}`);
+      return Promise.resolve(null);
+    }),
+    setItem: jest.fn((name, value) => {
+      // console.log(`Mock setItem for ${name}: ${value}`);
+      return Promise.resolve();
+    }),
+    removeItem: jest.fn((name) => {
+      // console.log(`Mock removeItem for ${name}`);
+      return Promise.resolve();
+    }),
+  }),
+}));
