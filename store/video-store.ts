@@ -277,17 +277,24 @@ export const useVideoStore = create<VideoState>()(
             videoUri
           );
           // Subir video a Cloudinary
+<<<<<<< HEAD
           const uploadResult = (await cloudinaryUpload(videoUri, options)) as {
             secure_url?: string;
           };
           if (!uploadResult || typeof uploadResult.secure_url !== "string")
             throw new Error("Error subiendo a Cloudinary: respuesta inválida");
+=======
+          const uploadResult = await cloudinaryUpload(videoUri, options);
+          if (!uploadResult || !uploadResult.secure_url)
+            throw new Error("Error subiendo a Cloudinary");
+
+>>>>>>> 6ba9898 (refactor(video-store): improve uploadVideo error handling and simplify setMainVideo function)
           console.log(
             "[uploadVideo] Video subido a Cloudinary:",
             uploadResult.secure_url
           );
 
-          // Opcional: obtener thumbnail (si tienes lógica, si no, deja string vacío)
+          // Get thumbnail URL
           let thumbnailUrl = "";
           if (typeof getVideoThumbnailUrl === "function") {
             try {
@@ -424,8 +431,6 @@ export const useVideoStore = create<VideoState>()(
 
           if (error) throw error;
 
-          console.log("[fetchVideos] Raw data from Supabase:", data);
-
           // Format the videos for our app
           const formattedVideos: Video[] = data.map((video: any) => ({
             id: video.id,
@@ -456,8 +461,6 @@ export const useVideoStore = create<VideoState>()(
             })),
             timestamp: new Date(video.created_at).getTime(),
           }));
-
-          console.log("[fetchVideos] Formatted videos:", formattedVideos);
 
           // Update local state
           set((state) => ({
@@ -583,11 +586,10 @@ export const useVideoStore = create<VideoState>()(
         }
       },
 
-      setMainVideo: (video: Video | null) => {
-        set({ mainVideo: video });
-      },
+      setMainVideo: (video: Video | null) => set({ mainVideo: video }),
     }),
     {
+<<<<<<< HEAD
       name: "video-store",
       storage: createJSONStorage(() =>
         Platform.OS === "web"
@@ -602,8 +604,16 @@ export const useVideoStore = create<VideoState>()(
         savedVideos: state.savedVideos,
       }),
       // Limpia videos del estado al rehidratar para evitar mostrar videos viejos
+=======
+      name: "video-storage",
+      storage: createJSONStorage(() => AsyncStorage),
+>>>>>>> 6ba9898 (refactor(video-store): improve uploadVideo error handling and simplify setMainVideo function)
       onRehydrateStorage: (state) => {
-        if (state) state.videos = [];
+        return (state, error) => {
+          if (error) {
+            console.error("Error on rehydrate storage:", error);
+          }
+        };
       },
     }
   )
