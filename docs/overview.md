@@ -2,7 +2,57 @@
 
 > ℹ️ **Para IA y desarrolladores:** Sigue siempre la [guía de buenas prácticas Markdown](./guia-documentacion.md) para evitar errores de formato y mantener la documentación consistente.
 
-Sigue estos pasos para probar y validar las funciones principales de LOOKYM antes de avanzar con nuevas features:
+---
+
+## Checklist de validación real con comercios y usuarios (2025-06)
+
+1. **Verificar configuración de Supabase y Cloudinary**
+   - Revisar variables de entorno y credenciales.
+   - Probar subida y consulta de videos reales.
+
+2. **Validar flujo de negocio real**
+   - Crear cuenta de comercio, subir video real.
+   - Verificar que el video aparece en el feed y perfil.
+
+3. **Validar flujo de usuario real**
+   - Crear cuenta de usuario, navegar el feed, interactuar (like, comentario, guardar).
+   - Probar chat real con un comercio.
+
+4. **Recoger feedback**
+   - Documentar problemas, sugerencias y oportunidades detectadas por usuarios y comercios reales.
+   - Registrar hallazgos en `docs/progreso-y-roadmap.md` o `memory-bank/activeContext.md`.
+
+---
+
+## Script de onboarding y validación con comercios/usuarios reales (2025-06)
+
+> Utiliza este guion para validar la idea principal de LOOKYM con comercios y usuarios reales, usando datos reales y recogiendo feedback genuino.
+
+### Para comercios
+
+1. Crea una cuenta de negocio desde la app/web.
+2. Completa el perfil de tu comercio (nombre, avatar, descripción, categoría).
+3. Sube al menos un video real mostrando tu vidriera, local o productos.
+4. Verifica que el video aparece en el feed y en tu perfil de negocio.
+5. Prueba responder mensajes de usuarios reales desde el chat.
+6. Anota cualquier dificultad, sugerencia o mejora que detectes.
+
+### Para usuarios
+
+1. Crea una cuenta de usuario desde la app/web.
+2. Navega el feed de videos y explora diferentes comercios.
+3. Interactúa: dale like, comenta y guarda videos que te interesen.
+4. Usa la búsqueda para encontrar comercios, productos o hashtags.
+5. Inicia un chat real con un comercio y haz preguntas sobre productos o servicios.
+6. Anota cualquier dificultad, sugerencia o mejora que detectes.
+
+### Para el equipo (IA, DEV, UX/UI, Product Manager)
+
+- Recoge feedback cualitativo y cuantitativo de cada sesión.
+- Documenta hallazgos en `docs/progreso-y-roadmap.md` o `memory-bank/activeContext.md`.
+- Prioriza mejoras en base a la experiencia real de usuarios y comercios.
+
+---
 
 ## 1. Inicio y Autenticación
 
