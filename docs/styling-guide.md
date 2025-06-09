@@ -253,3 +253,49 @@ export const styles = StyleSheet.create({
 5. **Naming**: Use clear and consistent naming for style properties
 6. **Organization**: Group related styles together
 7. **Comments**: Add comments for complex style calculations or decisions
+
+## Guía de buenas prácticas para tests de componentes visuales (ejemplo: FollowButton)
+
+## Contexto
+
+Durante la modernización y refactorización del frontend LOOKYM, se detectaron y corrigieron problemas en los tests automatizados de componentes visuales clave, como FollowButton. Este proceso es fundamental para asegurar calidad, robustez y mantenibilidad en el desarrollo colaborativo IA + DEV + UX/UI.
+
+## Pasos seguidos y recomendaciones
+
+1. **Identificación de fallos en tests existentes**
+
+   - Los tests fallaban porque no encontraban los textos esperados ("Seguir", "Siguiendo") ni los elementos visuales (ActivityIndicator, error).
+   - Causa: los métodos de testing (`findByText`, `getByRole`) no siempre funcionan bien con mocks de React Native.
+
+2. **Mejoras en el componente**
+
+   - Se agregaron `testID` explícitos a los elementos clave (`Text`, `ActivityIndicator`, mensaje de error) en el componente `FollowButton`.
+
+   ```tsx
+   <Text style={styles.text} testID="FollowButtonText">...</Text>
+   <ActivityIndicator testID="ActivityIndicator" ... />
+   <Text style={styles.error} testID="FollowButtonError">...</Text>
+   ```
+
+3. **Ajuste de los tests**
+
+   - Se reemplazó el uso de `findByText`/`getByRole` por `getByTestId` y `getByLabelText` (`getByLabelText` busca por `accessibilityLabel`).
+   - Se simularon interacciones reales (ej: `fireEvent.press`) para testear estados como loading y error.
+   - Se aseguró que los tests validen los estados visuales y de feedback del usuario.
+
+4. **Validación**
+
+   - Se ejecutaron los tests tras cada cambio para asegurar que todos los casos pasen correctamente.
+   - Se documentó el proceso y los aprendizajes en este archivo para futuras iteraciones.
+
+## Recomendaciones para IA, DEV y UX/UI
+
+- Siempre agregar `testID` a los elementos visuales clave en componentes reutilizables.
+- Preferir `getByTestId` y `getByLabelText` en tests de React Native.
+- Simular interacciones reales en los tests para cubrir estados de carga y error.
+- Documentar cada ajuste relevante en los tests y en la guía de estilos para mantener coherencia y facilitar onboarding.
+- Validar visualmente los cambios en la app/web tras modificar componentes o estilos.
+
+---
+
+**Este patrón puede ser replicado para otros componentes visuales y sus tests, asegurando calidad y mantenibilidad en el desarrollo colaborativo.**
